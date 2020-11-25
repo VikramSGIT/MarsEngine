@@ -1,0 +1,6 @@
+[submodule "MarsEngine/src/Vender/imgui"]
+	path = MarsEngine/src/Vender/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "MarsEngine/src/Vender/stb"]
+	path = MarsEngine/src/Vender/stb
+	url = https://github.com/nothings/stb
