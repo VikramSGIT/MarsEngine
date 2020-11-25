@@ -1,7 +1,7 @@
 # MarsEngine
 This is a project for 3D engine named MarsEngine
 
-<img src="https://github.com/VikramSGIT/MarsEngine/tree/master/Branding/MarsEngine/MarsEngine.jpg">
+<img src="Branding/MarsEngine/MarsEngine.jpg">
 
 Download Build File: https://github.com/VikramSGIT/MarsEngine/releases
 
