@@ -25,8 +25,8 @@ public:
 };
 
 static std::unique_ptr<Logger> logger = std::make_unique<Logger>();
-#define ME_CORE_MSG(X)  logger->LogNormal(X)
+#define ME_CORE_MSG(X)  logger->LogNormal(X); logger->LogNormal(std::to_string(this))
 #define ME_CORE_INFO(X) logger->LogInfo(X)
-#define ME_CORE_WARNING(X) logger->LogWarning(X)
+#define ME_CORE_WARNING(X) logger->LogWarning(X); logger->LogNormal(std::to_string(*(int*)&logger))
 #define ME_CORE_ERROR(X) logger->LogError(X)
 #define ME_CORE_CRITICAL(X) logger->LogCritical(X)

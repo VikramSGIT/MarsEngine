@@ -1,49 +1,50 @@
 #pragma once
 
-#include "MarsHeader.h"
-
 #include <mutex>
 #include <chrono>
 #include <iostream>
+#include <ctime>
+#include <string>
+#include <fstream>
 #include <vector>
+#include <sstream>
 
-static std::unique_ptr<std::vector<const char*>> CallStack = std::make_unique<std::vector<const char*>>();
-static std::unique_ptr<std::vector<long long>> CallStackTimer = std::make_unique<std::vector<long long>>();
+#include "Vender\imgui\imgui.h"
 
-#define ME_PROFILE_TRACE_CALL()CallStack->push_back(__FUNCTION__)
-#define ME_PROFILE_PRINTSTACK()\
-for (auto it = CallStack->begin(); it != CallStack->end(); it++)\
-    ME_CORE_INFO(*it);
+class CallTracer
+{
+public:
+	CallTracer(const char* name);
+	~CallTracer();
+
+	void Start();
+	void End();
+private:
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTime;
+	const char* m_Name;
+};
 
 class InstrumentorTimer
 {
 public:
-	InstrumentorTimer()
-	{
-		Start();
-	}
+	InstrumentorTimer(double& out);
+	~InstrumentorTimer();
 
-	~InstrumentorTimer()
-	{
-
-		End();
-	}
-
-	void Start()
-	{
-		m_StartTime = std::chrono::high_resolution_clock::now();
-	}
-
-	void End()
-	{
-		auto endTime = std::chrono::high_resolution_clock::now();
-
-		auto start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTime).time_since_epoch().count();
-		auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch().count();
-
-		auto duration = end - start;
-		CallStackTimer->push_back(duration);
-	}
+	void Start();
+	void End();
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTime;
+	double& m_Out;
 };
+
+std::string PrintFooter();
+std::string PrintHeader();
+void WriteFile(const std::string& filepath);
+
+#ifdef ME_PROFILE_TRACE_CALLFUNC
+#define ME_PROFILE_TRACE_CALL()\
+CallTracer tracer##__LINE__(__FUNCTION__)
+#else
+#define ME_PROFILE_TRACE_CALL()
+#define ME_PROFILE_PRINT_CALLSTACK(X)
+#endif

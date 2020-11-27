@@ -12,7 +12,6 @@ Application::Application()
 
 bool Application::OnWindowClose()
 {
-
     ME_PROFILE_TRACE_CALL();
 
     m_Running = false;
@@ -21,6 +20,7 @@ bool Application::OnWindowClose()
 
 void Application::OnEvent(Event::Event& e)
 {
+
     Event::EventDispatcher dispatcher(e);
     dispatcher.Dispatch<Event::AppEvent::WindowClosedEvent>(std::bind(&Application::OnWindowClose, this));
 
@@ -89,12 +89,14 @@ void Application::Run()
     va->unBind();
     ib->unBind();
     shader.unBind();
-    
-    float x = 0.0;
+
+    double ms = 0.0;
+    window->SetVSync(true);
 
     /* Loop until the user closes the window */
     while (m_Running)
     {
+        InstrumentorTimer timer(ms);
         renderer.OnUpdate();
 //Always pass the uniforms after binding the shader
         shader.Bind();
@@ -103,6 +105,18 @@ void Application::Run()
 
         renderer.Draw(*va, *ib, shader);
 //Updating layers
+
+        imgui->SetDrawData([this, &ms]()
+            {
+                ImGui::Begin("Benchmark");
+                ImGui::Text("Game : ");
+                ImGui::SameLine();
+                ImGui::Text(std::to_string(ms).substr(0, 6).c_str());
+                ImGui::SameLine();
+                ImGui::Text("ms");
+                ImGui::End();
+            });
+
         for (auto it = m_LayerStack.begin(); it != m_LayerStack.end(); ++it)
             (*it)->OnUpdate();
 
@@ -121,9 +135,7 @@ void Application::Run()
         m_result = m_trans * m_proj;
 
         window->OnUpdate();
-
     }
 }
-    ME_PROFILE_PRINTSTACK();
     glfwTerminate();
 }

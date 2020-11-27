@@ -71,12 +71,8 @@ namespace Window
             ImGui::NewFrame();
             ImGuiIO& io = ImGui::GetIO();
 
-            if (m_Show)
-            {
-                ImGui::Begin("Hey!!", &m_Show);
-                ImGui::Text("Hi!");
-                ImGui::End();
-            }
+            draw();
+            
             ImGui::Render();
 
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -104,6 +100,11 @@ namespace Window
                 e.Handled |= e.IsInCategory(Event::EventCategoryFlag::EventCategoryMouse) & io.WantCaptureMouse;
                 e.Handled |= e.IsInCategory(Event::EventCategoryFlag::EventCategoryKeyboard) & io.WantCaptureKeyboard;
 		    }
+        }
+
+        void imguiLayer::SetDrawData(const std::function<void()>& func)
+        {
+            draw = func;
         }
     }
 }

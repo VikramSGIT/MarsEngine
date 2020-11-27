@@ -24,6 +24,7 @@ namespace Window
             float m_Time;
             bool m_BlockEvents = true;
             bool m_Show = true;
+            std::function<void()> draw;
 
         public:
             imguiLayer();
@@ -33,6 +34,7 @@ namespace Window
             void OnDetach() override;
             void OnUpdate() override;
             void OnEvent(Event::Event& e);
+            void SetDrawData(const std::function<void()>& func);
 
             void SetBlockEvents(bool block) { m_BlockEvents = !block;}
         };

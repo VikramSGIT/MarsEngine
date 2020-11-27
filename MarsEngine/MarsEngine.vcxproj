@@ -149,6 +149,7 @@
     <ClCompile Include="src\Core\EntryPoint.cpp" />
     <ClCompile Include="src\Core\Logger.cpp" />
     <ClCompile Include="src\Core\oglm.cpp" />
+    <ClCompile Include="src\RenderAPI\Camera.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLErrorhandle.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLIndexBuffer.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLRenderer.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLTexture.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLVertexArray.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLVertexBuffer.cpp" />
+    <ClCompile Include="src\Utils\Instrumentor.cpp" />
     <ClCompile Include="src\Window\Layers\BasicLayer.cpp" />
     <ClCompile Include="src\Window\Layers\ImGUI\imguiLayer.cpp" />
     <ClCompile Include="src\Window\Layers\LayerStack.cpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="src\GL\glxew.h" />
     <ClInclude Include="src\GL\wglew.h" />
     <ClInclude Include="src\MarsHeader.h" />
+    <ClInclude Include="src\RenderAPI\Camera.h" />
     <ClInclude Include="src\RenderAPI\OpenGL\OpenGLErrorhandle.h" />
     <ClInclude Include="src\RenderAPI\OpenGL\OpenGLIndexBuffer.h" />
     <ClInclude Include="src\RenderAPI\OpenGL\OpenGLRenderer.h" />
