@@ -29,7 +29,7 @@ namespace Event
                 }
             const double GetX() const {return m_MouseX;}
             const double GetY() const {return m_MouseY;}
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -59,9 +59,9 @@ namespace Event
                     genericdata = (void*)mouse;
                 }
             
-            const double GetOffsetX() const { ME_PROFILE_TRACE_CALL(); return m_OffsetX;}
-            const double GetOffsetY() const { ME_PROFILE_TRACE_CALL(); return m_OffsetY;}
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            const double GetOffsetX() const { return m_OffsetX; }
+            const double GetOffsetY() const { return m_OffsetY; }
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -99,7 +99,7 @@ namespace Event
 
                     genericdata = (void*)(new uint16_t(mousecode)); 
                 }
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -121,7 +121,7 @@ namespace Event
 
                 genericdata = (void*)(new uint16_t(mousecode)); 
             }
-            #ifdef ME_DEBUG_SHOW_EVENTSTR    
+            #ifdef ME_DEBUG_SHOW_EVENT  
             std::string ToString() const override
             {
                 std::stringstream ss;

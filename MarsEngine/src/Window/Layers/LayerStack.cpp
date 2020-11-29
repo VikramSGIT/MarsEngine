@@ -8,14 +8,14 @@ namespace Window
 
             ME_PROFILE_TRACE_CALL();
 
-            for (Layer* layer : m_layerstack)
+            for (Ref<Layer> layer : m_layerstack)
             {
                 layer->OnDetach();
-                delete layer;
+                layer.reset();
             }    
         }
 
-        void LayerStack::PushLayer(Layer* layer)
+        void LayerStack::PushLayer(Ref<Layer> layer)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -25,7 +25,7 @@ namespace Window
             m_totallayers++;
         }
 
-        void LayerStack::PushOverlay(Layer* overlay)
+        void LayerStack::PushOverlay(Ref<Layer> overlay)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -34,7 +34,7 @@ namespace Window
             overlay->OnAttach();
         }
 
-        void LayerStack::PopLayer(Layer* layer)
+        void LayerStack::PopLayer(Ref<Layer> layer)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -44,12 +44,11 @@ namespace Window
             {
                 layer->OnDetach();
                 m_layerstack.erase(it);
-                delete layer;
                 m_totallayers--;
             }
         }
 
-        void LayerStack::PopOverlay(Layer* overlay)
+        void LayerStack::PopOverlay(Ref<Layer> overlay)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -59,9 +58,11 @@ namespace Window
             {
                 overlay->OnDetach();
                 m_layerstack.erase(it);
-                delete overlay;
+                overlay.reset();
             }
         }
+
+        
 
     }
 }

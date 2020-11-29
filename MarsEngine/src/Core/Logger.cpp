@@ -1,4 +1,11 @@
 #include "Logger.h"
+
+std::shared_ptr<Logger> logger = std::make_shared<Logger>();
+std::shared_ptr<Logger> GetLogger()
+{
+    return logger;
+}
+
 void Logger::LogError(const std::string& err)
 {
     if(m_setlog)

@@ -24,9 +24,6 @@
     <ClCompile Include="src\Core\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\oglm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLErrorhandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,15 +63,15 @@
     <ClCompile Include="src\Utils\Instrumentor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Vender\OGLM\oglm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\oglm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GL\eglew.h">
@@ -168,6 +165,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderAPI\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vender\OGLM\oglm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

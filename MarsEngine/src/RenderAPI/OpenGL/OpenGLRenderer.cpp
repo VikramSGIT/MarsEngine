@@ -63,7 +63,7 @@ namespace Renderer
             GLLogCall(glClear(GL_COLOR_BUFFER_BIT));
         }
 
-        void OpenGLRendererAPI::Draw(const VertexArray& va, const IndexBuffer& ib, const OpenGLShader& shader) const
+        void OpenGLRendererAPI::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -82,12 +82,12 @@ namespace Renderer
             return true;
         }
 
-        Layer::BasicLayer* OpenGLRendererAPI::GetLayer()
+        Ref<Layer::BasicLayer> OpenGLRendererAPI::GetLayer()
         {
 
             ME_PROFILE_TRACE_CALL();
 
-            Layer::BasicLayer* layer = new Layer::BasicLayer();
+            Ref<Layer::BasicLayer> layer = CreateRef<Layer::BasicLayer>();
             layer -> SetOnUpdate(std::bind(&OpenGLRendererAPI::OnUpdate , this));
             layer -> SetOnEvent(std::bind(&OpenGLRendererAPI::OnEvent,this, std::placeholders::_1));
             return layer;
@@ -98,7 +98,7 @@ namespace Renderer
 
             ME_PROFILE_TRACE_CALL();
 
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             ME_CORE_INFO(e.ToString());
             #endif
         }

@@ -43,10 +43,10 @@ namespace Event
         virtual EventType GetEventType() const  = 0;
         virtual const char* GetName() const  = 0;
         virtual int GetCategoryFlags() const = 0;
-        #ifdef ME_DEBUG_SHOW_EVENTSTR
+        #ifdef ME_DEBUG_SHOW_EVENT
         virtual std::string ToString() const  {return GetName();}
         #endif
-        bool IsInCategory(EventCategoryFlag category) { ME_PROFILE_TRACE_CALL(); return GetCategoryFlags() & category; }
+        bool IsInCategory(EventCategoryFlag category) {return GetCategoryFlags() & category; }
 
 
         void* genericdata = nullptr;
@@ -108,9 +108,8 @@ namespace Event
         bool Dispatch(const F& func)
         {
             if(m_Event.GetEventType() == T::GetStaticType())
-            {
                 m_Event.Handled |= func(static_cast<T&>(m_Event));
-            }
+
             return true;
         }
         private:

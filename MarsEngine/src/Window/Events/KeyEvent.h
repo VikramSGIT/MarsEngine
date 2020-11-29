@@ -43,7 +43,7 @@ namespace Event
                 
                 uint16_t GetRepeatCount() const { return m_RepeatCount;}
 
-                #ifdef ME_DEBUG_SHOW_EVENTSTR
+                #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
                 {
                     std::stringstream ss;
@@ -66,7 +66,7 @@ namespace Event
                     genericdata = (void*)(new KeyCode(keycode));
                 }
             
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override 
             {
                 std::stringstream ss;
@@ -89,8 +89,8 @@ namespace Event
                     KeyCode key = keycode; 
                     genericdata = (void*)(new KeyCode(keycode));
                 }
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
-            std::string ToString()
+            #ifdef ME_DEBUG_SHOW_EVENT
+            std::string ToString() const override
             {
                 std::stringstream ss;
                 ss << "KeyTyped: "<< m_KeyCode;

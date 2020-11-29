@@ -9,8 +9,6 @@
 #include <vector>
 #include <sstream>
 
-#include "Vender\imgui\imgui.h"
-
 class CallTracer
 {
 public:

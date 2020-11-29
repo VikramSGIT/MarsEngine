@@ -1,9 +1,1 @@
-1)Logging System
-2)Batch Rendering
-3)Add a hearder file
-	-> #define ME_NONE 0
-	-> enum class ME_RENDER_API
-	   {
-		ME_RENDERER_NONE = 0,
-		ME_RENDERER_OPENGL,
-	   };
+1)Batch Rendering

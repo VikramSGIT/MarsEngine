@@ -20,6 +20,7 @@
 #include "Window/Layers/LayerStack.h"
 #include "Window/Layers/ImGUI/imguiLayer.h"
 #include "Window/Events/KeyboardCode.h"
+#include "RenderAPI\Camera.h"
 
 
 class Application
@@ -28,10 +29,6 @@ private:
     Window::Layer::LayerStack m_LayerStack;
     bool m_Running = true;
     std::unique_ptr<Window::Window> window = std::unique_ptr<Window::Window>(Window::Window::Create({"Mars-Engine", 500, 500}));
-    oglm::Matrix4 m_result, m_trans;
-    oglm::Matrix4 m_proj = oglm::genOrtho(0.0f, 300.0f, 0.0f, 300.0f, -1.0f, 1.0f);
-    oglm::vec3 trans;
-
 
 public:
     Application();

@@ -28,10 +28,10 @@ namespace Event
                     genericdata = (void*)window;
                 }
 
-            unsigned int GetWidth() const { ME_PROFILE_TRACE_CALL(); return m_Width;}
-            unsigned int GetHeight() const { ME_PROFILE_TRACE_CALL(); return m_Height;}
+            unsigned int GetWidth() const {return m_Width;}
+            unsigned int GetHeight() const {return m_Height;}
 
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -51,7 +51,7 @@ namespace Event
 
             EVENT_CLASS_TYPE(WindowClosed)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -68,7 +68,7 @@ namespace Event
 
             EVENT_CLASS_TYPE(AppTick)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -85,7 +85,7 @@ namespace Event
 
             EVENT_CLASS_TYPE(AppUpdate)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;
@@ -102,7 +102,7 @@ namespace Event
 
             EVENT_CLASS_TYPE(AppRender)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-            #ifdef ME_DEBUG_SHOW_EVENTSTR
+            #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
                 std::stringstream ss;

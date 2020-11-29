@@ -1,6 +1,6 @@
 #pragma once
 
-#define ME_PROFILE_TRACE_CALLFUNC
+#define ME_DEBUG_SHOW_EVENT
 
 #include "Utils\Intrumentor.h"
 

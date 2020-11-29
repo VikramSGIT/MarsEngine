@@ -6,7 +6,7 @@
 #include "OpenGLIndexBuffer.h"
 #include "OpenGLShader.h"
 #include "Window/Layers/BasicLayer.h"
-#include "Core/oglm.h"
+#include "Vender/OGLM/oglm.h"
 #include "RenderAPI/Renderer.h"
 #include "GL/glew.h"
 #include "OpenGLErrorhandle.h"
@@ -34,10 +34,10 @@ namespace Renderer
 
             bool SwitchAPI(const RenderAPItype api);
 
-            void SetClearColor(const oglm::vec4& color);
-            void Draw(const VertexArray& va, const IndexBuffer& ib, const OpenGLShader& shader) const;
+            void SetClearColor(const oglm::vec4& color) override;
+            void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const override;
 
-            Layer::BasicLayer* GetLayer();
+            Ref<Layer::BasicLayer> GetLayer() override;
         };
 
     }

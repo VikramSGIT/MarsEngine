@@ -1,5 +1,6 @@
 #pragma once
 #include "MarsHeader.h"
+#include "Shader.h"
 
 namespace Renderer
 {
@@ -19,7 +20,10 @@ namespace Renderer
 
         virtual void Init() = 0;
         virtual void OnUpdate() = 0;
-        
+        virtual void SetClearColor(const oglm::vec4& color) = 0;
+        virtual Ref<Layer::BasicLayer> GetLayer() = 0;
+        virtual void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const = 0;
+
         virtual bool SwitchAPI(const RenderAPItype api) = 0;
 
         virtual RenderAPItype GetAPI() { return m_renderapi; };
@@ -85,6 +89,19 @@ namespace Renderer
             {
                 ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
                     return nullptr;
+            }
+        }
+
+        Ref<Shader> Create(const std::string& filepath)
+        {
+            if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
+            {
+                return CreateRef<OpenGL::OpenGLShader>(filepath);
+            }
+            else
+            {
+                ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
+                return nullptr;
             }
         }
     };

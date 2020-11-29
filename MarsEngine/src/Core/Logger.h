@@ -24,9 +24,9 @@ public:
     void SetLogging(bool setlog) {m_setlog = setlog;}
 };
 
-static std::unique_ptr<Logger> logger = std::make_unique<Logger>();
-#define ME_CORE_MSG(X)  logger->LogNormal(X)
-#define ME_CORE_INFO(X) logger->LogInfo(X)
-#define ME_CORE_WARNING(X) logger->LogWarning(X)
-#define ME_CORE_ERROR(X) logger->LogError(X)
-#define ME_CORE_CRITICAL(X) logger->LogCritical(X)
+std::shared_ptr<Logger> GetLogger();
+#define ME_CORE_MSG(X) GetLogger()->LogNormal(X);
+#define ME_CORE_INFO(X) GetLogger()->LogInfo(X)
+#define ME_CORE_WARNING(X) GetLogger()->LogWarning(X)
+#define ME_CORE_ERROR(X) GetLogger()->LogError(X)
+#define ME_CORE_CRITICAL(X) GetLogger()->LogCritical(X)

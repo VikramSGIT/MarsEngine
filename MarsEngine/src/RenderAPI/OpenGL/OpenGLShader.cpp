@@ -5,14 +5,12 @@ namespace Renderer
     namespace OpenGL
     {
         OpenGLShader::OpenGLShader(const std::string& filepath)
-            :Filepath(filepath), m_RendererID(0)
+            :m_RendererID(0), m_Filepath(filepath)
         {
-
             ME_PROFILE_TRACE_CALL();
 
             ShaderSource src = PharseShader(filepath);
             m_RendererID = CreateShader(src.VertexShader, src.FragmentShader);
-
         }
 
         OpenGLShader::~OpenGLShader()
@@ -41,7 +39,7 @@ namespace Renderer
                 GLLogCall(glUniform1i(location, i1));
             }
             else
-                std::cout << "Cant pass the Uniforms!!" << std::endl;
+                ME_CORE_ERROR("Cant pass the Uniforms!!");
         }
 
         void OpenGLShader::SetUniformsMat4f(const std::string& name, const oglm::Matrix4& matrix)
