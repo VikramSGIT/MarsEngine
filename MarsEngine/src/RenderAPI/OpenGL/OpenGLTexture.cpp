@@ -8,7 +8,7 @@ namespace Renderer
     namespace OpenGL
     {
         OpenGLTexture::OpenGLTexture(const std::string filename)
-            :m_RendererID(0), m_FilePath(filename), m_LocalBuffer(nullptr)
+            :m_RendererID(0), m_FilePath(filename), m_LocalBuffer(nullptr), Slot(NULL)
         {
 
             ME_PROFILE_TRACE_CALL();

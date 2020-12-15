@@ -29,6 +29,8 @@ namespace Event
                 }
             const double GetX() const {return m_MouseX;}
             const double GetY() const {return m_MouseY;}
+            virtual void* GetGenericData() const override { return genericdata; }
+
             #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
@@ -61,6 +63,8 @@ namespace Event
             
             const double GetOffsetX() const { return m_OffsetX; }
             const double GetOffsetY() const { return m_OffsetY; }
+            virtual void* GetGenericData() const override { return genericdata; }
+
             #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
             {
@@ -84,6 +88,7 @@ namespace Event
         public:
 
             MouseCode GetMouseCode() const { return m_MouseCode; }
+            virtual void* GetGenericData() const override { return genericdata; }
 
             EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
         };

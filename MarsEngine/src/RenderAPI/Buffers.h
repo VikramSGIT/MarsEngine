@@ -12,8 +12,13 @@ namespace Renderer
         VertexBuffer() = default;
         virtual ~VertexBuffer() = default;
 
+        virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset)= 0;
+
         virtual void Bind() const = 0;
         virtual void unBind() const = 0;
+
+        virtual inline bool IsEmpty() const = 0;
+        virtual inline unsigned int GetFilledSize() const = 0;
     };
 
     class IndexBuffer
@@ -22,11 +27,17 @@ namespace Renderer
         IndexBuffer() = default;
         virtual ~IndexBuffer() = default;
 
+        virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
+
         virtual void Bind() const = 0;
         virtual void unBind() const = 0;
-    };
 
-    //OpenGL stuffs need to be hidden
+        virtual inline bool IsEmpty() const = 0;
+        virtual inline unsigned int GetFilledSize() const = 0;
+    };
+//
+// OpenGL stuffs need to be hidden
+//
     struct VertexBufferElement
     {
         unsigned int type;
@@ -62,7 +73,7 @@ namespace Renderer
         VertexArray() = default;
         virtual ~VertexArray() = default;
 
-        virtual void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout) = 0;
+        virtual void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout) = 0;
 
         virtual void Bind() const = 0;
         virtual void unBind() const = 0;

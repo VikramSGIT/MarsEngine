@@ -18,7 +18,7 @@ namespace Renderer
             OpenGLVertexArray();
             ~OpenGLVertexArray();
 
-            void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout) override;
+            void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout) override;
 
             void Bind() const override;
             void unBind() const override;

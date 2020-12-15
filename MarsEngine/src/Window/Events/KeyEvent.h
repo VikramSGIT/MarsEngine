@@ -15,6 +15,7 @@ namespace Event
         {
         public:
             KeyCode GetkeyCode() const {return m_KeyCode;}
+            virtual void* GetGenericData() const override { return genericdata; }
 
             EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
         protected:
@@ -31,15 +32,15 @@ namespace Event
             public:
                 KeyPressedEvent(const KeyCode keycode, const uint16_t repeatcount)
                     : KeyEvent(keycode), m_RepeatCount(repeatcount) 
-                    {
+                {
                         
-                        ME_PROFILE_TRACE_CALL();
+                    ME_PROFILE_TRACE_CALL();
 
-                        uint16_t* key = new uint16_t[2];
-                        *key = keycode;
-                        *(key + 1) = repeatcount;
-                        genericdata = (void*)(key);
-                    }
+                    uint16_t* key = new uint16_t[2];
+                    *key = keycode;
+                    *(key + 1) = repeatcount;
+                    genericdata = (void*)(key);
+                }
                 
                 uint16_t GetRepeatCount() const { return m_RepeatCount;}
 

@@ -148,7 +148,7 @@
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\EntryPoint.cpp" />
     <ClCompile Include="src\Core\Logger.cpp" />
-    <ClCompile Include="src\Vender\OGLM\oglm.cpp" />
+    <ClCompile Include="src\RenderAPI\Mesh.cpp" />
     <ClCompile Include="src\RenderAPI\Camera.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLErrorhandle.cpp" />
     <ClCompile Include="src\RenderAPI\OpenGL\OpenGLIndexBuffer.cpp" />
@@ -167,6 +167,7 @@
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\RenderAPI\Buffers.h" />
     <ClInclude Include="src\Core\Logger.h" />
+    <ClInclude Include="src\RenderAPI\Mesh.h" />
     <ClInclude Include="src\Vender\OGLM\oglm.h" />
     <ClInclude Include="src\GL\eglew.h" />
     <ClInclude Include="src\GL\glew.h" />

@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 namespace Renderer
 {
@@ -22,7 +23,12 @@ namespace Renderer
         class OpenGLRendererAPI : public RenderAPI 
         {
         private:
-            oglm::vec4 m_clearcolor;
+            bool Ready = false, LiveStreamData = true;
+            unsigned int indexoffset = 0;
+            oglm::vec4<float> m_clearcolor;
+            std::vector<MeshQueue> m_RenderQueue;
+            Scope<VertexBuffer> vertex = CreateScope<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
+            Scope<IndexBuffer> index = CreateScope<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
         public:
             OpenGLRendererAPI();
             ~OpenGLRendererAPI();
@@ -31,13 +37,15 @@ namespace Renderer
             void OnUpdate() override;
             void OnEvent(Event::Event& e);
             void Clear() const;
+            void AddRenderSubmition(const MeshQueue& meshqueue) override;
 
             bool SwitchAPI(const RenderAPItype api);
+            void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
+            void SetClearColor(const oglm::vec4<float>& color) override;
+            void Draw(const Shader& shader) override;
 
-            void SetClearColor(const oglm::vec4& color) override;
-            void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const override;
-
-            Ref<Layer::BasicLayer> GetLayer() override;
+            inline Ref<Layer::BasicLayer> GetLayer() override;
+            inline std::vector<MeshQueue> GetRenderQueue() override { return m_RenderQueue; }
         };
 
     }

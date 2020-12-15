@@ -1,4 +1,5 @@
 #include "WindowsWindow.h"
+#include "Vender\imgui\imgui.h"
 
 namespace Window
 {
@@ -88,10 +89,14 @@ namespace Window
                 {
                     case GLFW_PRESS:
                     {
-                        auto it = std::find(data.keystack->begin(), data.keystack->end(), key);
-                        if (it == data.keystack->end())
+                        ImGuiIO& io = ImGui::GetIO();
+                        if (!io.WantCaptureKeyboard)
                         {
-                            data.keystack->push_back(key);
+                            auto it = std::find(data.keystack->begin(), data.keystack->end(), key);
+                            if (it == data.keystack->end())
+                            {
+                                data.keystack->push_back(key);
+                            }
                         }
                         Event::KeyEvent::KeyPressedEvent event(key, 0);
                         keyrepeatcount = 0;
@@ -128,9 +133,13 @@ namespace Window
                 {
                     case GLFW_PRESS:
                     {
-                        auto it = std::find(data.keystack->begin(), data.keystack->end(), button);
-                        if (it == data.keystack->end())
-                            data.keystack->push_back(button);
+                        ImGuiIO& io = ImGui::GetIO();
+                        if (!io.WantCaptureKeyboard)
+                        {
+                            auto it = std::find(data.keystack->begin(), data.keystack->end(), button);
+                            if (it == data.keystack->end())
+                                data.keystack->push_back(button);
+                        }
                         Event::Mouse::MouseButtonPressedEvent event(button);
                         data.fn(event);
                         event.DeleteGenericData();

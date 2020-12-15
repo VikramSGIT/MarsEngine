@@ -5,11 +5,12 @@ namespace Renderer
     namespace OpenGL
     {
         OpenGLVertexArray::OpenGLVertexArray()
+            :m_RendererID(1)
         {
             
             ME_PROFILE_TRACE_CALL();
 
-            GLLogCall(glGenVertexArrays(1, &m_RendererID));
+            //GLLogCall(glGenVertexArrays(1, &m_RendererID));
         }
 
         OpenGLVertexArray::~OpenGLVertexArray()
@@ -17,17 +18,16 @@ namespace Renderer
 
             ME_PROFILE_TRACE_CALL();
 
-            GLLogCall(glDeleteVertexArrays(1, &m_RendererID));
+            //GLLogCall(glDeleteVertexArrays(1, &m_RendererID));
         }
 
-        void OpenGLVertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
+        void OpenGLVertexArray::AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout)
         {
 
             ME_PROFILE_TRACE_CALL();
 
             Bind();
-            vb.Bind();
-
+            vertexbuffer.Bind();
             const std::vector<VertexBufferElement>& elements = layout.GetElements();
             unsigned int offset = 0;
 
@@ -38,6 +38,7 @@ namespace Renderer
                 GLLogCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)(offset)));
                 offset += GetElementSize(element.type) * element.count;
             }
+            vertexbuffer.unBind();
         }
 
         void OpenGLVertexArray::Bind() const

@@ -1,6 +1,7 @@
 #pragma once
 #include "MarsHeader.h"
 #include "Shader.h"
+#include "Mesh.h"
 
 namespace Renderer
 {
@@ -20,15 +21,18 @@ namespace Renderer
 
         virtual void Init() = 0;
         virtual void OnUpdate() = 0;
-        virtual void SetClearColor(const oglm::vec4& color) = 0;
+        virtual void SetClearColor(const oglm::vec4<float>& color) = 0;
+        virtual void AddRenderSubmition(const MeshQueue& meshqueue) = 0;
         virtual Ref<Layer::BasicLayer> GetLayer() = 0;
-        virtual void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const = 0;
+        virtual void Draw(const Shader& shader) = 0;
 
         virtual bool SwitchAPI(const RenderAPItype api) = 0;
+        virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) = 0;
 
-        virtual RenderAPItype GetAPI() { return m_renderapi; };
+        inline RenderAPItype GetAPI() { return m_renderapi; };
+        virtual inline std::vector<MeshQueue> GetRenderQueue() = 0;
 
-        Ref<VertexBuffer> Create(const void* data, const unsigned int size, const unsigned int mode)
+        /*Ref<VertexBuffer> Create(const void* data, const unsigned int size, const unsigned int mode)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -90,7 +94,7 @@ namespace Renderer
                 ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
                     return nullptr;
             }
-        }
+        }*/
 
         Ref<Shader> Create(const std::string& filepath)
         {
@@ -105,4 +109,5 @@ namespace Renderer
             }
         }
     };
+
 }

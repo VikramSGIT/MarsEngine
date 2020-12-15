@@ -43,14 +43,15 @@ namespace Event
         virtual EventType GetEventType() const  = 0;
         virtual const char* GetName() const  = 0;
         virtual int GetCategoryFlags() const = 0;
+        virtual void* GetGenericData() const = 0;
+
         #ifdef ME_DEBUG_SHOW_EVENT
         virtual std::string ToString() const  {return GetName();}
         #endif
+
         bool IsInCategory(EventCategoryFlag category) {return GetCategoryFlags() & category; }
 
-
         void* genericdata = nullptr;
-        
         void DeleteGenericData()
         {
 

@@ -42,7 +42,7 @@ namespace Renderer
                 ME_CORE_ERROR("Cant pass the Uniforms!!");
         }
 
-        void OpenGLShader::SetUniformsMat4f(const std::string& name, const oglm::Matrix4& matrix)
+        void OpenGLShader::SetUniformsMat4f(const std::string& name, const oglm::Matrix4<float>& matrix)
         {
 
             ME_PROFILE_TRACE_CALL();

@@ -30,6 +30,7 @@ namespace Event
 
             unsigned int GetWidth() const {return m_Width;}
             unsigned int GetHeight() const {return m_Height;}
+            virtual void* GetGenericData() const override { return genericdata; }
 
             #ifdef ME_DEBUG_SHOW_EVENT
             std::string ToString() const override
@@ -48,6 +49,7 @@ namespace Event
         {
         public:
             WindowClosedEvent() = default;
+            virtual void* GetGenericData() const override { return genericdata; }
 
             EVENT_CLASS_TYPE(WindowClosed)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -65,6 +67,7 @@ namespace Event
         {
         public:
             ApptickEvent() = default;
+            virtual void* GetGenericData() const override { return genericdata; }
 
             EVENT_CLASS_TYPE(AppTick)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -82,6 +85,7 @@ namespace Event
         {
         public:
             AppUpdateEvent() = default;
+            virtual void* GetGenericData() const override { return genericdata; }
 
             EVENT_CLASS_TYPE(AppUpdate)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -99,6 +103,7 @@ namespace Event
         {
         public:
             AppRenderEvent() = default;
+            virtual void* GetGenericData() const override { return genericdata; }
 
             EVENT_CLASS_TYPE(AppRender)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)

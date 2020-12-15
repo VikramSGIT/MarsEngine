@@ -10,8 +10,8 @@ public:
 	Camera();
 	~Camera();
 
-	inline oglm::Matrix4& GetProjectionViewMat() { return m_PV; }
-	inline void SetProjectionView(const oglm::Matrix4& pv) { m_PV = pv; }
+	inline oglm::Matrix4<float>& GetProjectionViewMat() { return m_PV; }
+	inline void SetProjectionViewMat(const oglm::Matrix4<float>& pv) { m_PV = pv; }
 private:
-	oglm::Matrix4 m_PV;
+	oglm::Matrix4<float> m_PV;
 };
