@@ -20,7 +20,7 @@ namespace Renderer
 
             ME_PROFILE_TRACE_CALL();
 
-            glewInit();
+            //glewInit();
 
             GLLogCall(glGenBuffers(1, &m_RendererID));
             GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
