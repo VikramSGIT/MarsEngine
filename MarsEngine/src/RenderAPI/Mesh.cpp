@@ -36,11 +36,14 @@ namespace Renderer
 		total_vertices += mesh->GetVertices()->size() * m_Layout->GetTotalCount();
 		total_indices += mesh->GetIndices()->size();
 
-		vertexbuffer.reset();
-		indexbuffer.reset();
+		
+		if (vertexbuffer != nullptr)
+			delete[] vertexbuffer;
+		if (indexbuffer != nullptr)
+			delete[] indexbuffer;
 
-		vertexbuffer = CreateScope<float[]>(total_vertices);
-		indexbuffer = CreateScope<unsigned int[]>(total_indices);
+		vertexbuffer = new float[total_vertices];
+		indexbuffer = new unsigned int[total_indices];
 
 		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 		for (Ref<Mesh> ms : m_Meshes)
@@ -72,6 +75,14 @@ namespace Renderer
 			ioffset += ms->GetIndices()->size();
 			indexoffset += *std::max_element(ms->GetIndices()->begin(), ms->GetIndices()->end()) + 1;
 		}
+	}
+
+	void MeshQueue::ClearBuffer() const
+	{
+		if (vertexbuffer != nullptr)
+			delete[] vertexbuffer;
+		if (indexbuffer != nullptr)
+			delete[] indexbuffer;
 	}
 
 	inline const std::vector<oglm::vec2<unsigned int>> MeshQueue::GetUpdate()

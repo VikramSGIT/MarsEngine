@@ -17,6 +17,8 @@ namespace Renderer
             ME_PROFILE_TRACE_CALL();
 
             ClearBufferCache();
+            for (MeshQueue mq : m_RenderQueue)
+                mq.ClearBuffer();
         }
 
         void OpenGLRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
@@ -123,7 +125,6 @@ namespace Renderer
                 {
                     if ((i + 1) == m_RenderQueue.size())
                         Ready = true;
-                    MeshQueue ms = m_RenderQueue[i];
                     SetUpBuffers(m_RenderQueue[i]);
                 }
 //

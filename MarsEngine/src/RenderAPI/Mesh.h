@@ -56,13 +56,12 @@ namespace Renderer
 	class MeshQueue
 	{
 	public:
-		MeshQueue() = default;
-		MeshQueue(const MeshQueue& mesh)
-		{
-			MeshQueue(meshqueue);
-		}
+		MeshQueue()
+			:vertexbuffer(nullptr), indexbuffer(nullptr)
+		{}
 
 		void PushMesh(Ref<Mesh> mesh);
+		void ClearBuffer() const;
 
 		inline Ref<VertexBufferLayout> GetLayout() const { return m_Layout; }
 		inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }
@@ -81,12 +80,12 @@ namespace Renderer
 		std::vector<Ref<Mesh>>::const_reverse_iterator rbegin() const { return m_Meshes.rbegin(); }
 		std::vector< Ref<Mesh>>::const_reverse_iterator rend() const { return m_Meshes.rend(); }
 
-		inline const float const* GetVertexBuffer() const { return vertexbuffer.get(); }
-		inline const unsigned int const* GetIndexBuffer() const { return indexbuffer.get(); }
+		inline const float const* GetVertexBuffer() const { return vertexbuffer; }
+		inline const unsigned int const* GetIndexBuffer() const { return indexbuffer; }
 	private:
 		std::vector<Ref<Mesh>> m_Meshes;
-		Scope<float[]> vertexbuffer;
-		Scope<unsigned int[]> indexbuffer;
+		float* vertexbuffer;
+		unsigned int* indexbuffer;
 		Ref<VertexBufferLayout> m_Layout = CreateRef<VertexBufferLayout>();
 		unsigned int total_vertices = 0, total_indices = 0;
 	};
