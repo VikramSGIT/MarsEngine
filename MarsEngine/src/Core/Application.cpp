@@ -29,6 +29,13 @@ bool Application::OnWindowResize()
     return true;
 }
 
+void Application::METerminate()
+{
+    m_LayerStack.~LayerStack();
+    camera->~Camera();
+    renderer->~RenderAPI();
+}
+
 void Application::OnEvent(Event::Event& e)
 {
     Event::EventDispatcher dispatcher(e);
@@ -52,8 +59,8 @@ void Application::Run()
     GetLogger()->SetLogging(true);
 
     window->SetEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+
     renderer = CreateRef<Renderer::OpenGL::OpenGLRendererAPI>();
-    glewInit();
     renderer->Init();
     renderer->SetClearColor({50.0, 50.0, 50.0, 256.0});
 
@@ -66,19 +73,19 @@ void Application::Run()
 
 //This Parenthiesis is to Destroy The Stack Allocated Vertex and Index Buffers before Destroying OpenGl Context
 {
-    float object1[] = {
-        100.0f, 100.0f, 1.0f,  //0
-        200.0f, 100.0f, 1.0f,  //1
-        200.0f, 200.0f, 1.0f,  //2
-        100.0f, 200.0f, 1.0f   //4
+    Renderer::VERTEX v1[] = {
+        { 100.0f, 100.0f, 1.0f, 0.0f, 0.0f, 0.0f }, //1
+        { 200.0f, 100.0f, 1.0f, 1.0f, 0.0f, 0.0f }, //2
+        { 200.0f, 200.0f, 1.0f, 1.0f, 1.0f, 0.0f }, //3
+        { 100.0f, 200.0f, 1.0f, 0.0f, 1.0f, 0.0f }  //4
     };
 
-    float object2[] =
+    Renderer::VERTEX v2[] =
     {
-        200.0f, 200.0f, 1.0f,  //1
-        300.0f, 200.0f, 1.0f,  //2
-        300.0f, 300.0f, 1.0f,  //3
-        200.0f, 300.0f, 1.0f   //4
+        { 200.0f, 200.0f, 1.0f, 0.0f, 0.0f, 0.0f},   //1
+        { 300.0f, 200.0f, 1.0f, 1.0f, 0.0f, 0.0f },  //2
+        { 300.0f, 300.0f, 1.0f, 1.0f, 1.0f, 0.0f },  //3
+        { 200.0f, 300.0f, 1.0f, 0.0f, 1.0f, 0.0f }   //4
     };
 
     unsigned int oindices1[] =
@@ -93,13 +100,13 @@ void Application::Run()
         0,3,2
     };
 
-    Renderer::Mesh mesh1("Test");
-    Renderer::Mesh mesh2("Test");
-    mesh1.BufferVertices(object1, sizeof(float) * 12);
-    mesh1.BufferIndices(oindices1, sizeof(float)* 6);
+    Ref<Renderer::Mesh> mesh1 = CreateRef<Renderer::Mesh>("Test");
+    Ref<Renderer::Mesh> mesh2 = CreateRef<Renderer::Mesh>("Test");
+    mesh1->BufferVertices(v1, sizeof(v1));
+    mesh1->BufferIndices(oindices1, sizeof(oindices1));
 
-    mesh2.BufferVertices(object2, sizeof(float)*  12);
-    mesh2.BufferIndices(oindices1, sizeof(float)* 6);
+    mesh2->BufferVertices(v2, sizeof(v2));
+    mesh2->BufferIndices(oindices1, sizeof(oindices2));
 
     Renderer::MeshQueue meshqueue;
     meshqueue.PushMesh(mesh1);
@@ -110,9 +117,9 @@ void Application::Run()
     Ref<Shader> shader = renderer->Create("res/shaders/Basic.shader");
     shader->Bind();
 
-    //Renderer::OpenGL::OpenGLTexture texture("res/textures/android.png");
-    //texture.Bind();
-    //shader->SetUniforms1i("u_Texture", texture.GetSlot());
+    Renderer::OpenGL::OpenGLTexture texture("res/textures/android.png");
+    texture.Bind();
+    shader->SetUniforms1i("u_Texture", texture.GetSlot());
     shader->unBind();
 
     double ms = 0.0;
@@ -129,6 +136,7 @@ void Application::Run()
 
         renderer->OnUpdate();
         renderer->Draw(*shader);
+
 //Updating layers
 #ifdef ME_IMGUI
         imgui->SetDrawData([this, &ms]()
@@ -144,8 +152,8 @@ void Application::Run()
             });
 #endif
 
-        for (auto it = m_LayerStack.begin(); it != m_LayerStack.end(); ++it)
-            (*it)->OnUpdate();
+        for (Ref<Window::Layer::Layer> layer : m_LayerStack)
+            layer->OnUpdate();
 
         if (window->IsKeyPressed(Event::Key::W))
             m_Projection = oglm::Transulate<float>(oglm::GenIdentity<float>(), 0, 10, 0) * m_Projection;
@@ -166,11 +174,10 @@ void Application::Run()
             m_Projection = oglm::Rotate<float>(oglm::GenIdentity<float>(), 0, 0, 3.14 / 50) * m_Projection;
         m_MVP = m_Projection * m_Model;
 
-        for (Ref<Window::Layer::Layer> layer : m_LayerStack)
-            layer->OnUpdate();
 
         window->OnUpdate();
     }
 }
+    METerminate();
     glfwTerminate();
 }

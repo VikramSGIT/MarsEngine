@@ -10,5 +10,5 @@ int main(int, char**)
     ME_CORE_WARNING("MARS ENGINE SHUTDOWN....");
     WriteFile("Data.XLS");
 
-    return -1;
+    return 0;
 }

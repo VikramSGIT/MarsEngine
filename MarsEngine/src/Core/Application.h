@@ -12,6 +12,7 @@
 
 #include "RenderAPI/OpenGL/OpenGLRenderer.h"
 #include "RenderAPI/OpenGL/OpenGLTexture.h"
+#include "RenderAPI/Buffers.h"
 
 #include "RenderAPI/Mesh.h"
 #include "Window/Window.h"
@@ -31,10 +32,12 @@ private:
     Window::Layer::LayerStack m_LayerStack;
     bool m_Running = true;
     std::unique_ptr<Window::Window> window = std::unique_ptr<Window::Window>(Window::Window::Create({"Mars-Engine", 500, 500}));
-    Ref<Camera> camera = CreateRef<Camera>();
-    Ref<Renderer::RenderAPI> renderer;
     oglm::Matrix4<float> m_MVP, m_Model, m_Projection = oglm::GenOrtho<float>(0, 500, 0, 500, -1.0, 1.0);
-
+    Ref<Camera> camera = CreateRef<Camera>();
+//
+// Needs to get destroyed before glfw terminate
+//
+    Ref<Renderer::RenderAPI> renderer;
 public:
     Application();
     ~Application() = default;
@@ -42,6 +45,7 @@ public:
     void OnEvent(Event::Event& e);
     bool OnWindowClose();
     bool OnWindowResize();
+    void METerminate();
 
     Window::Window& GetWindow() {return *window;}
     static Application& GetInstance() { return *s_Application;}

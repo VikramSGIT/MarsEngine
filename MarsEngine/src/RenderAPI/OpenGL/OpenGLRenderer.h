@@ -15,6 +15,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <vector>
 
 namespace Renderer
 {
@@ -27,8 +28,11 @@ namespace Renderer
             unsigned int indexoffset = 0;
             oglm::vec4<float> m_clearcolor;
             std::vector<MeshQueue> m_RenderQueue;
-            Scope<VertexBuffer> vertex = CreateScope<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
-            Scope<IndexBuffer> index = CreateScope<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
+            std::vector <unsigned int> vertexbuffercache;
+            std::vector<unsigned int> indexbuffercache;
+
+            void SetUpBuffers(const MeshQueue& meshqueue);
+            void ClearBufferCache();
         public:
             OpenGLRendererAPI();
             ~OpenGLRendererAPI();

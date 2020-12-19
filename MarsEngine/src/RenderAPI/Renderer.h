@@ -32,69 +32,6 @@ namespace Renderer
         inline RenderAPItype GetAPI() { return m_renderapi; };
         virtual inline std::vector<MeshQueue> GetRenderQueue() = 0;
 
-        /*Ref<VertexBuffer> Create(const void* data, const unsigned int size, const unsigned int mode)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
-            {
-                return CreateRef<OpenGL::OpenGLVertexBuffer>(data, size, mode);
-            }
-            else
-            {
-                ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
-                return nullptr;
-            }
-        }
-
-        Ref<IndexBuffer> Create(const unsigned int* data, const unsigned int size, const unsigned int mode)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
-            {
-                return CreateRef<OpenGL::OpenGLIndexBuffer>(data, size, mode);
-            }
-            else
-            {
-                ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
-                return nullptr;
-            }
-        }
-
-        Ref<VertexArray> Create()
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
-            {
-                return CreateRef<OpenGL::OpenGLVertexArray>();
-            }
-            else
-            {
-                ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
-                return nullptr;
-            }
-        }
-
-        Ref<VertexBufferLayout> CreateBufferLayout()
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
-            {
-                return CreateRef<VertexBufferLayout>();
-            }
-            else
-            {
-                ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
-                    return nullptr;
-            }
-        }*/
 
         Ref<Shader> Create(const std::string& filepath)
         {

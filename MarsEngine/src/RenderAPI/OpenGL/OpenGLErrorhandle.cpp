@@ -49,7 +49,6 @@ namespace Renderer
 
         bool GLPrintError(const char* function, const char* srcfile, int codeline)
         {
-            bool flag = true;
             std::string line, hex;
             GLenum error;
             std::stringstream ss;
@@ -68,13 +67,11 @@ namespace Renderer
                             << "\n Error    : " << line.erase(0, 8)
                             << "\n";
                         ME_CORE_CRITICAL(ss.str());
-
-                            flag = false;
-                        break;
+                        return false;
                     }
                 }
             }
-            return flag;
+            return true;
         }
 
         void GLClearError()

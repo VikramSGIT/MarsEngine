@@ -98,6 +98,17 @@ namespace oglm
             z = XYZ.z;
             w = W;
         }
+
+        vec4 operator* (const Matrix4<T>& matrix)
+        {
+            vec4 vector;
+
+            vector.x = this->x * matrix.mat[0][0] + this->y * matrix.mat[1][0] + this->z * matrix.mat[2][0] + this->z * matrix.mat[3][0];
+            vector.y = this->x * matrix.mat[0][1] + this->y * matrix.mat[1][1] + this->z * matrix.mat[2][1] + this->z * matrix.mat[3][1];
+            vector.z = this->x * matrix.mat[0][2] + this->y * matrix.mat[1][2] + this->z * matrix.mat[2][2] + this->z * matrix.mat[3][2];
+
+            return vector;
+        }
     };
 
     template<typename T>

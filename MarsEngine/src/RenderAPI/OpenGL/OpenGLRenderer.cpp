@@ -16,6 +16,7 @@ namespace Renderer
 
             ME_PROFILE_TRACE_CALL();
 
+            ClearBufferCache();
         }
 
         void OpenGLRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
@@ -72,9 +73,36 @@ namespace Renderer
             GLLogCall(glClear(GL_COLOR_BUFFER_BIT));
         }
 
+        void OpenGLRendererAPI::ClearBufferCache()
+        {
+            for (unsigned int i : vertexbuffercache)
+                OpenGLVertexBuffer vb(i);
+            vertexbuffercache.clear();
+            for (unsigned int i : indexbuffercache)
+                OpenGLIndexBuffer ib(i);
+            indexbuffercache.clear();
+        }
+
         void OpenGLRendererAPI::AddRenderSubmition(const MeshQueue& meshqueue)
         {
             m_RenderQueue.push_back(meshqueue);
+        }
+
+        void OpenGLRendererAPI::SetUpBuffers(const MeshQueue& meshqueue)
+        {
+            ClearBufferCache();
+
+            Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
+            Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
+
+            vertexbufferobj->BufferPostRenderData(meshqueue.GetVertexBuffer(), meshqueue.GetTotalVertices(), 0);
+            indexbufferobj->BufferPostRenderData(meshqueue.GetIndexBuffer(), meshqueue.GetTotalIndices(), 0);
+
+            vertexbufferobj->ClearBufferOnDestroy(false);
+            indexbufferobj->ClearBufferOnDestroy(false);
+
+            vertexbuffercache.push_back(vertexbufferobj->GetID());
+            indexbuffercache.push_back(indexbufferobj->GetID());
         }
 
         void OpenGLRendererAPI::Draw(const Shader& shader)
@@ -85,62 +113,38 @@ namespace Renderer
 // Will Soon Sort out the shaders when Materials Are Implemented
 //
             shader.Bind();
+
+            for (int i = 0; i < m_RenderQueue.size(); i++)
+            {
 //
 // Constructing buffers for each meshqueue
 //
-            for (MeshQueue mq : m_RenderQueue)
-            {
                 if (!Ready)
                 {
-                    if (LiveStreamData)
-                    {
-//
-// Heap allocating buffers using (known sizes)
-// 
-                        Scope<float[]> vertexbuffer = CreateScope<float[]>(mq.GetTotalVertices());
-                        Scope<unsigned int[]> indexbuffer = CreateScope<unsigned int[]>(mq.GetTotalIndices());
-
-                        unsigned int voffset = 0, ioffset = 0;
-                        unsigned int indexoffset = 0;
-                        for (Mesh ms : mq)
-                        {
-//
-// Filling up of vertexbuffer with datas
-//
-                            for (int j = 0; j < ms.GetVertices().size() * 3; j += 3)
-                            {
-                                vertexbuffer[j + voffset] = ms.GetVertices()[j / 3].x;
-                                vertexbuffer[j + 1 + voffset] = ms.GetVertices()[j / 3].y;
-                                vertexbuffer[j + 2 + voffset] = ms.GetVertices()[j / 3].z;
-                            }
-                            voffset += ms.GetVertices().size() * 3;
-//                  
-// Filling up indexbuffer with data with maintaining offsets of indices
-//
-                            for (int j = 0; j < ms.GetIndices().size(); j++)
-                            {
-                                indexbuffer[j + ioffset] = ms.GetIndices()[j] + indexoffset;
-                            }
-                            ioffset += ms.GetIndices().size();
-                            indexoffset += *std::max_element(ms.GetIndices().begin(), ms.GetIndices().end()) + 1;
-                            Ready = true;
-                        }
-                        vertex->BufferPostRenderData(vertexbuffer.get(), mq.GetTotalVertices(), 0);
-                        index->BufferPostRenderData(indexbuffer.get(), mq.GetTotalIndices(), 0);
-                    }
-//
-// Constructing buffers and drawing them
-// 
-                    Ref<VertexArray> array = CreateRef<OpenGLVertexArray>();
-                    vertex->Bind();
-                    array->AddBuffer(*vertex, *mq.GetLayout());
-                    index->Bind();
-
-                    GLLogCall(glDrawElements(GL_TRIANGLES, mq.GetTotalIndices(), GL_UNSIGNED_INT, nullptr));
-
-                    vertex->unBind();
-                    index->unBind();
+                    if ((i + 1) == m_RenderQueue.size())
+                        Ready = true;
+                    MeshQueue ms = m_RenderQueue[i];
+                    SetUpBuffers(m_RenderQueue[i]);
                 }
+//
+// Setting up VertexArray for each call, needs to be fixed at higher builds!!
+//
+                Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[i]);
+                Ref<IndexBuffer> indexbuffer = CreateRef<OpenGLIndexBuffer>(indexbuffercache[i]);
+                Ref<VertexArray> array = CreateRef<OpenGLVertexArray>();
+
+                vertexbuffer->ClearBufferOnDestroy(false);
+                indexbuffer->ClearBufferOnDestroy(false);
+
+                array->AddBuffer(*vertexbuffer, *m_RenderQueue[i].GetLayout());
+
+                indexbuffer->Bind();
+                vertexbuffer->Bind();
+
+                GLLogCall(glDrawElements(GL_TRIANGLES, m_RenderQueue[i].GetTotalIndices(), GL_UNSIGNED_INT, nullptr));
+
+                vertexbuffer->unBind();
+                indexbuffer->unBind();
             }
         }
 

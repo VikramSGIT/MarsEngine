@@ -5,7 +5,7 @@ namespace Renderer
     namespace OpenGL
     {
         OpenGLVertexBuffer::OpenGLVertexBuffer(const float* data, unsigned int size, unsigned int mode)
-            :Emptybuffer(false)
+            :Emptybuffer(false), m_RendererID(0)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -14,13 +14,25 @@ namespace Renderer
             GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
             GLLogCall(glBufferData(GL_ARRAY_BUFFER, size, data, mode));
         }
+
+        OpenGLVertexBuffer::OpenGLVertexBuffer(const unsigned int& RendererID)
+            :Emptybuffer(true), m_RendererID(RendererID)
+        {
+            GLClearError();
+            glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+            if (!GLPrintError("glBindBuffer", __FILE__, __LINE__))
+            {
+                ME_CORE_CRITICAL("Can't load buffer with ID");
+                ClearBuffer = false;
+                this->~OpenGLVertexBuffer();
+            }
+        }
+
         OpenGLVertexBuffer::OpenGLVertexBuffer(const unsigned int& size, const unsigned int& mode)
-            :Emptybuffer(true)
+            :Emptybuffer(true), m_RendererID(0)
         {
 
             ME_PROFILE_TRACE_CALL();
-
-            //glewInit();
 
             GLLogCall(glGenBuffers(1, &m_RendererID));
             GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
@@ -31,7 +43,10 @@ namespace Renderer
 
             ME_PROFILE_TRACE_CALL();
 
-            GLLogCall(glDeleteBuffers(1, &m_RendererID));
+            if (ClearBuffer)
+            {
+                GLLogCall(glDeleteBuffers(1, &m_RendererID));
+            }
         }
         void OpenGLVertexBuffer::Bind() const
         {

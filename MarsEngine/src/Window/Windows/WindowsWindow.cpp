@@ -60,8 +60,9 @@ namespace Window
             glfwMakeContextCurrent(m_Window);
             glfwSetWindowUserPointer(m_Window, &m_Data);
             SetVSync(true);
-
-            //CallBacks from glfw
+//
+//CallBacks from glfw
+//
             glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
             {
                 WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
