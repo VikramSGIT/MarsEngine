@@ -26,7 +26,7 @@ namespace Renderer
             glViewport(0, 0, X, Y);
         }
 
-        void OpenGLRendererAPI::SetClearColor(const oglm::vec4<float>& color)
+        void OpenGLRendererAPI::SetClearColor(const oglm::vec4<ME_DATATYPE>& color)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -35,7 +35,7 @@ namespace Renderer
             m_clearcolor.y = color.y;
             m_clearcolor.z = color.z;
             m_clearcolor.w = color.w;
-            oglm::Normalize<oglm::vec4<float>>(m_clearcolor, 256.0f);
+            oglm::Normalize<oglm::vec4<ME_DATATYPE>>(m_clearcolor, 256.0f);
         }
 
         void OpenGLRendererAPI::Init()
@@ -107,6 +107,16 @@ namespace Renderer
             indexbuffercache.push_back(indexbufferobj->GetID());
         }
 
+        void OpenGLRendererAPI::CheckBufferUpdate(const unsigned int& id)
+        {
+            for (oglm::vec2 range : m_RenderQueue[id].GetUpdate())
+            {
+                Ref<VertexBuffer> vb = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
+                vb->ClearBufferOnDestroy(false);
+                vb->BufferPostRenderData((m_RenderQueue[id].GetVertexBuffer() + range.x), (range.y - range.x), range.x);
+            }
+        }
+
         void OpenGLRendererAPI::Draw(const Shader& shader)
         {
 
@@ -127,6 +137,10 @@ namespace Renderer
                         Ready = true;
                     SetUpBuffers(m_RenderQueue[i]);
                 }
+//
+// Checks for buffer Update
+//
+                CheckBufferUpdate(i);
 //
 // Setting up VertexArray for each call, needs to be fixed at higher builds!!
 //

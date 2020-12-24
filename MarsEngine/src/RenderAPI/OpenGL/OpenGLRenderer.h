@@ -26,12 +26,13 @@ namespace Renderer
         private:
             bool Ready = false, LiveStreamData = true;
             unsigned int indexoffset = 0;
-            oglm::vec4<float> m_clearcolor;
+            oglm::vec4<ME_DATATYPE> m_clearcolor;
             std::vector<MeshQueue> m_RenderQueue;
             std::vector <unsigned int> vertexbuffercache;
             std::vector<unsigned int> indexbuffercache;
 
             void SetUpBuffers(const MeshQueue& meshqueue);
+            void CheckBufferUpdate(const unsigned int& id);
             void ClearBufferCache();
         public:
             OpenGLRendererAPI();
@@ -45,7 +46,7 @@ namespace Renderer
 
             bool SwitchAPI(const RenderAPItype api);
             void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-            void SetClearColor(const oglm::vec4<float>& color) override;
+            void SetClearColor(const oglm::vec4<ME_DATATYPE>& color) override;
             void Draw(const Shader& shader) override;
 
             inline Ref<Layer::BasicLayer> GetLayer() override;

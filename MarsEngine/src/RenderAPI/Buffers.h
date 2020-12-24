@@ -91,7 +91,7 @@ namespace Renderer
         inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
 
         inline const unsigned int GetStride() const { return m_Stride; }
-        inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(float); }
+        inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(ME_DATATYPE); }
     };
 
     class VertexArray

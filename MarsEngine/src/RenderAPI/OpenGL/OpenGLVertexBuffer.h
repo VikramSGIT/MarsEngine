@@ -15,7 +15,7 @@ namespace Renderer
             unsigned int m_RendererID = 0, m_Filled = 0;
             bool Emptybuffer, ClearBuffer = true;
         public:
-            OpenGLVertexBuffer(const float* data, unsigned int size, unsigned int mode);
+            OpenGLVertexBuffer(const ME_DATATYPE* data, unsigned int size, unsigned int mode);
             OpenGLVertexBuffer(const unsigned int& RendererID);
             OpenGLVertexBuffer(const unsigned int& size, const unsigned int& mode);
             ~OpenGLVertexBuffer();

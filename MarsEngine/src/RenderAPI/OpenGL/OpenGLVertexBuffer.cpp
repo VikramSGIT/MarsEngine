@@ -4,7 +4,7 @@ namespace Renderer
 {
     namespace OpenGL
     {
-        OpenGLVertexBuffer::OpenGLVertexBuffer(const float* data, unsigned int size, unsigned int mode)
+        OpenGLVertexBuffer::OpenGLVertexBuffer(const ME_DATATYPE* data, unsigned int size, unsigned int mode)
             :Emptybuffer(false), m_RendererID(0)
         {
 
@@ -62,7 +62,7 @@ namespace Renderer
             ME_PROFILE_TRACE_CALL();
 
             Bind();
-            GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, offset, count *sizeof(float), data));
+            GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), data));
             unBind();
             m_Filled += count;
         }

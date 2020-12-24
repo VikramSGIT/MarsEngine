@@ -1,6 +1,7 @@
 #pragma once
 
 #define ME_IMGUI
+#define ME_DATATYPE float
 //#define ME_DEBUG_SHOW_EVENT
 //#define ME_PROFILE_TRACE_CALLFUNC
 #define ME_MAX_VERTEX_BUFFER_SIZE 1000

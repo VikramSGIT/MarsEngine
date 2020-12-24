@@ -12,9 +12,9 @@ namespace Renderer
 {
 	struct VERTEX
 	{
-		float vertices[3];
-		float texturecoord[2];
-		float index;
+		ME_DATATYPE vertices[3] = { 0.0f, 0.0f, 0.0f };
+		ME_DATATYPE texturecoord[2] = { 0.0f, 0.0f };
+		ME_DATATYPE index = 0.0f;
 	};
 
 	class Mesh
@@ -24,31 +24,42 @@ namespace Renderer
 			:m_Name(name) {}
 		~Mesh() = default;
 
-		void BufferVertices(const VERTEX* vertex, const unsigned int& size);
-		void BufferIndices(const unsigned int* data, const unsigned int& size);
-		void BufferTextureCoord(const float* data, const unsigned int& size);
+		void BufferVertices(const VERTEX* vertex, const unsigned int& count);
+		void BufferIndices(const unsigned int* data, const unsigned int& count);
+
+		void UpdateVertices(const VERTEX* vertex, const unsigned int& count);
+		void UpdateIndices(const unsigned int* data, const unsigned int& count);
+
 		void SetReady(bool ready) { Ready = ready; }
 
 		inline std::vector<VERTEX>* GetVertices() { return &m_Vertices; }
 		inline std::vector<unsigned int>* GetIndices() { return &m_Indices; }
+		inline oglm::Matrix4<ME_DATATYPE> GetModelMat() { return m_Model; }
+
 		inline bool IsReady() const { return Ready; }
 
-		friend Mesh operator * (Mesh &mesh, const oglm::Matrix4<float> &mat)
+		friend Ref<Mesh> operator * (Ref<Mesh> mesh, const oglm::Matrix4<ME_DATATYPE> &mat)
 		{
-			oglm::vec4<float> out;
-			for (VERTEX &vertex : *mesh.GetVertices())
+			Scope<VERTEX[]> vertex = CreateScope<VERTEX[]>(mesh->m_Vertices.size());
+
+			for (int i = 0; i < mesh->m_Vertices.size(); i++)
 			{
-				out = oglm::vec4<float>({ vertex.vertices[0], vertex.vertices[1], vertex.vertices[2] }, 1.0f) * mat;
-				vertex.vertices[0] = out.x;
-				vertex.vertices[1] = out.y;
-				vertex.vertices[2] = out.z;
+				vertex[i] = mesh->m_Vertices.at(i);
+				oglm::vec4<ME_DATATYPE> out(vertex[i].vertices[0], vertex[i].vertices[1], vertex[i].vertices[2], 1.0f);
+				out = out * mat;
+				vertex[i].vertices[0] = out.x;
+				vertex[i].vertices[1] = out.y;
+				vertex[i].vertices[2] = out.z;
 			}
-			mesh.SetReady(false);
+
+			mesh->UpdateVertices(vertex.get(), mesh->m_Vertices.size());
+			return mesh;
 		}
 
 	private:
 		std::vector<VERTEX> m_Vertices;
 		std::vector<unsigned int> m_Indices;
+		oglm::Matrix4<ME_DATATYPE> m_Model;
 		std::string m_Name;
 		bool Ready = false;
 	};
@@ -57,8 +68,7 @@ namespace Renderer
 	{
 	public:
 		MeshQueue()
-			:vertexbuffer(nullptr), indexbuffer(nullptr)
-		{}
+			:vertexbuffer(nullptr), indexbuffer(nullptr) {}
 
 		void PushMesh(Ref<Mesh> mesh);
 		void ClearBuffer() const;
@@ -68,7 +78,7 @@ namespace Renderer
 
 		inline unsigned int GetTotalVertices() const { return total_vertices; }
 		inline unsigned int GetTotalIndices() const { return total_indices; }
-		inline const std::vector<oglm::vec2<unsigned int>> GetUpdate();
+		std::vector<oglm::vec2<unsigned int>> GetUpdate();
 
 		std::vector<Ref<Mesh>>::iterator begin() { return m_Meshes.begin(); }
 		std::vector< Ref<Mesh>>::iterator end() { return m_Meshes.end(); }
@@ -80,11 +90,12 @@ namespace Renderer
 		std::vector<Ref<Mesh>>::const_reverse_iterator rbegin() const { return m_Meshes.rbegin(); }
 		std::vector< Ref<Mesh>>::const_reverse_iterator rend() const { return m_Meshes.rend(); }
 
-		inline const float const* GetVertexBuffer() const { return vertexbuffer; }
-		inline const unsigned int const* GetIndexBuffer() const { return indexbuffer; }
+		inline const ME_DATATYPE* GetVertexBuffer() const { return vertexbuffer; }
+		inline const unsigned int* GetIndexBuffer() const { return indexbuffer; }
+
 	private:
 		std::vector<Ref<Mesh>> m_Meshes;
-		float* vertexbuffer;
+		ME_DATATYPE* vertexbuffer;
 		unsigned int* indexbuffer;
 		Ref<VertexBufferLayout> m_Layout = CreateRef<VertexBufferLayout>();
 		unsigned int total_vertices = 0, total_indices = 0;

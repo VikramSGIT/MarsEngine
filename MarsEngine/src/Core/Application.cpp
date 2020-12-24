@@ -21,7 +21,7 @@ bool Application::OnWindowResize()
 {
     unsigned int X = window->GetWidth();
     unsigned int Y = window->GetHeight();
-    oglm::Matrix4<float> proj = oglm::GenOrtho<float>(0.0f, X, 0.0f, Y, -1.0f, 1.0f);
+    oglm::Matrix4<ME_DATATYPE> proj = oglm::GenOrtho<ME_DATATYPE>(0.0f, X, 0.0f, Y, -1.0f, 1.0f);
     camera->SetProjectionViewMat(proj);
     m_Projection = proj;
     renderer->SetViewPortSize(X, Y);
@@ -74,18 +74,18 @@ void Application::Run()
 //This Parenthiesis is to Destroy The Stack Allocated Vertex and Index Buffers before Destroying OpenGl Context
 {
     Renderer::VERTEX v1[] = {
-        { 100.0f, 100.0f, 1.0f, 0.0f, 0.0f, 0.0f }, //1
-        { 200.0f, 100.0f, 1.0f, 1.0f, 0.0f, 0.0f }, //2
-        { 200.0f, 200.0f, 1.0f, 1.0f, 1.0f, 0.0f }, //3
-        { 100.0f, 200.0f, 1.0f, 0.0f, 1.0f, 0.0f }  //4
+        { 100.0f, 100.0f, 1.0f, 0.0f, 0.0f}, //1
+        { 200.0f, 100.0f, 1.0f, 1.0f, 0.0f}, //2
+        { 200.0f, 200.0f, 1.0f, 1.0f, 1.0f}, //3
+        { 100.0f, 200.0f, 1.0f, 0.0f, 1.0f}  //4
     };
 
     Renderer::VERTEX v2[] =
     {
-        { 200.0f, 200.0f, 1.0f, 0.0f, 0.0f, 0.0f},   //1
-        { 300.0f, 200.0f, 1.0f, 1.0f, 0.0f, 0.0f },  //2
-        { 300.0f, 300.0f, 1.0f, 1.0f, 1.0f, 0.0f },  //3
-        { 200.0f, 300.0f, 1.0f, 0.0f, 1.0f, 0.0f }   //4
+        { 200.0f, 200.0f, 1.0f, 0.0f, 0.0f},  //1
+        { 300.0f, 200.0f, 1.0f, 1.0f, 0.0f},  //2
+        { 300.0f, 300.0f, 1.0f, 1.0f, 1.0f},  //3
+        { 200.0f, 300.0f, 1.0f, 0.0f, 1.0f}   //4
     };
 
     unsigned int oindices1[] =
@@ -102,11 +102,11 @@ void Application::Run()
 
     Ref<Renderer::Mesh> mesh1 = CreateRef<Renderer::Mesh>("Test");
     Ref<Renderer::Mesh> mesh2 = CreateRef<Renderer::Mesh>("Test");
-    mesh1->BufferVertices(v1, sizeof(v1));
-    mesh1->BufferIndices(oindices1, sizeof(oindices1));
+    mesh1->BufferVertices(v1, sizeof(v1) / sizeof(Renderer::VERTEX));
+    mesh1->BufferIndices(oindices1, 6);
 
-    mesh2->BufferVertices(v2, sizeof(v2));
-    mesh2->BufferIndices(oindices1, sizeof(oindices2));
+    mesh2->BufferVertices(v2, sizeof(v2) / sizeof(Renderer::VERTEX));
+    mesh2->BufferIndices(oindices1, 6);
 
     Renderer::MeshQueue meshqueue;
     meshqueue.PushMesh(mesh1);
@@ -125,14 +125,13 @@ void Application::Run()
     double ms = 0.0;
     window->SetVSync(true);
 
-    /* Loop until the user closes the window */
     while (m_Running)
     {
         InstrumentorTimer timer(ms);
 
 //Always pass the uniforms after binding the shader
 
-        shader->SetUniformsMat4f("u_MVP", m_MVP);
+        shader->SetUniformsMat4f("u_MVP", oglm::Copy(m_MVP, oglm::GenIdentity<float>()));
 
         renderer->OnUpdate();
         renderer->Draw(*shader);
@@ -156,24 +155,29 @@ void Application::Run()
             layer->OnUpdate();
 
         if (window->IsKeyPressed(Event::Key::W))
-            m_Projection = oglm::Transulate<float>(oglm::GenIdentity<float>(), 0, 10, 0) * m_Projection;
+            m_Projection = oglm::Transulate<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), 0, 10, 0) * m_Projection;
 
         if (window->IsKeyPressed(Event::Key::S))
-            m_Projection = oglm::Transulate<float>(oglm::GenIdentity<float>(), 0, -10, 0) * m_Projection;
+            m_Projection = oglm::Transulate<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), 0, -10, 0) * m_Projection;
 
         if (window->IsKeyPressed(Event::Key::A))
-            m_Projection = oglm::Transulate<float>(oglm::GenIdentity<float>(), -10, 0, 0) * m_Projection;
+            m_Projection = oglm::Transulate<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), -10, 0, 0) * m_Projection;
 
         if (window->IsKeyPressed(Event::Key::D))
-            m_Projection = oglm::Transulate<float>(oglm::GenIdentity<float>(), 10, 0, 0) * m_Projection;
+            m_Projection = oglm::Transulate<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), 10, 0, 0) * m_Projection;
 
         if (window->IsKeyPressed(Event::Key::E))
-            m_Projection = oglm::Rotate<float>(oglm::GenIdentity<float>(), 0, 0, -3.14 / 50) * m_Projection;
+            m_Projection = oglm::Rotate<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), 0, 0, -3.14 / 50) * m_Projection;
 
         if (window->IsKeyPressed(Event::Key::Q))
-            m_Projection = oglm::Rotate<float>(oglm::GenIdentity<float>(), 0, 0, 3.14 / 50) * m_Projection;
-        m_MVP = m_Projection * m_Model;
+            m_Projection = oglm::Rotate<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), 0, 0, 3.14 / 50) * m_Projection;
 
+        if (window->IsKeyPressed(Event::Key::Space))
+        {
+            mesh1 = mesh1 * oglm::Scale<ME_DATATYPE>(oglm::GenIdentity<ME_DATATYPE>(), 1.01, 1.01, 1);
+        }
+
+        m_MVP = m_Projection;
 
         window->OnUpdate();
     }

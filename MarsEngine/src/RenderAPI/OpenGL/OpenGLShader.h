@@ -40,7 +40,7 @@ namespace Renderer
             void Bind() const override;
             void unBind() const override;
 
-            void SetUniforms4f(const std::string& name, float f1, float f2, float f3, float f4) override;
+            void SetUniforms4f(const std::string& name, ME_DATATYPE f1, ME_DATATYPE f2, ME_DATATYPE f3, ME_DATATYPE f4) override;
             void SetUniforms1i(const std::string& name, int i1) override;
             void SetUniformsMat4f(const std::string& name, const oglm::Matrix4<float>& matrix) override;
         };

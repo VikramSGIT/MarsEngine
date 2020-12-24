@@ -4,17 +4,34 @@ namespace Renderer
 {
 //////////////////////////////////////// Mesh //////////////////////////////////////////////////
 
-	void Mesh::BufferVertices(const VERTEX* vertex, const unsigned int& size)
+	void Mesh::BufferVertices(const VERTEX* vertex, const unsigned int& count)
 	{
-		for (int i = 0; i < size / sizeof(VERTEX); i++)
+		for (int i = 0; i < count; i++)
 			m_Vertices.emplace_back(vertex[i]);
 		Ready = false;
 	}
 
-	void Mesh::BufferIndices(const unsigned int* data, const unsigned int& size)
+	void Mesh::BufferIndices(const unsigned int* data, const unsigned int& count)
 	{
-		for (int i = 0; i < size / sizeof(unsigned int); i++)
+		for (int i = 0; i < count; i++)
 			m_Indices.emplace_back(data[i]);
+		Ready = false;
+	}
+
+	void Mesh::UpdateVertices(const VERTEX* vertex, const unsigned int& count)
+	{
+		m_Vertices.clear();
+		for (int i = 0; i < count; i++)
+			m_Vertices.emplace_back(vertex[i]);
+		Ready = false;
+	}
+
+	void Mesh::UpdateIndices(const unsigned int* data, const unsigned int& count)
+	{
+		m_Indices.clear();
+		for (int i = 0; i < count; i++)
+			m_Indices.emplace_back(data[i]);
+		Ready = false;
 	}
 
 ////////////////////////////////////////// Mesh Queue ////////////////////////////////////////////////
@@ -42,7 +59,7 @@ namespace Renderer
 		if (indexbuffer != nullptr)
 			delete[] indexbuffer;
 
-		vertexbuffer = new float[total_vertices];
+		vertexbuffer = new ME_DATATYPE[total_vertices];
 		indexbuffer = new unsigned int[total_indices];
 
 		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
@@ -74,6 +91,7 @@ namespace Renderer
 			}
 			ioffset += ms->GetIndices()->size();
 			indexoffset += *std::max_element(ms->GetIndices()->begin(), ms->GetIndices()->end()) + 1;
+			ms->SetReady(true);
 		}
 	}
 
@@ -85,7 +103,7 @@ namespace Renderer
 			delete[] indexbuffer;
 	}
 
-	inline const std::vector<oglm::vec2<unsigned int>> MeshQueue::GetUpdate()
+	std::vector<oglm::vec2<unsigned int>> MeshQueue::GetUpdate()
 	{
 		std::vector<oglm::vec2<unsigned int>> ranges;
 
@@ -95,9 +113,23 @@ namespace Renderer
 			oglm::vec2<unsigned int> input;
 			if (!m_Meshes[i]->IsReady())
 			{
-				input.x = offset; 
+				input.x = offset;
 				input.y = offset + m_Meshes[i]->GetVertices()->size() * m_Layout->GetTotalCount();
 				ranges.emplace_back(input);
+				for (int j = offset; j < (m_Meshes[i]->GetVertices()->size() * m_Layout->GetTotalCount() + offset); j += m_Layout->GetTotalCount())
+				{
+					unsigned int __offset__ = 0;
+
+					vertexbuffer[j + (__offset__++)] = m_Meshes[i]->GetVertices()->at(j / m_Layout->GetTotalCount()).vertices[0];
+					vertexbuffer[j + (__offset__++)] = m_Meshes[i]->GetVertices()->at(j / m_Layout->GetTotalCount()).vertices[1];
+					vertexbuffer[j + (__offset__++)] = m_Meshes[i]->GetVertices()->at(j / m_Layout->GetTotalCount()).vertices[2];
+
+					vertexbuffer[j + (__offset__++)] = m_Meshes[i]->GetVertices()->at(j / m_Layout->GetTotalCount()).texturecoord[0];
+					vertexbuffer[j + (__offset__++)] = m_Meshes[i]->GetVertices()->at(j / m_Layout->GetTotalCount()).texturecoord[1];
+
+					vertexbuffer[j + (__offset__++)] = m_Meshes[i]->GetVertices()->at(j / m_Layout->GetTotalCount()).index;
+				}
+				m_Meshes[i]->SetReady(true);
 			}
 			else
 				offset += m_Meshes[i]->GetVertices()->size() * m_Layout->GetTotalCount();

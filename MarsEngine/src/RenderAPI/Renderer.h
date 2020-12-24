@@ -21,7 +21,7 @@ namespace Renderer
 
         virtual void Init() = 0;
         virtual void OnUpdate() = 0;
-        virtual void SetClearColor(const oglm::vec4<float>& color) = 0;
+        virtual void SetClearColor(const oglm::vec4<ME_DATATYPE>& color) = 0;
         virtual void AddRenderSubmition(const MeshQueue& meshqueue) = 0;
         virtual Ref<Layer::BasicLayer> GetLayer() = 0;
         virtual void Draw(const Shader& shader) = 0;

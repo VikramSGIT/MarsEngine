@@ -21,7 +21,7 @@ namespace Window
         class imguiLayer : public Layer
         {
         private:
-            float m_Time;
+            ME_DATATYPE m_Time;
             bool m_BlockEvents = true;
             bool m_Show = true;
             std::function<void()> draw;

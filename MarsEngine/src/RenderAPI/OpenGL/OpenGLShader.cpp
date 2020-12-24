@@ -57,13 +57,14 @@ namespace Renderer
             }
             if (location != -1)
             {
+                oglm::Matrix4<float> mat;
                 GLLogCall(glUniformMatrix4fv(location, 1, GL_FALSE, &matrix.mat[0][0]));
             }
             else
                 std::cout << "Cant pass the Uniforms!!" << std::endl;
         }
 
-        void OpenGLShader::SetUniforms4f(const std::string& name, float f1, float f2, float f3, float f4)
+        void OpenGLShader::SetUniforms4f(const std::string& name, ME_DATATYPE f1, ME_DATATYPE f2, ME_DATATYPE f3, ME_DATATYPE f4)
         {
 
             ME_PROFILE_TRACE_CALL();

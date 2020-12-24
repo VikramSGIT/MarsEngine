@@ -32,7 +32,7 @@ private:
     Window::Layer::LayerStack m_LayerStack;
     bool m_Running = true;
     std::unique_ptr<Window::Window> window = std::unique_ptr<Window::Window>(Window::Window::Create({"Mars-Engine", 500, 500}));
-    oglm::Matrix4<float> m_MVP, m_Model, m_Projection = oglm::GenOrtho<float>(0, 500, 0, 500, -1.0, 1.0);
+    oglm::Matrix4<ME_DATATYPE> m_MVP, m_Model, m_Projection = oglm::GenOrtho(0.0f, 500.0f, 0.0f, 500.0f, -1.0f, 1.0f);
     Ref<Camera> camera = CreateRef<Camera>();
 //
 // Needs to get destroyed before glfw terminate
