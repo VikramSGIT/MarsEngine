@@ -1,7 +1,7 @@
 #pragma once
 #include "MarsHeader.h"
 #include "RenderAPI/Buffers.h"
-#include "Vender/OGLM/oglm.h"
+#include "Vender/glm/glm/gtc/matrix_transform.hpp"
 #include "GL/glew.h"
 #include "OpenGLErrorHandle.h"
 #include "RenderAPI\Shader.h"
@@ -42,7 +42,7 @@ namespace Renderer
 
             void SetUniforms4f(const std::string& name, ME_DATATYPE f1, ME_DATATYPE f2, ME_DATATYPE f3, ME_DATATYPE f4) override;
             void SetUniforms1i(const std::string& name, int i1) override;
-            void SetUniformsMat4f(const std::string& name, const oglm::Matrix4<float>& matrix) override;
+            void SetUniformsMat4f(const std::string& name, const glm::mat4& matrix) override;
         };
     }
 }

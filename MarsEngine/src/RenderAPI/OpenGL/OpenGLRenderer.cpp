@@ -26,16 +26,12 @@ namespace Renderer
             glViewport(0, 0, X, Y);
         }
 
-        void OpenGLRendererAPI::SetClearColor(const oglm::vec4<ME_DATATYPE>& color)
+        void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
         {
 
             ME_PROFILE_TRACE_CALL();
 
-            m_clearcolor.x = color.x;
-            m_clearcolor.y = color.y;
-            m_clearcolor.z = color.z;
-            m_clearcolor.w = color.w;
-            oglm::Normalize<oglm::vec4<ME_DATATYPE>>(m_clearcolor, 256.0f);
+            m_clearcolor = color;
         }
 
         void OpenGLRendererAPI::Init()
@@ -49,8 +45,10 @@ namespace Renderer
             if (glewInit() != GLEW_OK)
                 ME_CORE_ERROR("Can't Impliment GLEW");
             else
+#ifdef ME_DEBUG
                 ss << "Detected OpenGL Vesrion (using) : " << glGetString(GL_VERSION);
             ME_CORE_INFO(ss.str());
+#endif
 //
 // Enabling blending, typically transparencies
 //
@@ -85,15 +83,14 @@ namespace Renderer
             indexbuffercache.clear();
         }
 
-        void OpenGLRendererAPI::AddRenderSubmition(const MeshQueue& meshqueue)
+        void OpenGLRendererAPI::AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata)
         {
             m_RenderQueue.push_back(meshqueue);
+            preprocessing.emplace_back(preprocessdata);
         }
 
         void OpenGLRendererAPI::SetUpBuffers(const MeshQueue& meshqueue)
         {
-            ClearBufferCache();
-
             Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
             Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
 
@@ -109,7 +106,10 @@ namespace Renderer
 
         void OpenGLRendererAPI::CheckBufferUpdate(const unsigned int& id)
         {
-            for (oglm::vec2 range : m_RenderQueue[id].GetUpdate())
+
+            ME_PROFILE_TRACE_CALL();
+
+            for (glm::uvec2 range : m_RenderQueue[id].GetUpdate())
             {
                 Ref<VertexBuffer> vb = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
                 vb->ClearBufferOnDestroy(false);
@@ -124,7 +124,6 @@ namespace Renderer
 //
 // Will Soon Sort out the shaders when Materials Are Implemented
 //
-            shader.Bind();
 
             for (int i = 0; i < m_RenderQueue.size(); i++)
             {
@@ -143,7 +142,9 @@ namespace Renderer
                 CheckBufferUpdate(i);
 //
 // Setting up VertexArray for each call, needs to be fixed at higher builds!!
-//
+//              
+                preprocessing.at(i)();
+
                 Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[i]);
                 Ref<IndexBuffer> indexbuffer = CreateRef<OpenGLIndexBuffer>(indexbuffercache[i]);
                 Ref<VertexArray> array = CreateRef<OpenGLVertexArray>();
@@ -153,6 +154,7 @@ namespace Renderer
 
                 array->AddBuffer(*vertexbuffer, *m_RenderQueue[i].GetLayout());
 
+                shader.Bind();
                 indexbuffer->Bind();
                 vertexbuffer->Bind();
 
@@ -160,6 +162,7 @@ namespace Renderer
 
                 vertexbuffer->unBind();
                 indexbuffer->unBind();
+                shader.unBind();
             }
         }
 

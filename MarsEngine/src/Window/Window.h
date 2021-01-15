@@ -3,6 +3,7 @@
 
 #include "Events/Event.h"
 #include "Events/KeyboardCode.h"
+#include "Vender/GLFW/glfw3.h"
 
 #include <string>
 #include <functional>
@@ -43,7 +44,7 @@ namespace Window
         virtual void SetVSync(bool enable) = 0;
         virtual bool IsVSync() const = 0;
 
-        virtual void* GetNativeWindow() const = 0;
+        virtual GLFWwindow* GetNativeWindow() = 0;
 
         virtual bool IsKeyPressed(Event::KeyCode code) const
         {

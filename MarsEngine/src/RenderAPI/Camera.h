@@ -2,7 +2,7 @@
 
 #include "MarsHeader.h"
 
-#include "Vender/OGLM/oglm.h"
+#include "Vender/glm/glm/gtc/matrix_transform.hpp"
 
 class Camera
 {
@@ -10,8 +10,8 @@ public:
 	Camera();
 	~Camera();
 
-	inline oglm::Matrix4<ME_DATATYPE>& GetProjectionViewMat() { return m_PV; }
-	inline void SetProjectionViewMat(const oglm::Matrix4<ME_DATATYPE>& pv) { m_PV = pv; }
+	inline glm::mat4& GetProjectionViewMat() { return m_PV; }
+	inline void SetProjectionViewMat(const glm::mat4& pv) { m_PV = pv; }
 private:
-	oglm::Matrix4<ME_DATATYPE> m_PV;
+	glm::mat4 m_PV;
 };

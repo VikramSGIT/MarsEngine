@@ -62,7 +62,7 @@ namespace Renderer
             ME_PROFILE_TRACE_CALL();
 
             Bind();
-            GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), data));
+            GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(ME_DATATYPE), count * sizeof(ME_DATATYPE), data));
             unBind();
             m_Filled += count;
         }

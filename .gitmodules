@@ -4,3 +4,6 @@
 [submodule "MarsEngine/src/Vender/stb"]
 	path = MarsEngine/src/Vender/stb
 	url = https://github.com/nothings/stb
+[submodule "MarsEngine/src/Vender/glm"]
+	path = MarsEngine/src/Vender/glm
+	url = https://github.com/g-truc/glm

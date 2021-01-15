@@ -48,7 +48,7 @@ namespace Window
                 style.Colors[ImGuiCol_WindowBg].w = 1.0f;
             }
 
-            ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow()), true);
+            ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(app.GetWindow()->GetNativeWindow()), true);
             ImGui_ImplOpenGL3_Init("#version 400");
         }
         void imguiLayer::OnDetach()

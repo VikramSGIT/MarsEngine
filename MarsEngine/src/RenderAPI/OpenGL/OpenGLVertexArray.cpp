@@ -35,7 +35,7 @@ namespace Renderer
             {
                 const VertexBufferElement element = elements[i];
                 GLLogCall(glEnableVertexAttribArray(i));
-                GLLogCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)(offset)));
+                GLLogCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
                 offset += GetElementSize(element.type) * element.count;
             }
             vertexbuffer.unBind();

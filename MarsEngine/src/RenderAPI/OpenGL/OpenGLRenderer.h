@@ -6,7 +6,7 @@
 #include "OpenGLIndexBuffer.h"
 #include "OpenGLShader.h"
 #include "Window/Layers/BasicLayer.h"
-#include "Vender/OGLM/oglm.h"
+#include "Vender/glm/glm/glm.hpp"
 #include "RenderAPI/Renderer.h"
 #include "GL/glew.h"
 #include "OpenGLErrorhandle.h"
@@ -26,10 +26,11 @@ namespace Renderer
         private:
             bool Ready = false, LiveStreamData = true;
             unsigned int indexoffset = 0;
-            oglm::vec4<ME_DATATYPE> m_clearcolor;
+            glm::vec4 m_clearcolor;
             std::vector<MeshQueue> m_RenderQueue;
             std::vector <unsigned int> vertexbuffercache;
             std::vector<unsigned int> indexbuffercache;
+            std::vector<std::function<void()>> preprocessing;
 
             void SetUpBuffers(const MeshQueue& meshqueue);
             void CheckBufferUpdate(const unsigned int& id);
@@ -42,11 +43,11 @@ namespace Renderer
             void OnUpdate() override;
             void OnEvent(Event::Event& e);
             void Clear() const;
-            void AddRenderSubmition(const MeshQueue& meshqueue) override;
+            void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) override;
 
             bool SwitchAPI(const RenderAPItype api);
             void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-            void SetClearColor(const oglm::vec4<ME_DATATYPE>& color) override;
+            void SetClearColor(const glm::vec4& color) override;
             void Draw(const Shader& shader) override;
 
             inline Ref<Layer::BasicLayer> GetLayer() override;

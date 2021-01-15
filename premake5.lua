@@ -78,7 +78,6 @@ workspace "MarsEngine"
 			"MarsEngine/src/Utils/**.h",
 			"MarsEngine/src/Utils/**.cpp",
 			"MarsEngine/src/Vender/GLFW/**.h",
-			"MarsEngine/src/Vender/OGLM/**.h",
 			"MarsEngine/src/Vender/stb/stb_image.h",
 			"MarsEngine/src/Window/**.h",
 			"MarsEngine/src/Window/**.cpp",

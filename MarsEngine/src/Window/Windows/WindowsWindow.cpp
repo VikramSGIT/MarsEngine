@@ -90,8 +90,10 @@ namespace Window
                 {
                     case GLFW_PRESS:
                     {
+#ifdef ME_IMGUI
                         ImGuiIO& io = ImGui::GetIO();
                         if (!io.WantCaptureKeyboard)
+#endif
                         {
                             auto it = std::find(data.keystack->begin(), data.keystack->end(), key);
                             if (it == data.keystack->end())
@@ -134,8 +136,10 @@ namespace Window
                 {
                     case GLFW_PRESS:
                     {
+#ifdef ME_IMGUI
                         ImGuiIO& io = ImGui::GetIO();
                         if (!io.WantCaptureKeyboard)
+#endif
                         {
                             auto it = std::find(data.keystack->begin(), data.keystack->end(), button);
                             if (it == data.keystack->end())

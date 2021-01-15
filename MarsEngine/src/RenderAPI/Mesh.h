@@ -4,7 +4,8 @@
 
 #include "Buffers.h"
 #include "Shader.h"
-#include "Vender/OGLM/oglm.h"
+#include "Vender/glm/glm/gtc/matrix_transform.hpp"
+#include "Vender/glm/glm/glm.hpp"
 #include <memory>
 #include <algorithm>
 
@@ -31,35 +32,44 @@ namespace Renderer
 		void UpdateIndices(const unsigned int* data, const unsigned int& count);
 
 		void SetReady(bool ready) { Ready = ready; }
+		void SetReset(const VERTEX* vertex, const unsigned int& count);
+		void Reset();
 
-		inline std::vector<VERTEX>* GetVertices() { return &m_Vertices; }
-		inline std::vector<unsigned int>* GetIndices() { return &m_Indices; }
-		inline oglm::Matrix4<ME_DATATYPE> GetModelMat() { return m_Model; }
+		inline const std::vector<VERTEX> GetVertices() { return m_Vertices; }
+		inline const std::vector<unsigned int> GetIndices() { return m_Indices; }
+		inline glm::mat4 GetModelMat() { return m_Model; }
+		inline std::string GetName() const { return m_Name; }
 
 		inline bool IsReady() const { return Ready; }
 
-		friend Ref<Mesh> operator * (Ref<Mesh> mesh, const oglm::Matrix4<ME_DATATYPE> &mat)
+		friend Ref<Mesh> operator* (Ref<Mesh>& mesh, const glm::mat4 &mat)
 		{
-			Scope<VERTEX[]> vertex = CreateScope<VERTEX[]>(mesh->m_Vertices.size());
 
-			for (int i = 0; i < mesh->m_Vertices.size(); i++)
+			ME_PROFILE_TRACE_CALL();
+
+			glm::mat4 matrix = mat;
+			std::vector<VERTEX> vertices = mesh->m_Vertices;
+			mesh->m_Vertices.clear();
+			for (int i = 0; i < vertices.size(); i++)
 			{
-				vertex[i] = mesh->m_Vertices.at(i);
-				oglm::vec4<ME_DATATYPE> out(vertex[i].vertices[0], vertex[i].vertices[1], vertex[i].vertices[2], 1.0f);
-				out = out * mat;
-				vertex[i].vertices[0] = out.x;
-				vertex[i].vertices[1] = out.y;
-				vertex[i].vertices[2] = out.z;
+				VERTEX vertex;
+				vertex = vertices.at(i);
+				glm::vec4 out(vertex.vertices[0], vertex.vertices[1], vertex.vertices[2], 1.0f);
+				out = matrix * out;
+				vertex.vertices[0] = out.x;
+				vertex.vertices[1] = out.y;
+				vertex.vertices[2] = out.z;
+				mesh->m_Vertices.emplace_back(vertex);
 			}
-
-			mesh->UpdateVertices(vertex.get(), mesh->m_Vertices.size());
+			mesh->Ready = false;
 			return mesh;
 		}
 
 	private:
 		std::vector<VERTEX> m_Vertices;
 		std::vector<unsigned int> m_Indices;
-		oglm::Matrix4<ME_DATATYPE> m_Model;
+		std::vector<VERTEX> m_ResetVertices;
+		glm::mat4 m_Model = glm::identity<glm::mat4>();
 		std::string m_Name;
 		bool Ready = false;
 	};
@@ -70,7 +80,8 @@ namespace Renderer
 		MeshQueue()
 			:vertexbuffer(nullptr), indexbuffer(nullptr) {}
 
-		void PushMesh(Ref<Mesh> mesh);
+		void PushMesh(const Ref<Mesh>& mesh);
+		void PushMeshes(const std::vector<Ref<Mesh>>& meshes);
 		void ClearBuffer() const;
 
 		inline Ref<VertexBufferLayout> GetLayout() const { return m_Layout; }
@@ -78,7 +89,7 @@ namespace Renderer
 
 		inline unsigned int GetTotalVertices() const { return total_vertices; }
 		inline unsigned int GetTotalIndices() const { return total_indices; }
-		std::vector<oglm::vec2<unsigned int>> GetUpdate();
+		std::vector<glm::uvec2> GetUpdate();
 
 		std::vector<Ref<Mesh>>::iterator begin() { return m_Meshes.begin(); }
 		std::vector< Ref<Mesh>>::iterator end() { return m_Meshes.end(); }

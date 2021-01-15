@@ -51,8 +51,7 @@ namespace Window
                 void SetVSync(bool enable) override;
                 bool IsVSync() const override;
 
-                virtual void* GetNativeWindow() const {return m_Window;}
-
+                virtual GLFWwindow* GetNativeWindow() override {return m_Window;}
         };
     }
 }

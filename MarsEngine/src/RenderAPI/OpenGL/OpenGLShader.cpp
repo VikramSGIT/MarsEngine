@@ -42,7 +42,7 @@ namespace Renderer
                 ME_CORE_ERROR("Cant pass the Uniforms!!");
         }
 
-        void OpenGLShader::SetUniformsMat4f(const std::string& name, const oglm::Matrix4<float>& matrix)
+        void OpenGLShader::SetUniformsMat4f(const std::string& name, const glm::mat4& matrix)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -57,8 +57,9 @@ namespace Renderer
             }
             if (location != -1)
             {
-                oglm::Matrix4<float> mat;
-                GLLogCall(glUniformMatrix4fv(location, 1, GL_FALSE, &matrix.mat[0][0]));
+                Bind();
+                GLLogCall(glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]));
+                unBind();
             }
             else
                 std::cout << "Cant pass the Uniforms!!" << std::endl;

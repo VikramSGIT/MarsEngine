@@ -2,6 +2,9 @@
 #include "MarsHeader.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Window/Layers/Layer.h"
+#include "Window/Layers/BasicLayer.h"
+#include "RenderAPI/OpenGL/OpenGLShader.h"
 
 namespace Renderer
 {
@@ -21,8 +24,8 @@ namespace Renderer
 
         virtual void Init() = 0;
         virtual void OnUpdate() = 0;
-        virtual void SetClearColor(const oglm::vec4<ME_DATATYPE>& color) = 0;
-        virtual void AddRenderSubmition(const MeshQueue& meshqueue) = 0;
+        virtual void SetClearColor(const glm::vec4& color) = 0;
+        virtual void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) = 0;
         virtual Ref<Layer::BasicLayer> GetLayer() = 0;
         virtual void Draw(const Shader& shader) = 0;
 
