@@ -22,7 +22,7 @@ namespace Renderer
 	{
 	public:
 		Mesh(const std::string& name)
-			:m_Name(name) {}
+		:m_Name(name) { ME_PROFILE_TRACE_CALL(); }
 		~Mesh() = default;
 
 		void BufferVertices(const VERTEX* vertex, const unsigned int& count);
@@ -35,10 +35,18 @@ namespace Renderer
 		void SetReset(const VERTEX* vertex, const unsigned int& count);
 		void Reset();
 
+		void Transulate(const float& X, const float& Y, const float& Z);
+		void Transulate(const glm::vec3& XYZ);
+		void Rotate(const float& degreeX, const float& degreeY, const float& degreeZ);
+		void Rotate(const glm::vec3& XYZ);
+		void Scale(const float& X, const float& Y, const float& Z);
+		void Scale(const glm::vec3& XYZ);
+
 		inline const std::vector<VERTEX> GetVertices() { return m_Vertices; }
 		inline const std::vector<unsigned int> GetIndices() { return m_Indices; }
 		inline glm::mat4 GetModelMat() { return m_Model; }
 		inline std::string GetName() const { return m_Name; }
+		glm::vec3 GetCentroid() const;
 
 		inline bool IsReady() const { return Ready; }
 

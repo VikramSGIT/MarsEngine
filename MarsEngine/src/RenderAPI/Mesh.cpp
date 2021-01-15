@@ -6,6 +6,9 @@ namespace Renderer
 
 	void Mesh::BufferVertices(const VERTEX* vertex, const unsigned int& count)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_Vertices.clear();
 		m_ResetVertices.clear();
 		for (unsigned int i = 0; i < count; i++)
@@ -18,6 +21,9 @@ namespace Renderer
 
 	void Mesh::BufferIndices(const unsigned int* data, const unsigned int& count)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_Indices.clear();
 		for (unsigned int i = 0; i < count; i++)
 			m_Indices.emplace_back(data[i]);
@@ -26,6 +32,9 @@ namespace Renderer
 
 	void Mesh::UpdateVertices(const VERTEX* vertex, const unsigned int& count)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_Vertices.clear();
 		for (unsigned int i = 0; i < count; i++)
 			m_Vertices.emplace_back(vertex[i]);
@@ -34,6 +43,9 @@ namespace Renderer
 
 	void Mesh::UpdateIndices(const unsigned int* data, const unsigned int& count)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_Indices.clear();
 		for (unsigned int i = 0; i < count; i++)
 			m_Indices.emplace_back(data[i]);
@@ -42,6 +54,9 @@ namespace Renderer
 
 	void Mesh::SetReset(const VERTEX* vertex, const unsigned int& count)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_ResetVertices.clear();
 		for (int i = 0; i < count; i++)
 			m_ResetVertices.emplace_back(vertex[i]);
@@ -49,7 +64,138 @@ namespace Renderer
 
 	void Mesh::Reset()
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_Vertices = m_ResetVertices;
+		Ready = false;
+	}
+
+	void Mesh::Transulate(const ME_DATATYPE& X, const ME_DATATYPE& Y, const ME_DATATYPE& Z)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		for (VERTEX& vertex : m_Vertices)
+		{
+			vertex.vertices[0] += X;
+			vertex.vertices[1] += Y;
+			vertex.vertices[2] += Z;
+		}
+		Ready = false;
+	}
+
+	void Mesh::Transulate(const glm::vec3& XYZ)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		for (VERTEX& vertex : m_Vertices)
+		{
+			vertex.vertices[0] += XYZ.x;
+			vertex.vertices[1] += XYZ.y;
+			vertex.vertices[2] += XYZ.z;
+		}
+		Ready = false;
+	}
+
+	void Mesh::Rotate(const ME_DATATYPE& degreeX, const ME_DATATYPE& degreeY, const ME_DATATYPE& degreeZ)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
+		for (size_t i = 0; i < m_Vertices.size(); i++)
+		{
+			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f};
+			out = trans * out;
+			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeX), glm::vec3(1.0f, 0.0f, 0.0f)) * out;
+			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeX), glm::vec3(0.0f, 1.0f, 0.0f)) * out;
+			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeX), glm::vec3(0.0f, 0.0f, 1.0f)) * out;
+			out = glm::inverse(trans) * out;
+
+			m_Vertices[i].vertices[0] = out.x;
+			m_Vertices[i].vertices[1] = out.y;
+			m_Vertices[i].vertices[2] = out.z;
+		}
+		Ready = false;
+	}
+
+	void Mesh::Rotate(const glm::vec3& degreeXYZ)
+	{
+		ME_PROFILE_TRACE_CALL();
+
+		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
+		for (size_t i = 0; i < m_Vertices.size(); i++)
+		{
+			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f };
+			out = trans * out;
+			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.x), glm::vec3(1.0f, 0.0f, 0.0f)) * out;
+			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.y), glm::vec3(0.0f, 1.0f, 0.0f)) * out;
+			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.z), glm::vec3(0.0f, 0.0f, 1.0f)) * out;
+			out = glm::inverse(trans) * out;
+
+			m_Vertices[i].vertices[0] = out.x;
+			m_Vertices[i].vertices[1] = out.y;
+			m_Vertices[i].vertices[2] = out.z;
+		}
+		Ready = false;
+	}
+
+	void Mesh::Scale(const ME_DATATYPE& X, const ME_DATATYPE& Y, const ME_DATATYPE& Z)
+	{
+		ME_PROFILE_TRACE_CALL();
+
+		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
+		for (size_t i = 0; i < m_Vertices.size(); i++)
+		{
+			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f };
+			out = trans * out;
+			out = glm::scale(glm::identity<glm::mat4>(), glm::vec3(X, Y, Z)) * out;
+			out = glm::inverse(trans) * out;
+
+			m_Vertices[i].vertices[0] = out.x;
+			m_Vertices[i].vertices[1] = out.y;
+			m_Vertices[i].vertices[2] = out.z;
+		}
+		Ready = false;
+	}
+
+	void Mesh::Scale(const glm::vec3& XYZ)
+	{
+		ME_PROFILE_TRACE_CALL();
+
+		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
+		for (size_t i = 0; i < m_Vertices.size(); i++)
+		{
+			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f };
+			out = trans * out;
+			out = glm::scale(glm::identity<glm::mat4>(), glm::vec3(XYZ.x, XYZ.y, XYZ.z)) * out;
+			out = glm::inverse(trans) * out;
+
+			m_Vertices[i].vertices[0] = out.x;
+			m_Vertices[i].vertices[1] = out.y;
+			m_Vertices[i].vertices[2] = out.z;
+		}
+		Ready = false;
+	}
+
+	glm::vec3 Mesh::GetCentroid() const
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		glm::vec3 Result = { 0.0f, 0.0f, 0.0f };
+		for (VERTEX const& vertex : m_Vertices)
+		{
+			Result.x += vertex.vertices[0];
+			Result.y += vertex.vertices[1];
+			Result.z += vertex.vertices[2];
+		}
+		Result.x = Result.x / static_cast<ME_DATATYPE>(m_Vertices.size());
+		Result.y = Result.y / static_cast<ME_DATATYPE>(m_Vertices.size());
+		Result.z = Result.z / static_cast<ME_DATATYPE>(m_Vertices.size());
+		return Result;
 	}
 
 ////////////////////////////////////////// Mesh Queue ////////////////////////////////////////////////
