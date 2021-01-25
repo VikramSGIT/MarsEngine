@@ -33,6 +33,7 @@ namespace Renderer
 
 		void SetReady(bool ready) { Ready = ready; }
 		void SetReset(const VERTEX* vertex, const unsigned int& count);
+		void SetReset(const std::vector<VERTEX>& vertex);
 		void Reset();
 
 		void Transulate(const float& X, const float& Y, const float& Z);

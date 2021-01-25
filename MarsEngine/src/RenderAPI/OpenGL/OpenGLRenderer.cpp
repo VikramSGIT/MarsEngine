@@ -91,8 +91,8 @@ namespace Renderer
 
         void OpenGLRendererAPI::SetUpBuffers(const MeshQueue& meshqueue)
         {
-            Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
-            Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE, GL_DYNAMIC_DRAW);
+            Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE * sizeof(ME_DATATYPE), GL_DYNAMIC_DRAW);
+            Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE * sizeof(unsigned int), GL_DYNAMIC_DRAW);
 
             vertexbufferobj->BufferPostRenderData(meshqueue.GetVertexBuffer(), meshqueue.GetTotalVertices(), 0);
             indexbufferobj->BufferPostRenderData(meshqueue.GetIndexBuffer(), meshqueue.GetTotalIndices(), 0);
@@ -117,7 +117,7 @@ namespace Renderer
             }
         }
 
-        void OpenGLRendererAPI::Draw(const Shader& shader)
+        void OpenGLRendererAPI::Draw(const Ref<Shader>& shader)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -154,7 +154,7 @@ namespace Renderer
 
                 array->AddBuffer(*vertexbuffer, *m_RenderQueue[i].GetLayout());
 
-                shader.Bind();
+                shader->Bind();
                 indexbuffer->Bind();
                 vertexbuffer->Bind();
 
@@ -162,7 +162,7 @@ namespace Renderer
 
                 vertexbuffer->unBind();
                 indexbuffer->unBind();
-                shader.unBind();
+                shader->unBind();
             }
         }
 

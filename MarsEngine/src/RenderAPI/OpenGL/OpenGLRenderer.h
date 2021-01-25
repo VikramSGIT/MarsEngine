@@ -48,7 +48,7 @@ namespace Renderer
             bool SwitchAPI(const RenderAPItype api);
             void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
             void SetClearColor(const glm::vec4& color) override;
-            void Draw(const Shader& shader) override;
+            void Draw(const Ref<Shader>& shader) override;
 
             inline Ref<Layer::BasicLayer> GetLayer() override;
             inline std::vector<MeshQueue> GetRenderQueue() override { return m_RenderQueue; }

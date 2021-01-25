@@ -21,7 +21,7 @@ namespace Renderer
             GLLogCall(glDeleteProgram(m_RendererID));
         }
 
-        void OpenGLShader::SetUniforms1i(const std::string& name, int i1)
+        void OpenGLShader::SetUniforms1i(const  std::string& name, const int& data)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -36,7 +36,31 @@ namespace Renderer
             }
             if (location != -1)
             {
-                GLLogCall(glUniform1i(location, i1));
+                Bind();
+                GLLogCall(glUniform1i(location, data));
+                unBind();
+            }
+            else
+                ME_CORE_ERROR("Cant pass the Uniforms!!");
+        }
+
+        void OpenGLShader::SetUniforms1f(const std::string& name, const float& data)
+        {
+            ME_PROFILE_TRACE_CALL();
+
+            int location;
+            if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                location = m_UniformLocationCache[name];
+            else
+            {
+                location = GLValidUniformLocation(m_RendererID, name.c_str());
+                m_UniformLocationCache[name] = location;
+            }
+            if (location != -1)
+            {
+                Bind();
+                GLLogCall(glUniform1f(location, data));
+                unBind();
             }
             else
                 ME_CORE_ERROR("Cant pass the Uniforms!!");
@@ -65,7 +89,7 @@ namespace Renderer
                 std::cout << "Cant pass the Uniforms!!" << std::endl;
         }
 
-        void OpenGLShader::SetUniforms4f(const std::string& name, ME_DATATYPE f1, ME_DATATYPE f2, ME_DATATYPE f3, ME_DATATYPE f4)
+        void OpenGLShader::SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -80,26 +104,34 @@ namespace Renderer
             }
             if (location != -1)
             {
+                Bind();
                 GLLogCall(glUniform4f(location, f1, f2, f3, f4));
+                unBind();
             }
             else
                 std::cout << "Cant pass the Uniforms!!" << std::endl;
         }
 
-        void OpenGLShader::Bind() const
+        void OpenGLShader::Bind()
         {
 
             ME_PROFILE_TRACE_CALL();
-
-            GLLogCall(glUseProgram(m_RendererID));
+            if (!Bound)
+            {
+                GLLogCall(glUseProgram(m_RendererID));
+                Bound = true;
+            }
         }
 
-        void OpenGLShader::unBind() const
+        void OpenGLShader::unBind()
         {
-
-            ME_PROFILE_TRACE_CALL();
-
-            GLLogCall(glUseProgram(0));
+            if(Bound)
+                ME_PROFILE_TRACE_CALL();
+            if (Bound)
+            {
+                GLLogCall(glUseProgram(0));
+                Bound = false;
+            }
         }
 
         ShaderSource OpenGLShader::PharseShader(const std::string& filepath)

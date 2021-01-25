@@ -28,6 +28,7 @@ namespace Renderer
             unsigned int m_RendererID;
             std::unordered_map<std::string, int> m_UniformLocationCache;
             std::string m_Filepath;
+            bool Bound = false;
 
             ShaderSource PharseShader(const std::string& filepath);
             unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
@@ -37,11 +38,12 @@ namespace Renderer
             OpenGLShader(const std::string& filepath);
             ~OpenGLShader();
 
-            void Bind() const override;
-            void unBind() const override;
+            void Bind() override;
+            void unBind() override;
 
-            void SetUniforms4f(const std::string& name, ME_DATATYPE f1, ME_DATATYPE f2, ME_DATATYPE f3, ME_DATATYPE f4) override;
-            void SetUniforms1i(const std::string& name, int i1) override;
+            void SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4) override;
+            void SetUniforms1i(const  std::string& name, const int& data) override;
+            void SetUniforms1f(const  std::string& name, const float& data) override;
             void SetUniformsMat4f(const std::string& name, const glm::mat4& matrix) override;
         };
     }

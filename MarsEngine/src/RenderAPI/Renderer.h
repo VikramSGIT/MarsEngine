@@ -27,7 +27,7 @@ namespace Renderer
         virtual void SetClearColor(const glm::vec4& color) = 0;
         virtual void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) = 0;
         virtual Ref<Layer::BasicLayer> GetLayer() = 0;
-        virtual void Draw(const Shader& shader) = 0;
+        virtual void Draw(const Ref<Shader>& shader) = 0;
 
         virtual bool SwitchAPI(const RenderAPItype api) = 0;
         virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) = 0;
