@@ -39,19 +39,19 @@ namespace Renderer
             OpenGLRendererAPI();
             ~OpenGLRendererAPI();
 
-            void Init() override;
-            void OnUpdate() override;
-            void OnEvent(Event::Event& e);
-            void Clear() const;
-            void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) override;
+            virtual void Init() override;
+            virtual void OnUpdate() override;
+            virtual void OnEvent(Event::Event& e) override;
+            virtual void Clear() const override;
+            virtual void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) override;
 
-            bool SwitchAPI(const RenderAPItype api);
-            void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-            void SetClearColor(const glm::vec4& color) override;
-            void Draw(const Ref<Shader>& shader) override;
+            virtual bool SwitchAPI(const RenderAPItype api);
+            virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
+            virtual void SetClearColor(const glm::vec4& color) override;
+            virtual void Draw(const Ref<Shader>& shader) override;
 
-            inline Ref<Layer::BasicLayer> GetLayer() override;
-            inline std::vector<MeshQueue> GetRenderQueue() override { return m_RenderQueue; }
+            virtual inline Ref<Layer::BasicLayer> GetLayer() override;
+            virtual inline std::vector<MeshQueue> GetRenderQueue() override { return m_RenderQueue; }
         };
 
     }

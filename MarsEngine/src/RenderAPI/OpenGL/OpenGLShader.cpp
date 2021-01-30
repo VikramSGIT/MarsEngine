@@ -112,6 +112,29 @@ namespace Renderer
                 std::cout << "Cant pass the Uniforms!!" << std::endl;
         }
 
+        void OpenGLShader::SetUniforms3f(const std::string& name, const float* data)
+        {
+
+            ME_PROFILE_TRACE_CALL();
+
+            int location;
+            if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                location = m_UniformLocationCache[name];
+            else
+            {
+                location = GLValidUniformLocation(m_RendererID, name.c_str());
+                m_UniformLocationCache[name] = location;
+            }
+            if (location != -1)
+            {
+                Bind();
+                GLLogCall(glUniform1fv(location, 3, data));
+                unBind();
+            }
+            else
+                std::cout << "Cant pass the Uniforms!!" << std::endl;
+        }
+
         void OpenGLShader::Bind()
         {
 

@@ -24,6 +24,8 @@ namespace Renderer
 
         virtual void Init() = 0;
         virtual void OnUpdate() = 0;
+        virtual void OnEvent(Event::Event& e) = 0;
+        virtual void Clear() const = 0;
         virtual void SetClearColor(const glm::vec4& color) = 0;
         virtual void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) = 0;
         virtual Ref<Layer::BasicLayer> GetLayer() = 0;

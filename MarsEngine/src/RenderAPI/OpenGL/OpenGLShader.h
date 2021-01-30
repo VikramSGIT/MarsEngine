@@ -42,6 +42,7 @@ namespace Renderer
             void unBind() override;
 
             void SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4) override;
+            void SetUniforms3f(const std::string& name, const float* data) override;
             void SetUniforms1i(const  std::string& name, const int& data) override;
             void SetUniforms1f(const  std::string& name, const float& data) override;
             void SetUniformsMat4f(const std::string& name, const glm::mat4& matrix) override;
