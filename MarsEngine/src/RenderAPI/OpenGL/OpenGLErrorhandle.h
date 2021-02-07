@@ -10,14 +10,16 @@
 #define GLLogCall(x) GLClearError();\
         x;\
         GLPrintError(#x, __FILE__, __LINE__)
-
-namespace Renderer
+namespace ME
 {
-    namespace OpenGL
+    namespace Renderer
     {
-        bool GLPrintError(const char* function, const char* srcfile, int codeline);
-        void GLClearError();
-        bool GLShaderError(const unsigned int& type, const unsigned int& shaderid);
-        int GLValidUniformLocation(unsigned int& shader, const char* name);
+        namespace OpenGL
+        {
+            bool GLPrintError(const char* function, const char* srcfile, int codeline);
+            void GLClearError();
+            bool GLShaderError(const unsigned int& type, const unsigned int& shaderid);
+            int GLValidUniformLocation(unsigned int& shader, const char* name);
+        }
     }
 }

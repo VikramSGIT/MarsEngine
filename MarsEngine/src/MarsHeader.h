@@ -7,7 +7,7 @@
 #define ME_MAX_VERTEX_BUFFER_SIZE 1000
 #define ME_MAX_INDEX_BUFFER_SIZE 200
 
-#include "Utils\Intrumentor.h"
+#include "Utils/Intrumentor.h"
 #include "glm/glm/glm.hpp"
 #include "glm/glm/mat4x4.hpp"
 #include "glm/glm/vec4.hpp"

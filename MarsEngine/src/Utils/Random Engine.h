@@ -2,24 +2,27 @@
 
 #include <random>
 
-namespace Mars
+namespace ME
 {
-	enum Type
+	namespace Utils
 	{
-		NON_REPEATING_CYCLING_ADJUSTABLE_MINMAX
-	};
-	template<typename T, Type type>
-	class Random
-	{
-		Random() = default;
-		~Random() = default;
+		template<typename T>
+		class Random
+		{
+		public:
+			Random()
+			{
+				m_RandomEngine.seed(std::random_device()());
+			}
+			~Random() = default;
 
-		void SetMin(T min) {}
-		void SetMax(T max) {}
-		void Seed(T seed) {}
-	private:
-		T min, max, seed;
-		std::default_random_engine drm;
-		std::linear_congruential_engine lce;
-	};
+			void SetMin(float range) { m_Range = range; }
+
+			T operator()() { return m_Range * static_cast<T>(m_Distribution(m_RandomEngine)) / static_cast<T>(std::numeric_limits<uint32_t>::max()); }
+		private:
+			T m_Range = static_cast<T>(1);
+			std::mt19937 m_RandomEngine;
+			std::uniform_int_distribution<std::mt19937::result_type> m_Distribution;
+		};
+	}
 }

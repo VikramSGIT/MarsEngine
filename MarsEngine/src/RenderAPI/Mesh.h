@@ -6,10 +6,13 @@
 #include "Shader.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
 #include "Vender/glm/glm/glm.hpp"
+#include "Addons/Addon.h"
+
 #include <memory>
+#include <string>
 #include <algorithm>
 
-namespace Renderer
+namespace ME
 {
 	struct VERTEX
 	{
@@ -31,7 +34,7 @@ namespace Renderer
 		void UpdateVertices(const VERTEX* vertex, const unsigned int& count);
 		void UpdateIndices(const unsigned int* data, const unsigned int& count);
 
-		void SetReady(bool ready) { Ready = ready; }
+		void SetReady(bool ready) { m_Ready = ready; }
 		void SetReset(const VERTEX* vertex, const unsigned int& count);
 		void SetReset(const std::vector<VERTEX>& vertex);
 		void Reset();
@@ -42,14 +45,13 @@ namespace Renderer
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const float& X, const float& Y, const float& Z);
 		void Scale(const glm::vec3& XYZ);
+		void Destroy() {}
 
-		inline const std::vector<VERTEX> GetVertices() { return m_Vertices; }
-		inline const std::vector<unsigned int> GetIndices() { return m_Indices; }
-		inline glm::mat4 GetModelMat() { return m_Model; }
+		inline const std::vector<VERTEX>& GetVertices() const { return m_Vertices; }
 		inline std::string GetName() const { return m_Name; }
 		glm::vec3 GetCentroid() const;
 
-		inline bool IsReady() const { return Ready; }
+		inline bool IsReady() const { return m_Ready; }
 
 		friend Ref<Mesh> operator* (Ref<Mesh>& mesh, const glm::mat4 &mat)
 		{
@@ -70,7 +72,7 @@ namespace Renderer
 				vertex.vertices[2] = out.z;
 				mesh->m_Vertices.emplace_back(vertex);
 			}
-			mesh->Ready = false;
+			mesh->m_Ready = false;
 			return mesh;
 		}
 
@@ -78,22 +80,22 @@ namespace Renderer
 		std::vector<VERTEX> m_Vertices;
 		std::vector<unsigned int> m_Indices;
 		std::vector<VERTEX> m_ResetVertices;
-		glm::mat4 m_Model = glm::identity<glm::mat4>();
 		std::string m_Name;
-		bool Ready = false;
+		bool m_Ready = false, m_Destroy = false;
+
+		friend class MeshQueue;
 	};
 
 	class MeshQueue
 	{
 	public:
-		MeshQueue()
-			:vertexbuffer(nullptr), indexbuffer(nullptr) {}
-
+		MeshQueue() = default;
 		void PushMesh(const Ref<Mesh>& mesh);
 		void PushMeshes(const std::vector<Ref<Mesh>>& meshes);
-		void ClearBuffer() const;
+		void PushAddon(ME::Addon::MeshAddon& addon);
+		void ClearBuffer();
 
-		inline Ref<VertexBufferLayout> GetLayout() const { return m_Layout; }
+		inline Ref<Renderer::VertexBufferLayout> GetLayout() const { return m_Layout; }
 		inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }
 
 		inline unsigned int GetTotalVertices() const { return total_vertices; }
@@ -101,23 +103,101 @@ namespace Renderer
 		std::vector<glm::uvec2> GetUpdate();
 
 		std::vector<Ref<Mesh>>::iterator begin() { return m_Meshes.begin(); }
-		std::vector< Ref<Mesh>>::iterator end() { return m_Meshes.end(); }
-		std::vector< Ref<Mesh>>::reverse_iterator rbegin() { return m_Meshes.rbegin(); }
-		std::vector< Ref<Mesh>>::reverse_iterator rend() { return m_Meshes.rend(); }
+		std::vector<Ref<Mesh>>::iterator end() { return m_Meshes.end(); }
+		std::vector<Ref<Mesh>>::reverse_iterator rbegin() { return m_Meshes.rbegin(); }
+		std::vector<Ref<Mesh>>::reverse_iterator rend() { return m_Meshes.rend(); }
 
 		std::vector<Ref<Mesh>>::const_iterator begin() const { return m_Meshes.begin(); }
 		std::vector<Ref<Mesh>>::const_iterator end() const { return m_Meshes.end(); }
 		std::vector<Ref<Mesh>>::const_reverse_iterator rbegin() const { return m_Meshes.rbegin(); }
-		std::vector< Ref<Mesh>>::const_reverse_iterator rend() const { return m_Meshes.rend(); }
+		std::vector<Ref<Mesh>>::const_reverse_iterator rend() const { return m_Meshes.rend(); }
 
 		inline const ME_DATATYPE* GetVertexBuffer() const { return vertexbuffer; }
 		inline const unsigned int* GetIndexBuffer() const { return indexbuffer; }
 
 	private:
-		std::vector<Ref<Mesh>> m_Meshes;
 		ME_DATATYPE* vertexbuffer;
 		unsigned int* indexbuffer;
-		Ref<VertexBufferLayout> m_Layout = CreateRef<VertexBufferLayout>();
+		std::vector<Ref<Mesh>> m_Meshes;
+		std::allocator<ME_DATATYPE> vertexbufferallocator;
+		std::allocator<unsigned int> indexbufferallocator;
 		unsigned int total_vertices = 0, total_indices = 0;
+		Ref<Renderer::VertexBufferLayout> m_Layout = CreateRef<Renderer::VertexBufferLayout>();
 	};
+//
+// Commenly used meshes
+//
+	static Ref<Mesh> GenQuad(const std::string& name, const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3, const glm::vec2& v4, const unsigned int& index = 0)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		VERTEX vertexbuffer[] =
+		{
+			{v1.x, v1.y, 0.0f, 0.0f, (float)index},
+			{v2.x, v2.y, 1.0f, 0.0f, (float)index},
+			{v3.x, v3.y, 1.0f, 1.0f, (float)index},
+			{v4.x, v4.y, 0.0f, 1.0f, (float)index}
+		};
+		unsigned int indexbuffer[] =
+		{
+			0, 1, 2,
+			2, 3, 0
+		};
+		Ref<Mesh> out = CreateRef<Mesh>(name);
+		out->BufferVertices(vertexbuffer, sizeof(vertexbuffer) / sizeof(VERTEX));
+		out->BufferIndices(indexbuffer, sizeof(indexbuffer) / sizeof(unsigned int));
+		return out;
+	}
+//
+// Generate Rectangle using diagonal points
+	static Ref<Mesh> GenRect(const std::string& name, const glm::vec2& point1, const glm::vec2& point2, const unsigned int& index = 0)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		VERTEX vertexbuffer[] =
+		{
+			{point1.x, point1.y, 0.0f, 0.0f, (float)index},
+			{point2.x, point1.y, 1.0f, 0.0f, (float)index},
+			{point2.x, point2.y, 1.0f, 1.0f, (float)index},
+			{point1.y, point2.x, 0.0f, 1.0f, (float)index}
+		};
+		unsigned int indexbuffer[] =
+		{
+			0, 1, 2,
+			2, 3, 0
+		};
+		Ref<Mesh> out = CreateRef<Mesh>(name);
+		out->BufferVertices(vertexbuffer, sizeof(vertexbuffer) / sizeof(VERTEX));
+		out->BufferIndices(indexbuffer, sizeof(indexbuffer) / sizeof(unsigned int));
+		return out;
+	}
+//
+// Generates a quad using lenght and breath
+	static Ref<Mesh> GenRect(const std::string& name, const glm::vec2& lb, const unsigned int& index = 0)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		VERTEX vertexbuffer[] =
+		{
+			{0.0f, 0.0f, 0.0f, 0.0f, (float)index},
+			{0.0f, lb.x, 1.0f, 0.0f, (float)index},
+			{lb.x, lb.y, 1.0f, 1.0f, (float)index},
+			{0.0f, lb.y, 0.0f, 1.0f, (float)index}
+		};
+		unsigned int indexbuffer[] =
+		{
+			0, 1, 2,
+			2, 3, 0
+		};
+		Ref<Mesh> out = CreateRef<Mesh>(name);
+		out->BufferVertices(vertexbuffer, sizeof(vertexbuffer) / sizeof(VERTEX));
+		out->BufferIndices(indexbuffer, sizeof(indexbuffer) / sizeof(unsigned int));
+		return out;
+	}
+//
+// Quickest quad generation with 1x1 size
+	static Ref<Mesh> QuickQuad(const unsigned int& index = 0) { return GenRect("Quad", {1.0f, 1.0f}, index); }
 }

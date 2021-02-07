@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-namespace Renderer 
+namespace ME
 {
 //////////////////////////////////////// Mesh //////////////////////////////////////////////////
 
@@ -16,7 +16,7 @@ namespace Renderer
 			m_Vertices.emplace_back(vertex[i]);
 			m_ResetVertices.emplace_back(vertex[i]);
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::BufferIndices(const unsigned int* data, const unsigned int& count)
@@ -27,7 +27,7 @@ namespace Renderer
 		m_Indices.clear();
 		for (unsigned int i = 0; i < count; i++)
 			m_Indices.emplace_back(data[i]);
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::UpdateVertices(const VERTEX* vertex, const unsigned int& count)
@@ -38,7 +38,7 @@ namespace Renderer
 		m_Vertices.clear();
 		for (unsigned int i = 0; i < count; i++)
 			m_Vertices.emplace_back(vertex[i]);
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::UpdateIndices(const unsigned int* data, const unsigned int& count)
@@ -49,7 +49,7 @@ namespace Renderer
 		m_Indices.clear();
 		for (unsigned int i = 0; i < count; i++)
 			m_Indices.emplace_back(data[i]);
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::SetReset(const VERTEX* vertex, const unsigned int& count)
@@ -74,7 +74,7 @@ namespace Renderer
 		ME_PROFILE_TRACE_CALL();
 
 		m_Vertices = m_ResetVertices;
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::Transulate(const ME_DATATYPE& X, const ME_DATATYPE& Y, const ME_DATATYPE& Z)
@@ -88,7 +88,7 @@ namespace Renderer
 			vertex.vertices[1] += Y;
 			vertex.vertices[2] += Z;
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::Transulate(const glm::vec3& XYZ)
@@ -102,7 +102,7 @@ namespace Renderer
 			vertex.vertices[1] += XYZ.y;
 			vertex.vertices[2] += XYZ.z;
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::Rotate(const ME_DATATYPE& degreeX, const ME_DATATYPE& degreeY, const ME_DATATYPE& degreeZ)
@@ -124,7 +124,7 @@ namespace Renderer
 			m_Vertices[i].vertices[1] = out.y;
 			m_Vertices[i].vertices[2] = out.z;
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::Rotate(const glm::vec3& degreeXYZ)
@@ -145,7 +145,7 @@ namespace Renderer
 			m_Vertices[i].vertices[1] = out.y;
 			m_Vertices[i].vertices[2] = out.z;
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::Scale(const ME_DATATYPE& X, const ME_DATATYPE& Y, const ME_DATATYPE& Z)
@@ -164,7 +164,7 @@ namespace Renderer
 			m_Vertices[i].vertices[1] = out.y;
 			m_Vertices[i].vertices[2] = out.z;
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	void Mesh::Scale(const glm::vec3& XYZ)
@@ -183,7 +183,7 @@ namespace Renderer
 			m_Vertices[i].vertices[1] = out.y;
 			m_Vertices[i].vertices[2] = out.z;
 		}
-		Ready = false;
+		m_Ready = false;
 	}
 
 	glm::vec3 Mesh::GetCentroid() const
@@ -208,7 +208,11 @@ namespace Renderer
 
 	void MeshQueue::PushMesh(const Ref<Mesh>& mesh)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
 		m_Meshes.emplace_back(mesh);
+		ClearBuffer();
 
 		if (m_Layout->GetTotalCount() <= 0)
 		{
@@ -218,19 +222,13 @@ namespace Renderer
 		}
 //
 // This makes the allocation for the vertexbuffer and indexbuffer easier
-// Need to add normals, oject index, vertex colors
+//
 
-		total_vertices += static_cast<unsigned int>(mesh->GetVertices().size()) * m_Layout->GetTotalCount();
-		total_indices += static_cast<unsigned int>(mesh->GetIndices().size());
+		total_vertices += static_cast<unsigned int>(mesh->m_Vertices.size()) * m_Layout->GetTotalCount();
+		total_indices += static_cast<unsigned int>(mesh->m_Indices.size());
 
-		
-		if (vertexbuffer != nullptr)
-			delete[] vertexbuffer;
-		if (indexbuffer != nullptr)
-			delete[] indexbuffer;
-
-		vertexbuffer = new ME_DATATYPE[total_vertices];
-		indexbuffer = new unsigned int[total_indices];
+		vertexbuffer = vertexbufferallocator.allocate(total_vertices);
+		indexbuffer = indexbufferallocator.allocate(total_indices);
 
 		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 		for (Ref<Mesh> ms : m_Meshes)
@@ -238,9 +236,9 @@ namespace Renderer
 //
 // Filling up of vertexbuffer with datas
 //
-			std::vector<VERTEX> vertex = ms->GetVertices();
-			std::vector<unsigned int> index = ms->GetIndices();
-			for (int i = 0; i < ms->GetVertices().size() * m_Layout->GetTotalCount(); i+= m_Layout->GetTotalCount())
+			std::vector<VERTEX>& vertex = ms->m_Vertices;
+			std::vector<unsigned int>& index = ms->m_Indices;
+			for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i+= m_Layout->GetTotalCount())
 			{
 				unsigned int offset = 0;
 
@@ -253,11 +251,11 @@ namespace Renderer
 
 				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
 			}
-			voffset += static_cast<unsigned int>(ms->GetVertices().size()) * m_Layout->GetTotalCount();
+			voffset += static_cast<unsigned int>(ms->m_Vertices.size()) * m_Layout->GetTotalCount();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
-			for (int j = 0; j < ms->GetIndices().size(); j++)
+			for (unsigned __int64 j = 0; j < index.size(); j++)
 			{
 				indexbuffer[j + ioffset] = index.at(j) + indexoffset;
 			}
@@ -269,28 +267,28 @@ namespace Renderer
 
 	void MeshQueue::PushMeshes(const std::vector<Ref<Mesh>>& meshes)
 	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		ClearBuffer();
+
+		if (m_Layout->GetTotalCount() <= 0)
+		{
+			m_Layout->push(GL_FLOAT, 3);
+			m_Layout->push(GL_FLOAT, 2);
+			m_Layout->push(GL_FLOAT, 1);
+		}
+
 		for (Ref<Mesh> mesh : meshes)
 		{
 			m_Meshes.emplace_back(mesh);
-
-			if (m_Layout->GetTotalCount() <= 0)
-			{
-				m_Layout->push(GL_FLOAT, 3);
-				m_Layout->push(GL_FLOAT, 2);
-				m_Layout->push(GL_FLOAT, 1);
-			}
 //
 // This makes the allocation for the vertexbuffer and indexbuffer easier
-// Need to add normals, oject index, vertex colors
+//
 
-			total_vertices += static_cast<unsigned int>(mesh->GetVertices().size()) * m_Layout->GetTotalCount();
-			total_indices += static_cast<unsigned int>(mesh->GetIndices().size());
+			total_vertices += static_cast<unsigned int>(mesh->m_Vertices.size()) * m_Layout->GetTotalCount();
+			total_indices += static_cast<unsigned int>(mesh->m_Indices.size());
 		}
-
-		if (vertexbuffer != nullptr)
-			delete[] vertexbuffer;
-		if (indexbuffer != nullptr)
-			delete[] indexbuffer;
 
 		vertexbuffer = new ME_DATATYPE[total_vertices];
 		indexbuffer = new unsigned int[total_indices];
@@ -301,9 +299,9 @@ namespace Renderer
 //
 // Filling up of vertexbuffer with datas
 //
-			std::vector<VERTEX> vertex = ms->GetVertices();
-			std::vector<unsigned int> index = ms->GetIndices();
-			for (int i = 0; i < ms->GetVertices().size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
+			std::vector<VERTEX>& vertex = ms->m_Vertices;
+			std::vector<unsigned int>& index = ms->m_Indices;
+			for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
 			{
 				unsigned int offset = 0;
 
@@ -316,11 +314,11 @@ namespace Renderer
 
 				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
 			}
-			voffset += static_cast<unsigned int>(ms->GetVertices().size()) * m_Layout->GetTotalCount();
+			voffset += static_cast<unsigned int>(vertex.size()) * m_Layout->GetTotalCount();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
-			for (int j = 0; j < ms->GetIndices().size(); j++)
+			for (unsigned __int64 j = 0; j < index.size(); j++)
 			{
 				indexbuffer[j + ioffset] = index.at(j) + indexoffset;
 			}
@@ -328,14 +326,6 @@ namespace Renderer
 			indexoffset += *std::max_element(index.begin(), index.end()) + 1;
 			ms->SetReady(true);
 		}
-	}
-
-	void MeshQueue::ClearBuffer() const
-	{
-		if (vertexbuffer != nullptr)
-			delete[] vertexbuffer;
-		if (indexbuffer != nullptr)
-			delete[] indexbuffer;
 	}
 
 	std::vector<glm::uvec2> MeshQueue::GetUpdate()
@@ -349,13 +339,13 @@ namespace Renderer
 		for (int i = 0; i < m_Meshes.size(); i++)
 		{
 			glm::uvec2 input;
-			std::vector<VERTEX> vertex = m_Meshes[i]->GetVertices();
+			std::vector<VERTEX>& vertex = m_Meshes[i]->m_Vertices;
 			if (!m_Meshes[i]->IsReady())
 			{
 				input.x = offset;
 				input.y = offset + static_cast<unsigned int>(vertex.size()) * m_Layout->GetTotalCount();
 				ranges.emplace_back(input);
-				for (int j = 0; j < (vertex.size() * m_Layout->GetTotalCount()); j += m_Layout->GetTotalCount())
+				for (unsigned __int64 j = 0; j < (vertex.size() * m_Layout->GetTotalCount()); j += m_Layout->GetTotalCount())
 				{
 					unsigned int __offset__ = 0;
 					vertexbuffer[j + (__offset__++) + offset] = vertex.at(j / m_Layout->GetTotalCount()).vertices[0];
@@ -373,5 +363,85 @@ namespace Renderer
 		}
 
 		return ranges;
+	}
+
+	void MeshQueue::ClearBuffer()
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		vertexbufferallocator.deallocate(vertexbuffer, total_vertices);
+		indexbufferallocator.deallocate(indexbuffer, total_indices);
+	}
+
+	void MeshQueue::PushAddon(ME::Addon::MeshAddon& addon)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		ClearBuffer();
+
+		if (m_Layout->GetTotalCount() <= 0)
+		{
+			m_Layout->push(GL_FLOAT, 3);
+			m_Layout->push(GL_FLOAT, 2);
+			m_Layout->push(GL_FLOAT, 1);
+		}
+
+		std::vector<Ref<Mesh>> temp;
+		temp = m_Meshes;
+		m_Meshes.clear();
+		for (Ref<Mesh> mesh : addon.GetMeshes())
+		{
+			
+			m_Meshes.emplace_back(mesh);
+//
+// This makes the allocation for the vertexbuffer and indexbuffer easier
+//
+			total_vertices += static_cast<unsigned int>(mesh->m_Vertices.size()) * m_Layout->GetTotalCount();
+			total_indices += static_cast<unsigned int>(mesh->m_Indices.size());
+		}
+
+		for (Ref<Mesh> mesh : temp)
+		{
+			m_Meshes.emplace_back(mesh);
+		}
+
+		vertexbuffer = new ME_DATATYPE[total_vertices];
+		indexbuffer = new unsigned int[total_indices];
+
+		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
+		for (Ref<Mesh> ms : m_Meshes)
+		{
+//
+// Filling up of vertexbuffer with datas
+//
+			std::vector<VERTEX>& vertex = ms->m_Vertices;
+			std::vector<unsigned int>& index = ms->m_Indices;
+			for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
+			{
+				unsigned int offset = 0;
+
+				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[0];
+				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[1];
+				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[2];
+
+				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[0];
+				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[1];
+
+				vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
+			}
+			voffset += static_cast<unsigned int>(vertex.size()) * m_Layout->GetTotalCount();
+//                  
+// Filling up indexbuffer with data with maintaining offsets of indices
+//
+			for (unsigned __int64 j = 0; j < index.size(); j++)
+			{
+				indexbuffer[j + ioffset] = index.at(j) + indexoffset;
+			}
+			ioffset += static_cast<unsigned int>(index.size());
+			indexoffset += *std::max_element(index.begin(), index.end()) + 1;
+			ms->SetReady(true);
+		}
 	}
 }

@@ -1,12 +1,18 @@
 #include "Camera.h"
 
-Camera::Camera()
+namespace ME
 {
+	namespace Renderer
+	{
+		Camera::Camera()
+		{
 
-}
+		}
 
-Camera::~Camera()
-{
+		Camera::~Camera()
+		{
 
+		}
+	}
 }
 

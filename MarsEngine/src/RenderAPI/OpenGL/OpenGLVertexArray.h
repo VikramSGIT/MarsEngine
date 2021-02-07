@@ -6,23 +6,26 @@
 #include "OpenGLErrorHandle.h"
 
 #include <iostream>
-namespace Renderer
+namespace ME
 {
-    namespace OpenGL
+    namespace Renderer
     {
-        class OpenGLVertexArray : public VertexArray
+        namespace OpenGL
         {
-        private:
-            unsigned m_RendererID;
-        public:
-            OpenGLVertexArray();
-            ~OpenGLVertexArray();
+            class OpenGLVertexArray : public VertexArray
+            {
+            private:
+                unsigned m_RendererID;
+            public:
+                OpenGLVertexArray();
+                ~OpenGLVertexArray();
 
-            void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout) override;
+                void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout) override;
 
-            void Bind() const override;
-            void unBind() const override;
-        };
+                void Bind() const override;
+                void unBind() const override;
+            };
+        }
     }
 }
 

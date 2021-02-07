@@ -8,7 +8,7 @@ namespace ME
 {
 	namespace Utils
 	{
-		namespace Timer
+		namespace Time
 		{
 			enum class Precision
 			{
