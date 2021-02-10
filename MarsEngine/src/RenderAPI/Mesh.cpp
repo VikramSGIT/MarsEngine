@@ -77,20 +77,6 @@ namespace ME
 		m_Ready = false;
 	}
 
-	void Mesh::Transulate(const ME_DATATYPE& X, const ME_DATATYPE& Y, const ME_DATATYPE& Z)
-	{
-
-		ME_PROFILE_TRACE_CALL();
-
-		for (VERTEX& vertex : m_Vertices)
-		{
-			vertex.vertices[0] += X;
-			vertex.vertices[1] += Y;
-			vertex.vertices[2] += Z;
-		}
-		m_Ready = false;
-	}
-
 	void Mesh::Transulate(const glm::vec3& XYZ)
 	{
 
@@ -105,24 +91,20 @@ namespace ME
 		m_Ready = false;
 	}
 
-	void Mesh::Rotate(const ME_DATATYPE& degreeX, const ME_DATATYPE& degreeY, const ME_DATATYPE& degreeZ)
+	void Mesh::TransulateTo(const glm::vec3& XYZ)
 	{
 
 		ME_PROFILE_TRACE_CALL();
 
-		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
-		for (size_t i = 0; i < m_Vertices.size(); i++)
-		{
-			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f};
-			out = trans * out;
-			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeX), glm::vec3(1.0f, 0.0f, 0.0f)) * out;
-			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeX), glm::vec3(0.0f, 1.0f, 0.0f)) * out;
-			out = glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeX), glm::vec3(0.0f, 0.0f, 1.0f)) * out;
-			out = glm::inverse(trans) * out;
+		glm::vec3 centroid = GetCentroid();
 
-			m_Vertices[i].vertices[0] = out.x;
-			m_Vertices[i].vertices[1] = out.y;
-			m_Vertices[i].vertices[2] = out.z;
+		glm::vec3 distance = XYZ - centroid;
+
+		for (VERTEX& vertex : m_Vertices)
+		{
+			vertex.vertices[0] += distance.x;
+			vertex.vertices[1] += distance.y;
+			vertex.vertices[2] += distance.z;
 		}
 		m_Ready = false;
 	}
@@ -139,25 +121,6 @@ namespace ME
 			out = glm::transpose(glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.x), glm::vec3(1.0f, 0.0f, 0.0f))) * out;
 			out = glm::transpose(glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.y), glm::vec3(0.0f, 1.0f, 0.0f))) * out;
 			out = glm::transpose(glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.z), glm::vec3(0.0f, 0.0f, 1.0f))) * out;
-			out = glm::inverse(trans) * out;
-
-			m_Vertices[i].vertices[0] = out.x;
-			m_Vertices[i].vertices[1] = out.y;
-			m_Vertices[i].vertices[2] = out.z;
-		}
-		m_Ready = false;
-	}
-
-	void Mesh::Scale(const ME_DATATYPE& X, const ME_DATATYPE& Y, const ME_DATATYPE& Z)
-	{
-		ME_PROFILE_TRACE_CALL();
-
-		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
-		for (size_t i = 0; i < m_Vertices.size(); i++)
-		{
-			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f };
-			out = trans * out;
-			out = glm::scale(glm::identity<glm::mat4>(), glm::vec3(X, Y, Z)) * out;
 			out = glm::inverse(trans) * out;
 
 			m_Vertices[i].vertices[0] = out.x;
@@ -290,8 +253,8 @@ namespace ME
 			total_indices += static_cast<unsigned int>(mesh->m_Indices.size());
 		}
 
-		vertexbuffer = new ME_DATATYPE[total_vertices];
-		indexbuffer = new unsigned int[total_indices];
+		vertexbuffer = vertexbufferallocator.allocate(total_vertices);
+		indexbuffer = indexbufferallocator.allocate(total_indices);
 
 		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 		for (Ref<Mesh> ms : m_Meshes)
@@ -338,6 +301,8 @@ namespace ME
 		unsigned int offset = 0;
 		for (int i = 0; i < m_Meshes.size(); i++)
 		{
+			bool ans = !m_Meshes[i]->m_Ready && (m_Meshes[i]->m_Name.size() == 17);
+			ans;
 			glm::uvec2 input;
 			std::vector<VERTEX>& vertex = m_Meshes[i]->m_Vertices;
 			if (!m_Meshes[i]->IsReady())
@@ -407,15 +372,15 @@ namespace ME
 			m_Meshes.emplace_back(mesh);
 		}
 
-		vertexbuffer = new ME_DATATYPE[total_vertices];
-		indexbuffer = new unsigned int[total_indices];
+		vertexbuffer = vertexbufferallocator.allocate(total_vertices);
+		indexbuffer = indexbufferallocator.allocate(total_indices);
 
 		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 		for (Ref<Mesh> ms : m_Meshes)
 		{
 //
 // Filling up of vertexbuffer with datas
-//
+//			
 			std::vector<VERTEX>& vertex = ms->m_Vertices;
 			std::vector<unsigned int>& index = ms->m_Indices;
 			for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())

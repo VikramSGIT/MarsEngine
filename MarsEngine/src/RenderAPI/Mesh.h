@@ -14,6 +14,46 @@
 
 namespace ME
 {
+////////////////////////////////////// Custom Allocator ///////////////////////////////////////
+//This was made to make the mesh vertex allocation at one place which reduces memory usage a lot
+//Will be implemented later
+	template<typename T>
+	class VERTEXAllocator
+	{
+	public:
+
+		typedef T value_type;
+
+		VERTEXAllocator() = default;
+		template<typename U> constexpr VERTEXAllocator(const VERTEXAllocator<U>& vertexallocator) noexcept
+		{
+			alloc = vertexallocator.alloc;
+			m_Size = vertexallocator.m_Size;
+			m_VertexPointer = vertexallocator.m_VertexPointer;
+		}
+		~VERTEXAllocator() = default;
+
+		T* allocate(const size_t& size)
+		{
+			m_Size += size;
+			return alloc.allocate(size);
+		}
+
+		void deallocate(T* pointer, const size_t size) noexcept
+		{
+			m_Size -= size;
+			alloc.deallocate(pointer, size);
+		}
+
+	private:
+		std::allocator<T> alloc;
+		size_t m_Size = 0ull;
+		T* m_VertexPointer = nullprt;
+
+		friend class MeshQueue;
+		friend class VERTEXAllocator;
+	};
+
 	struct VERTEX
 	{
 		ME_DATATYPE vertices[3] = { 0.0f, 0.0f, 0.0f };
@@ -39,11 +79,9 @@ namespace ME
 		void SetReset(const std::vector<VERTEX>& vertex);
 		void Reset();
 
-		void Transulate(const float& X, const float& Y, const float& Z);
 		void Transulate(const glm::vec3& XYZ);
-		void Rotate(const float& degreeX, const float& degreeY, const float& degreeZ);
+		void TransulateTo(const glm::vec3& XYZ); //transulate the mesh's centroid with to the point specified
 		void Rotate(const glm::vec3& XYZ);
-		void Scale(const float& X, const float& Y, const float& Z);
 		void Scale(const glm::vec3& XYZ);
 		void Destroy() {}
 
@@ -116,8 +154,8 @@ namespace ME
 		inline const unsigned int* GetIndexBuffer() const { return indexbuffer; }
 
 	private:
-		ME_DATATYPE* vertexbuffer;
-		unsigned int* indexbuffer;
+		ME_DATATYPE* vertexbuffer = nullptr;
+		unsigned int* indexbuffer = nullptr;
 		std::vector<Ref<Mesh>> m_Meshes;
 		std::allocator<ME_DATATYPE> vertexbufferallocator;
 		std::allocator<unsigned int> indexbufferallocator;
@@ -134,10 +172,10 @@ namespace ME
 
 		VERTEX vertexbuffer[] =
 		{
-			{v1.x, v1.y, 0.0f, 0.0f, (float)index},
-			{v2.x, v2.y, 1.0f, 0.0f, (float)index},
-			{v3.x, v3.y, 1.0f, 1.0f, (float)index},
-			{v4.x, v4.y, 0.0f, 1.0f, (float)index}
+			{v1.x, v1.y, 1.0f, 0.0f, 0.0f, (float)index},
+			{v2.x, v2.y, 1.0f, 1.0f, 0.0f, (float)index},
+			{v3.x, v3.y, 1.0f, 1.0f, 1.0f, (float)index},
+			{v4.x, v4.y, 1.0f, 0.0f, 1.0f, (float)index}
 		};
 		unsigned int indexbuffer[] =
 		{
@@ -158,10 +196,10 @@ namespace ME
 
 		VERTEX vertexbuffer[] =
 		{
-			{point1.x, point1.y, 0.0f, 0.0f, (float)index},
-			{point2.x, point1.y, 1.0f, 0.0f, (float)index},
-			{point2.x, point2.y, 1.0f, 1.0f, (float)index},
-			{point1.y, point2.x, 0.0f, 1.0f, (float)index}
+			{point1.x, point1.y, 1.0f, 0.0f, 0.0f, (float)index},
+			{point2.x, point1.y, 1.0f, 1.0f, 0.0f, (float)index},
+			{point2.x, point2.y, 1.0f, 1.0f, 1.0f, (float)index},
+			{point1.y, point2.x, 1.0f, 0.0f, 1.0f, (float)index}
 		};
 		unsigned int indexbuffer[] =
 		{
@@ -182,10 +220,10 @@ namespace ME
 
 		VERTEX vertexbuffer[] =
 		{
-			{0.0f, 0.0f, 0.0f, 0.0f, (float)index},
-			{0.0f, lb.x, 1.0f, 0.0f, (float)index},
-			{lb.x, lb.y, 1.0f, 1.0f, (float)index},
-			{0.0f, lb.y, 0.0f, 1.0f, (float)index}
+			{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, (float)index},
+			{0.0f, lb.x, 1.0f, 1.0f, 0.0f, (float)index},
+			{lb.x, lb.y, 1.0f, 1.0f, 1.0f, (float)index},
+			{0.0f, lb.y, 1.0f, 0.0f, 1.0f, (float)index}
 		};
 		unsigned int indexbuffer[] =
 		{

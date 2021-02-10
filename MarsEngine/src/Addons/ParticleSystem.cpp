@@ -17,6 +17,7 @@ namespace ME
 
 			for (unsigned int i = 0; i < m_Count; i++)
 			{
+				particle.id = i;
 				m_Children.emplace_back(CreateRef<Mesh>(*m_Parent));
 				m_Particles.emplace_back(particle);
 			}
@@ -29,8 +30,10 @@ namespace ME
 				m_AliveParticles++;
 
 				Particle particle;
+				particle.id = m_AliveParticles;
 				particle.timeleft = m_Lifetime;
 				particle.startcolor = m_Color;
+				m_Children[m_AliveParticles - 1]->Transulate(veloctiy);
 			}
 			else if (m_AliveParticles >= m_Count)
 			{
@@ -38,20 +41,19 @@ namespace ME
 					{
 						return first.timeleft.m_Time > smallest.timeleft.m_Time;
 					});
+				it->timeleft = m_Lifetime;
+				it->startcolor = m_Color;
+				m_Children[it->id]->TransulateTo(veloctiy);
 			}
 		}
 		void ParticleSystem::OnUpdate()
 		{
 			for (unsigned int i = 0; i < m_Particles.size(); i++)
-				if (m_Particles[i].timeleft.m_Time <= 0)
-					RemoveParticle(i);
-
-			for (unsigned int i = 0; i < m_Particles.size(); i++)
 			{
-				m_Children[i] * (glm::scale(glm::mat4(1.0f), { 0.8f, 0.8f, 1.0f }) * glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), {0.0f, 0.0f, 1.0f})
-					*glm::translate(glm::mat4(1.0f), {1.0f, 1.0f, 1.0f}));
+				//m_Children[i] * (glm::scale(glm::mat4(1.0f), { 0.8f, 0.8f, 1.0f }) * glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), {0.0f, 0.0f, 1.0f})
+					//*glm::translate(glm::mat4(1.0f), {1.0f, 1.0f, 1.0f}));
 
-				if (timer.IfTime(Utils::Time::seconds(1ll)))
+				if (timer.TimeElapsed()[0] > Utils::Time::seconds(1ll))
 					m_Particles[i].timeleft.m_Time--;
 			}
 		}

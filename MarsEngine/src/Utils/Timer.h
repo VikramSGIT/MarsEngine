@@ -21,11 +21,15 @@ namespace ME
 				Time(const long long time = 0)
 					:m_Time(time) {}
 				~Time() = default;
+				template<Precision U> Time(const Time<U>& time) { m_Time = time_cast<T>(time); }
+			private:
+				template<Precision Q>
+				static long long time_cast(const Time<Q>& time);
 			};
 
-			//
-			// Time point casting
-			//
+//
+// Time point casting
+//
 			template<Precision T, Precision Q>
 			static long long time_cast(const Time<Q>& time)
 			{
@@ -50,16 +54,14 @@ namespace ME
 					: m_Start(std::chrono::high_resolution_clock::now()) {}
 				~Timer() = default;
 
-				std::vector<Time<T>> TimeElapsed()
+				const std::vector<Time<T>> TimeElapsed()
 				{
 
 					ME_PROFILE_TRACE_CALL();
-
-					return std::vector<Time<T>>(m_Laps);
+					return m_Laps;
 				}
 				inline bool IsPaused() { return Paused; }
 				template<Precision Q>
-				bool IfTime(Time<Q> time) const;
 
 				void Start();
 				Time<T> Stop();
@@ -72,9 +74,9 @@ namespace ME
 				std::vector<Time<T>> m_Laps;
 				bool Paused = false, Running = true;
 			};
-			//
-			// LowPrecision Timer
-			//
+//
+// LowPrecision Timer
+//
 			template<>
 			class Timer<Precision::SEC>
 			{
@@ -83,25 +85,18 @@ namespace ME
 					: m_Start(std::chrono::high_resolution_clock::now()) {}
 				~Timer() = default;
 
-				std::vector<Time<Precision::SEC>> TimeElapsed()
+				const std::vector<Time<Precision::SEC>> TimeElapsed()
 				{
 
 					ME_PROFILE_TRACE_CALL();
 
-					return std::vector<Time<Precision::SEC>>(m_Laps);
+					long long delta = 0ll;
+					delta = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count() - std::chrono::time_point_cast<std::chrono::seconds>(m_Start).time_since_epoch().count();
+					std::vector<Time<Precision::SEC>> out(m_Laps);
+					out.emplace_back(delta);
+					return out;
 				}
 				inline bool IsPaused() { return Paused; }
-				template<Precision Q>
-				bool IfTime(Time<Q> time) const
-				{
-
-					ME_PROFILE_TRACE_CALL();
-
-					long long delta = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count() - std::chrono::time_point_cast<std::chrono::seconds>(m_Start).time_since_epoch().count();
-					if (time_cast<Precision::SEC>(time) <= delta)
-						return true;
-					return false;
-				}
 
 				void Start()
 				{
@@ -180,9 +175,9 @@ namespace ME
 				std::vector<Time<Precision::SEC>> m_Laps;
 				bool Paused = false, Running = true;
 			};
-			//
-			// MediumPrecision Timer
-			//
+//
+// MediumPrecision Timer
+//
 			template<>
 			class Timer<Precision::MILLI>
 			{
@@ -191,25 +186,18 @@ namespace ME
 					: m_Start(std::chrono::high_resolution_clock::now()) {}
 				~Timer() = default;
 
-				std::vector<Time<Precision::MILLI>> TimeElapsed()
+				const std::vector<Time<Precision::MILLI>> TimeElapsed()
 				{
 
 					ME_PROFILE_TRACE_CALL();
 
-					return std::vector<Time<Precision::MILLI>>(m_Laps);
+					long long delta = 0ll;
+					delta = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count() - std::chrono::time_point_cast<std::chrono::milliseconds>(m_Start).time_since_epoch().count();
+					std::vector<Time<Precision::MILLI>> out(m_Laps);
+					out.emplace_back(delta);
+					return out;
 				}
 				inline bool IsPaused() { return Paused; }
-				template<Precision Q>
-				bool IfTime(Time<Q> time) const
-				{
-
-					ME_PROFILE_TRACE_CALL();
-
-					long long delta = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count() - std::chrono::time_point_cast<std::chrono::milliseconds>(m_Start).time_since_epoch().count();
-					if (time_cast<Precision::MILLI>(time) <= delta)
-						return true;
-					return false;
-				}
 
 				void Start()
 				{
@@ -288,9 +276,9 @@ namespace ME
 				std::vector<Time<Precision::MILLI>> m_Laps;
 				bool Paused = false, Running = true;
 			};
-			//
-			// HighPrecision Timer
-			//
+//
+// HighPrecision Timer
+//
 			template<>
 			class Timer<Precision::MICRO>
 			{
@@ -299,26 +287,18 @@ namespace ME
 					: m_Start(std::chrono::high_resolution_clock::now()) {}
 				~Timer() = default;
 
-				template<typename Q>
-				std::vector<Time<Precision::MICRO>> TimeElapsed()
+				const std::vector<Time<Precision::MICRO>> TimeElapsed()
 				{
 
 					ME_PROFILE_TRACE_CALL();
 
-					return std::vector<Time<Precision::MICRO>>(m_Laps);
+					long long delta = 0ll;
+					delta = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count() - std::chrono::time_point_cast<std::chrono::microseconds>(m_Start).time_since_epoch().count();
+					std::vector<Time<Precision::MICRO>> out(m_Laps);
+					out.emplace_back(delta);
+					return out;
 				}
 				inline bool IsPaused() { return Paused; }
-				template<Precision Q>
-				bool IfTime(Time<Q> time) const
-				{
-
-					ME_PROFILE_TRACE_CALL();
-
-					long long delta = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count() - std::chrono::time_point_cast<std::chrono::microseconds>(m_Start).time_since_epoch().count();
-					if (time_cast<Precision::MICRO>(time) <= delta)
-						return true;
-					return false;
-				}
 
 				void Start()
 				{
@@ -397,13 +377,79 @@ namespace ME
 				std::vector<Time<Precision::MICRO>> m_Laps;
 				bool Paused = false, Running = true;
 			};
-			//
-			// Widely used times
-			//
+//
+// Widely used times
+//
 			typedef Timer<Precision::MICRO> timer;
 			typedef Time<Precision::SEC> seconds;
-			typedef Time<Precision::MILLI> millseconds;
+			typedef Time<Precision::MILLI> milliseconds;
 			typedef Time<Precision::MICRO> microseconds;
+////////////////////////////////////// Operator Definitions ////////////////////////////////////////////
+// == operator
+//
+			template<Precision T, Precision U> bool operator==(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<> constexpr  bool operator==<Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time == right.m_Time; }
+			template<> constexpr  bool operator==<Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll == right.m_Time; }
+			template<> constexpr  bool operator==<Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll == right.m_Time; }
+			template<> constexpr  bool operator==<Precision::MILLI, Precision::SEC>(const Time<Precision::MILLI>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time == right.m_Time * 1000ll; }
+			template<> constexpr  bool operator==<Precision::MILLI, Precision::MILLI>(const Time<Precision::MILLI>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time == right.m_Time; }
+			template<> constexpr  bool operator==<Precision::MILLI, Precision::MICRO>(const Time<Precision::MILLI>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000ll == right.m_Time; }
+			template<> constexpr  bool operator==<Precision::MICRO, Precision::SEC>(const Time<Precision::MICRO>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time == right.m_Time * 1000000ull; }
+			template<> constexpr  bool operator==<Precision::MICRO, Precision::MILLI>(const Time<Precision::MICRO>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time == right.m_Time * 1000ull; }
+			template<> constexpr  bool operator==<Precision::MICRO, Precision::MICRO>(const Time<Precision::MICRO>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time == right.m_Time; }
+//
+// < operator
+//
+			template<Precision T, Precision U> bool operator<(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<> constexpr  bool operator< <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)		noexcept { return left.m_Time < right.m_Time; }
+			template<> constexpr  bool operator< <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll < right.m_Time; }
+			template<> constexpr  bool operator< <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll < right.m_Time; }
+			template<> constexpr  bool operator< <Precision::MILLI, Precision::SEC>(const Time<Precision::MILLI>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time < right.m_Time * 1000ll; }
+			template<> constexpr  bool operator< <Precision::MILLI, Precision::MILLI>(const Time<Precision::MILLI>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time < right.m_Time; }
+			template<> constexpr  bool operator< <Precision::MILLI, Precision::MICRO>(const Time<Precision::MILLI>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000ll < right.m_Time; }
+			template<> constexpr  bool operator< <Precision::MICRO, Precision::SEC>(const Time<Precision::MICRO>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time < right.m_Time * 1000000ll; }
+			template<> constexpr  bool operator< <Precision::MICRO, Precision::MILLI>(const Time<Precision::MICRO>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time < right.m_Time * 1000ll; }
+			template<> constexpr  bool operator< <Precision::MICRO, Precision::MICRO>(const Time<Precision::MICRO>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time < right.m_Time; }
+//
+// > operator
+//
+			template<Precision T, Precision U> bool operator>(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<> constexpr  bool operator> <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time > right.m_Time; }
+			template<> constexpr  bool operator> <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll > right.m_Time; }
+			template<> constexpr  bool operator> <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll > right.m_Time; }
+			template<> constexpr  bool operator> <Precision::MILLI, Precision::SEC>(const Time<Precision::MILLI>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time > right.m_Time * 1000ll; }
+			template<> constexpr  bool operator> <Precision::MILLI, Precision::MILLI>(const Time<Precision::MILLI>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time > right.m_Time; }
+			template<> constexpr  bool operator> <Precision::MILLI, Precision::MICRO>(const Time<Precision::MILLI>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000ll > right.m_Time; }
+			template<> constexpr  bool operator> <Precision::MICRO, Precision::SEC>(const Time<Precision::MICRO>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time > right.m_Time * 1000000ll; }
+			template<> constexpr  bool operator> <Precision::MICRO, Precision::MILLI>(const Time<Precision::MICRO>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time > right.m_Time * 1000ll; }
+			template<> constexpr  bool operator> <Precision::MICRO, Precision::MICRO>(const Time<Precision::MICRO>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time > right.m_Time; }
+//
+// <= operator
+//
+			template<Precision T, Precision U> bool operator<= (const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<> constexpr  bool operator<= <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time <= right.m_Time; }
+			template<> constexpr  bool operator<= <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll <= right.m_Time; }
+			template<> constexpr  bool operator<= <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll <= right.m_Time; }
+			template<> constexpr  bool operator<= <Precision::MILLI, Precision::SEC>(const Time<Precision::MILLI>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time <= right.m_Time * 1000ll; }
+			template<> constexpr  bool operator<= <Precision::MILLI, Precision::MILLI>(const Time<Precision::MILLI>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time <= right.m_Time; }
+			template<> constexpr  bool operator<= <Precision::MILLI, Precision::MICRO>(const Time<Precision::MILLI>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000ll <= right.m_Time; }
+			template<> constexpr  bool operator<= <Precision::MICRO, Precision::SEC>(const Time<Precision::MICRO>& left, const Time<Precision::SEC>& right)	noexcept	{ return left.m_Time <= right.m_Time * 1000000ll; }
+			template<> constexpr  bool operator<= <Precision::MICRO, Precision::MILLI>(const Time<Precision::MICRO>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time <= right.m_Time * 1000ll; }
+			template<> constexpr  bool operator<= <Precision::MICRO, Precision::MICRO>(const Time<Precision::MICRO>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time <= right.m_Time; }
+//
+// >= operator
+//
+			template<Precision T, Precision U> constexpr bool operator>= (const Time<T>& left, const Time<U>& right) noexcept { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<> constexpr bool operator>= <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept		{ return left.m_Time >= right.m_Time; }
+			template<> constexpr bool operator>= <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right) noexcept		{ return left.m_Time * 1000ll >= right.m_Time; }
+			template<> constexpr bool operator>= <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right) noexcept		{ return left.m_Time * 1000000ll >= right.m_Time; }
+			template<> constexpr bool operator>= <Precision::MILLI, Precision::SEC>(const Time<Precision::MILLI>& left, const Time<Precision::SEC>& right) noexcept		{ return left.m_Time >= right.m_Time * 1000ll; }
+			template<> constexpr bool operator>= <Precision::MILLI, Precision::MILLI>(const Time<Precision::MILLI>& left, const Time<Precision::MILLI>& right) noexcept { return left.m_Time >= right.m_Time; }
+			template<> constexpr bool operator>= <Precision::MILLI, Precision::MICRO>(const Time<Precision::MILLI>& left, const Time<Precision::MICRO>& right) noexcept { return left.m_Time * 1000ll >= right.m_Time; }
+			template<> constexpr bool operator>= <Precision::MICRO, Precision::SEC>(const Time<Precision::MICRO>& left, const Time<Precision::SEC>& right) noexcept		{ return left.m_Time >= right.m_Time * 1000000ll; }
+			template<> constexpr bool operator>= <Precision::MICRO, Precision::MILLI>(const Time<Precision::MICRO>& left, const Time<Precision::MILLI>& right) noexcept { return left.m_Time >= right.m_Time * 1000ll; }
+			template<> constexpr bool operator>= <Precision::MICRO, Precision::MICRO>(const Time<Precision::MICRO>& left, const Time<Precision::MICRO>& right) noexcept { return left.m_Time >= right.m_Time; }
+
 		}
 	}
 }

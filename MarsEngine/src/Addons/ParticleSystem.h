@@ -38,6 +38,7 @@ namespace ME
 		private:
 			struct Particle
 			{
+				size_t id;
 				Utils::Time::seconds timeleft;
 				glm::vec4 startcolor;
 			};
