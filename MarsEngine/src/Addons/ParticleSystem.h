@@ -54,7 +54,7 @@ namespace ME
 			glm::vec4 m_Color;
 			Utils::Time::seconds m_Lifetime;
 
-			Utils::Time::Timer<Utils::Time::Precision::SEC> timer;
+			Utils::Time::Timer<Utils::Time::Precision::MICRO> timer;
 			Utils::Random<float> random;
 			std::vector<Particle> m_Particles;
 			std::vector<Ref<Mesh>> m_Children;

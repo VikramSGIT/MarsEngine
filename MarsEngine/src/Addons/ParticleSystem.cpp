@@ -41,6 +41,7 @@ namespace ME
 					{
 						return first.timeleft.m_Time > smallest.timeleft.m_Time;
 					});
+
 				it->timeleft = m_Lifetime;
 				it->startcolor = m_Color;
 				m_Children[it->id]->TransulateTo(veloctiy);
@@ -48,13 +49,15 @@ namespace ME
 		}
 		void ParticleSystem::OnUpdate()
 		{
-			for (unsigned int i = 0; i < m_Particles.size(); i++)
+			if (timer.TimeElapsed()[0] > Utils::Time::milliseconds(1ll))
 			{
-				//m_Children[i] * (glm::scale(glm::mat4(1.0f), { 0.8f, 0.8f, 1.0f }) * glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), {0.0f, 0.0f, 1.0f})
-					//*glm::translate(glm::mat4(1.0f), {1.0f, 1.0f, 1.0f}));
-
-				if (timer.TimeElapsed()[0] > Utils::Time::seconds(1ll))
-					m_Particles[i].timeleft.m_Time--;
+				for (unsigned int i = 0; i < m_Particles.size(); i++)
+				{
+					if(m_Particles[i].timeleft > Utils::Time::milliseconds(0))
+						m_Particles[i].timeleft.m_Time--;
+					m_Children[i]->Transulate({ -1.0f, 0.0f, 0.0f });
+				}
+				timer.Reset();
 			}
 		}
 	}
