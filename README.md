@@ -19,7 +19,7 @@
   
   * Make a directory where game needs to be build.
   * Clone/download <a href="https://github.com/VikramSGIT/MarsEngine/archive/easy_game.zip">MarsEngine easy_game</a> branch.
-  * Extract this <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/untagged-95ec134c402a8e683c2b/TheGame.rar">zip</a> file into the directory.
+  * Extract this <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/untagged-95ec134c402a8e683c2b/Application.rar">zip</a> file into the directory.
   
   ### Step 2: ###
   
