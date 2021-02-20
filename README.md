@@ -13,13 +13,13 @@
   
   ### Prerequisite ###
   
-  * Visual Studios 2019 ( or <a href="">using any other code editor?</a>)
+  * Visual Studios 2019 ( or <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/1.0.0/NoVisualStudios.rar">using any other code editor?</a>)
   
   ### Step 1: ###
   
   * Make a directory where game needs to be build.
-  * Clone/download <a href="">MarsEngine easy_game</a> branch.
-  * Extract this <a href="">zip</a> file into the directory.
+  * Clone/download <a href="https://github.com/VikramSGIT/MarsEngine/archive/easy_game.zip">MarsEngine easy_game</a> branch.
+  * Extract this <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/untagged-95ec134c402a8e683c2b/TheGame.rar">zip</a> file into the directory.
   
   ### Step 2: ###
   
