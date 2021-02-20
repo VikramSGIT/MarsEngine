@@ -102,6 +102,6 @@
 	}
   ```
   * Now run `TheGame.bat` on your working directory.
-  * See the Magic!!
+  * Feel the Magic!!
 
 > This guide will soon be updated with the things you can play within to make the game much cooler.
