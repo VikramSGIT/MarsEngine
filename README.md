@@ -13,7 +13,7 @@
   
   ### Prerequisite ###
   
-  * Visual Studios 2019 ( or <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/1.0.0/NoVisualStudios.rar">using any other code editor?</a>)
+  * Visual Studios 2019 ( or <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/1.0.0/NoVisualStudios.rar">using any other code editor?</a>. Extract this into working directory once created)
   
   ### Step 1: ###
   
