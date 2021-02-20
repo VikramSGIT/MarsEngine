@@ -23,7 +23,7 @@
   
   ### Step 2: ###
   
-  * Open `Application.cpp` file in Visual Studios ( or <a href="">using any other code editor?</a>).
+  * Open `Application.cpp` file in Visual Studios ( or <a href="https://github.com/VikramSGIT/MarsEngine/releases/download/1.0.0/NoVisualStudios.rar">using any other code editor?</a>).
   * Paste this code into `Paste Code Here!!` inside `Application.cpp`.
   ```c++
     Ref<ME::Mesh> Logo = ME::GenRect("Vikram", glm::vec2(590.0f, 310.0f), glm::vec2(690.0f, 410.0f));
