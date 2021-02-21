@@ -1,5 +1,6 @@
 #pragma once
 
+#define ME_DEBUG
 //#define ME_IMGUI
 #define ME_DATATYPE float
 //#define ME_DEBUG_SHOW_EVENT

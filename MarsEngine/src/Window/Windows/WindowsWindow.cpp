@@ -3,19 +3,19 @@
 
 namespace Window
 {
-    Window* Window::Create(const WindowProperty& winprop)
+    Ref<Window> Window::Create(const WindowProperty& winprop)
     {
 
         ME_PROFILE_TRACE_CALL();
 
         std::stringstream ss;
-        ss << "Window Created!! Name: " << winprop.Title << " Dimension: " << winprop.Height << " X " << winprop.Width;
+        ss << "Window Created!! Name: " << winprop.Title << " Dimension: " << winprop.Width << " X " << winprop.Height;
         ME_CORE_WARNING(ss.str());
-        return new Windows::WindowsWindow(winprop);
+        return  CreateRef<Windows::WindowsWindow>(winprop);
     }
     namespace Windows
     {
-        static uint8_t s_GLFWWindowCount = 0;
+        static size_t s_GLFWWindowCount = 0;
         uint8_t keyrepeatcount = 0;
         WindowsWindow::WindowsWindow(const WindowProperty& props)
         {
@@ -52,11 +52,9 @@ namespace Window
 
             }
 
-            {
-                m_Window = glfwCreateWindow((int)props.Width, (int)props.Height,m_Data.Title.c_str(), nullptr, nullptr);
-                ++s_GLFWWindowCount;
-            }
-            
+            m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+            ++s_GLFWWindowCount;
+
             glfwMakeContextCurrent(m_Window);
             glfwSetWindowUserPointer(m_Window, &m_Data);
             SetVSync(true);
@@ -197,7 +195,6 @@ namespace Window
 
             glfwDestroyWindow(m_Window);
             --s_GLFWWindowCount;
-
             if(s_GLFWWindowCount == 0)
                 glfwTerminate();
         }

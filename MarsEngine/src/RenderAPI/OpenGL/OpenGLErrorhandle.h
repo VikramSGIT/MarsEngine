@@ -6,6 +6,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <algorithm>
+#include <memory>
 
 #define GLLogCall(x) GLClearError();\
         x;\

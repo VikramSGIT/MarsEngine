@@ -60,6 +60,6 @@ namespace Window
                 return true;
             return false;
         }
-        static Window* Create(const WindowProperty& winprop = WindowProperty());
+        static Ref<Window> Create(const WindowProperty& winprop = WindowProperty());
     };
 }

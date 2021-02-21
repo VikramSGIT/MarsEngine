@@ -17,7 +17,7 @@ namespace ME
 ////////////////////////////////////// Custom Allocator ///////////////////////////////////////
 //This was made to make the mesh vertex allocation at one place which reduces memory usage a lot
 //Will be implemented later
-	template<typename T>
+/*	template<typename T>
 	class VERTEXAllocator
 	{
 	public:
@@ -53,7 +53,7 @@ namespace ME
 		friend class MeshQueue;
 		friend class VERTEXAllocator;
 	};
-
+*/
 	struct VERTEX
 	{
 		ME_DATATYPE vertices[3] = { 0.0f, 0.0f, 0.0f };
@@ -183,8 +183,8 @@ namespace ME
 			2, 3, 0
 		};
 		Ref<Mesh> out = CreateRef<Mesh>(name);
-		out->BufferVertices(vertexbuffer, sizeof(vertexbuffer) / sizeof(VERTEX));
-		out->BufferIndices(indexbuffer, sizeof(indexbuffer) / sizeof(unsigned int));
+		out->BufferVertices(vertexbuffer, 4);
+		out->BufferIndices(indexbuffer, 6);
 		return out;
 	}
 //
@@ -199,7 +199,7 @@ namespace ME
 			{point1.x, point1.y, 1.0f, 0.0f, 0.0f, (float)index},
 			{point2.x, point1.y, 1.0f, 1.0f, 0.0f, (float)index},
 			{point2.x, point2.y, 1.0f, 1.0f, 1.0f, (float)index},
-			{point1.y, point2.x, 1.0f, 0.0f, 1.0f, (float)index}
+			{point1.x, point2.y, 1.0f, 0.0f, 1.0f, (float)index}
 		};
 		unsigned int indexbuffer[] =
 		{
@@ -207,8 +207,8 @@ namespace ME
 			2, 3, 0
 		};
 		Ref<Mesh> out = CreateRef<Mesh>(name);
-		out->BufferVertices(vertexbuffer, sizeof(vertexbuffer) / sizeof(VERTEX));
-		out->BufferIndices(indexbuffer, sizeof(indexbuffer) / sizeof(unsigned int));
+		out->BufferVertices(vertexbuffer, 4);
+		out->BufferIndices(indexbuffer, 6);
 		return out;
 	}
 //
@@ -221,7 +221,7 @@ namespace ME
 		VERTEX vertexbuffer[] =
 		{
 			{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, (float)index},
-			{0.0f, lb.x, 1.0f, 1.0f, 0.0f, (float)index},
+			{lb.x, 0.0f, 1.0f, 1.0f, 0.0f, (float)index},
 			{lb.x, lb.y, 1.0f, 1.0f, 1.0f, (float)index},
 			{0.0f, lb.y, 1.0f, 0.0f, 1.0f, (float)index}
 		};
@@ -231,8 +231,8 @@ namespace ME
 			2, 3, 0
 		};
 		Ref<Mesh> out = CreateRef<Mesh>(name);
-		out->BufferVertices(vertexbuffer, sizeof(vertexbuffer) / sizeof(VERTEX));
-		out->BufferIndices(indexbuffer, sizeof(indexbuffer) / sizeof(unsigned int));
+		out->BufferVertices(vertexbuffer, 4);
+		out->BufferIndices(indexbuffer, 6);
 		return out;
 	}
 //

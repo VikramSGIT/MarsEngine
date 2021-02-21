@@ -17,7 +17,7 @@ namespace ME
                 GLLogCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, mode));
             }
             OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int& RendererID)
-                :m_Filled(NULL), m_RendererID(RendererID), Emptyindex(true)
+                :m_Filled(0), m_RendererID(RendererID), Emptyindex(true)
             {
                 GLClearError();
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);

@@ -48,10 +48,12 @@ namespace ME
                 if (glewInit() != GLEW_OK)
                     ME_CORE_ERROR("Can't Impliment GLEW");
                 else
+                {
 #ifdef ME_DEBUG
                     ss << "Detected OpenGL Vesrion (using) : " << glGetString(GL_VERSION);
-                ME_CORE_INFO(ss.str());
+                    ME_CORE_INFO(ss.str());
 #endif
+                }
                 //
                 // Enabling blending, typically transparencies
                 //

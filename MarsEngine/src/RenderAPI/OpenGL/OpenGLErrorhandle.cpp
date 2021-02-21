@@ -89,7 +89,7 @@ namespace ME
                 {
                     glGetShaderiv(shaderid, GL_INFO_LOG_LENGTH, &len);
 
-                    char* msg = (char*)alloca(len * sizeof(char));
+                    char* msg = (char*)malloc(len);
                     glGetShaderInfoLog(shaderid, len, &len, msg);
 
                     //Print Shader Error
@@ -97,7 +97,6 @@ namespace ME
                     std::cout << "[OpenGl ERROR] : \n Error in Compiling Shader\n " <<
                         (type == GL_VERTEX_SHADER ? "Vertex" : "Fragment")
                         << " Shader : " << msg << std::endl;
-
                     return false;
                 }
                 return true;
