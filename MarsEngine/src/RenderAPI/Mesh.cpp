@@ -77,7 +77,24 @@ namespace ME
 		m_Ready = false;
 	}
 
-	void Mesh::Transulate(const glm::vec3& XYZ)
+	void Mesh::Transform(const glm::mat4& matrix)
+	{
+		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
+		for (VERTEX& vertex : m_Vertices)
+		{
+			glm::vec4 out = { vertex.vertices[0], vertex.vertices[1], vertex.vertices[2] , 1.0f };
+			out = trans * out;
+			out = matrix * out;
+			out = glm::inverse(trans) * out;
+
+			vertex.vertices[0] = out.x;
+			vertex.vertices[1] = out.y;
+			vertex.vertices[2] = out.z;
+		}
+		m_Ready = false;
+	}
+
+	void Mesh::Translate(const glm::vec3& XYZ)
 	{
 
 		ME_PROFILE_TRACE_CALL();
@@ -91,7 +108,7 @@ namespace ME
 		m_Ready = false;
 	}
 
-	void Mesh::TransulateTo(const glm::vec3& XYZ)
+	void Mesh::TranslateTo(const glm::vec3& XYZ)
 	{
 
 		ME_PROFILE_TRACE_CALL();
@@ -114,18 +131,18 @@ namespace ME
 		ME_PROFILE_TRACE_CALL();
 
 		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
-		for (size_t i = 0; i < m_Vertices.size(); i++)
+		for (VERTEX& vertex : m_Vertices)
 		{
-			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f };
+			glm::vec4 out = { vertex.vertices[0], vertex.vertices[1], vertex.vertices[2] , 1.0f };
 			out = trans * out;
 			out = glm::transpose(glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.x), glm::vec3(1.0f, 0.0f, 0.0f))) * out;
 			out = glm::transpose(glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.y), glm::vec3(0.0f, 1.0f, 0.0f))) * out;
 			out = glm::transpose(glm::rotate(glm::identity<glm::mat4>(), glm::radians(degreeXYZ.z), glm::vec3(0.0f, 0.0f, 1.0f))) * out;
 			out = glm::inverse(trans) * out;
 
-			m_Vertices[i].vertices[0] = out.x;
-			m_Vertices[i].vertices[1] = out.y;
-			m_Vertices[i].vertices[2] = out.z;
+			vertex.vertices[0] = out.x;
+			vertex.vertices[1] = out.y;
+			vertex.vertices[2] = out.z;
 		}
 		m_Ready = false;
 	}
@@ -135,16 +152,16 @@ namespace ME
 		ME_PROFILE_TRACE_CALL();
 
 		glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), -GetCentroid());
-		for (size_t i = 0; i < m_Vertices.size(); i++)
+		for (VERTEX& vertex : m_Vertices)
 		{
-			glm::vec4 out = { m_Vertices[i].vertices[0], m_Vertices[i].vertices[1], m_Vertices[i].vertices[2] , 1.0f };
+			glm::vec4 out = { vertex.vertices[0], vertex.vertices[1], vertex.vertices[2] , 1.0f };
 			out = trans * out;
 			out = glm::scale(glm::identity<glm::mat4>(), glm::vec3(XYZ.x, XYZ.y, XYZ.z)) * out;
 			out = glm::inverse(trans) * out;
 
-			m_Vertices[i].vertices[0] = out.x;
-			m_Vertices[i].vertices[1] = out.y;
-			m_Vertices[i].vertices[2] = out.z;
+			vertex.vertices[0] = out.x;
+			vertex.vertices[1] = out.y;
+			vertex.vertices[2] = out.z;
 		}
 		m_Ready = false;
 	}

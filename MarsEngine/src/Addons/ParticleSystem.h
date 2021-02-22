@@ -17,11 +17,12 @@ namespace ME
 	{
 		struct ParticleProps
 		{
-			Utils::Time::seconds lifetime = 5;
+			Utils::Time::milliseconds lifetime = 5;
 			unsigned int count = 10;
 			Ref<Mesh> parent;
 			glm::vec3 emitvelocity;
 			glm::vec4 color;
+			glm::mat4 transform = glm::identity<glm::mat4>();
 		};
 		class ParticleSystem : public MeshAddon
 		{
@@ -52,6 +53,7 @@ namespace ME
 			size_t m_Count, m_AliveParticles;
 			glm::vec3 m_Velocity;
 			glm::vec4 m_Color;
+			glm::mat4 m_Transform;
 			Utils::Time::seconds m_Lifetime;
 
 			Utils::Time::Timer<Utils::Time::Precision::MICRO> timer;
