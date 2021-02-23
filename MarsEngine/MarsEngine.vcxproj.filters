@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GL">
+      <UniqueIdentifier>{B8735900-A4FF-870B-0DAE-880BF958880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderAPI">
+      <UniqueIdentifier>{BF001F7C-2B6B-D3F2-74A9-8498E052B147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderAPI\OpenGL">
+      <UniqueIdentifier>{137DB9EA-FF75-D83C-28A8-BDC11400B848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vender">
+      <UniqueIdentifier>{495EDCD7-3500-07AE-1EBB-1A020AFC8DFE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vender\GLFW">
+      <UniqueIdentifier>{286F0A14-9424-8309-1D19-7DE089CD790D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vender\stb">
+      <UniqueIdentifier>{21192010-0DD1-615D-76D8-3AB962AFFC4D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window">
+      <UniqueIdentifier>{3DEA79DA-298C-A4B0-1247-B804FE872B01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Events">
+      <UniqueIdentifier>{810F147C-EDCF-8FB2-B60A-D92F228AD48E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Layers">
+      <UniqueIdentifier>{5CFAF68A-C8BA-72C1-91F5-BB3EFD74B79D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Layers\ImGUI">
+      <UniqueIdentifier>{46C0C0E7-B221-9EF5-3B8F-E4A7A7EFD4B4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Windows">
+      <UniqueIdentifier>{7781784A-634F-6C50-4CE3-DC76385048B5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Core\Application.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GL\glew.h">
+      <Filter>GL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MarsHeader.h" />
+    <ClInclude Include="src\RenderAPI\Buffers.h">
+      <Filter>RenderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\Camera.h">
+      <Filter>RenderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\Mesh.h">
+      <Filter>RenderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLErrorhandle.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLIndexBuffer.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLRenderer.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLShader.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLTexture.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLVertexArray.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\OpenGL\OpenGLVertexBuffer.h">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\Renderer.h">
+      <Filter>RenderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderAPI\Shader.h">
+      <Filter>RenderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Intrumentor.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Random Engine.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Timer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vender\GLFW\glfw3.h">
+      <Filter>Vender\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vender\GLFW\glfw3native.h">
+      <Filter>Vender\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vender\stb\stb_image.h">
+      <Filter>Vender\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Events\Event.h">
+      <Filter>Window\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Events\KeyEvent.h">
+      <Filter>Window\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Events\KeyboardCode.h">
+      <Filter>Window\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Events\MouseCode.h">
+      <Filter>Window\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Events\MouseEvent.h">
+      <Filter>Window\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Events\WindowEvent.h">
+      <Filter>Window\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Layers\BasicLayer.h">
+      <Filter>Window\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Layers\ImGUI\imguiLayer.h">
+      <Filter>Window\Layers\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Layers\Layer.h">
+      <Filter>Window\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Layers\LayerStack.h">
+      <Filter>Window\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Window.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Windows\WindowsWindow.h">
+      <Filter>Window\Windows</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Application.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\EntryPoint.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logger.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\Camera.cpp">
+      <Filter>RenderAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\Mesh.cpp">
+      <Filter>RenderAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLErrorhandle.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLIndexBuffer.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLRenderer.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLShader.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLTexture.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLVertexArray.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderAPI\OpenGL\OpenGLVertexBuffer.cpp">
+      <Filter>RenderAPI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\Instrumentor.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Layers\BasicLayer.cpp">
+      <Filter>Window\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Layers\ImGUI\imguiLayer.cpp">
+      <Filter>Window\Layers\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Layers\LayerStack.cpp">
+      <Filter>Window\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Windows\WindowsWindow.cpp">
+      <Filter>Window\Windows</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

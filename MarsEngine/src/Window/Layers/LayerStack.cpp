@@ -1,68 +1,71 @@
 #include "LayerStack.h"
-namespace Window
+namespace ME
 {
-    namespace Layer
+    namespace Window
     {
-        LayerStack::~LayerStack()
+        namespace Layer
         {
-
-            ME_PROFILE_TRACE_CALL();
-
-            for (Ref<Layer> layer : m_layerstack)
+            LayerStack::~LayerStack()
             {
-                layer->OnDetach();
-                layer.reset();
-            }    
-        }
 
-        void LayerStack::PushLayer(Ref<Layer> layer)
-        {
+                ME_PROFILE_TRACE_CALL();
 
-            ME_PROFILE_TRACE_CALL();
-
-            m_layerstack.emplace(m_layerstack.begin() + m_totallayers, layer);
-            layer->OnAttach();
-            m_totallayers++;
-        }
-
-        void LayerStack::PushOverlay(Ref<Layer> overlay)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            m_layerstack.emplace_back(overlay);
-            overlay->OnAttach();
-        }
-
-        void LayerStack::PopLayer(Ref<Layer> layer)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_totallayers, layer);
-            if(it != m_layerstack.begin() + m_totallayers)
-            {
-                layer->OnDetach();
-                m_layerstack.erase(it);
-                m_totallayers--;
+                for (Ref<Layer> layer : m_layerstack)
+                {
+                    layer->OnDetach();
+                    layer.reset();
+                }
             }
-        }
 
-        void LayerStack::PopOverlay(Ref<Layer> overlay)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_totallayers, overlay);
-            if(it != m_layerstack.end())
+            void LayerStack::PushLayer(Ref<Layer> layer)
             {
-                overlay->OnDetach();
-                m_layerstack.erase(it);
-                overlay.reset();
+
+                ME_PROFILE_TRACE_CALL();
+
+                m_layerstack.emplace(m_layerstack.begin() + m_totallayers, layer);
+                layer->OnAttach();
+                m_totallayers++;
             }
+
+            void LayerStack::PushOverlay(Ref<Layer> overlay)
+            {
+
+                ME_PROFILE_TRACE_CALL();
+
+                m_layerstack.emplace_back(overlay);
+                overlay->OnAttach();
+            }
+
+            void LayerStack::PopLayer(Ref<Layer> layer)
+            {
+
+                ME_PROFILE_TRACE_CALL();
+
+                auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_totallayers, layer);
+                if (it != m_layerstack.begin() + m_totallayers)
+                {
+                    layer->OnDetach();
+                    m_layerstack.erase(it);
+                    m_totallayers--;
+                }
+            }
+
+            void LayerStack::PopOverlay(Ref<Layer> overlay)
+            {
+
+                ME_PROFILE_TRACE_CALL();
+
+                auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_totallayers, overlay);
+                if (it != m_layerstack.end())
+                {
+                    overlay->OnDetach();
+                    m_layerstack.erase(it);
+                    overlay.reset();
+                }
+            }
+
+
+
         }
-
-        
-
     }
 }

@@ -12,46 +12,48 @@
 #include <sstream>
 #include <memory>
 #include <vector>
-
-namespace Window
+namespace ME
 {
-    namespace Windows
+    namespace Window
     {
-        class WindowsWindow : public Window
+        namespace Windows
         {
-        private:
-            GLFWwindow* m_Window;
-
-            virtual void Init(const WindowProperty &props);
-            virtual void Shutdown();
-
-            struct WindowData
+            class WindowsWindow : public Window
             {
-                std::string Title;
-                uint32_t Width, Height;
-                Ref<std::vector<uint16_t>> keystack;
-                bool VSync;
+            private:
+                GLFWwindow* m_Window;
 
-                EventCallBackFunc fn;
-            };
+                virtual void Init(const WindowProperty& props);
+                virtual void Shutdown();
 
-            WindowData m_Data;
-            
-        public:
+                struct WindowData
+                {
+                    std::string Title;
+                    uint32_t Width, Height;
+                    Ref<std::vector<uint16_t>> keystack;
+                    bool VSync;
+
+                    EventCallBackFunc fn;
+                };
+
+                WindowData m_Data;
+
+            public:
                 WindowsWindow(const WindowProperty& props);
                 virtual ~WindowsWindow();
 
                 void OnUpdate() override;
 
-                uint32_t GetWidth() const override {return m_Data.Width;}
-                uint32_t GetHeight() const override {return m_Data.Height;}
-                std::string GetTitle() const override {return m_Data.Title;}
+                uint32_t GetWidth() const override { return m_Data.Width; }
+                uint32_t GetHeight() const override { return m_Data.Height; }
+                std::string GetTitle() const override { return m_Data.Title; }
 
-                void SetEventCallBack(const EventCallBackFunc& callback) override {m_Data.fn = callback;}
+                void SetEventCallBack(const EventCallBackFunc& callback) override { m_Data.fn = callback; }
                 void SetVSync(bool enable) override;
                 bool IsVSync() const override;
 
-                virtual GLFWwindow* GetNativeWindow() override {return m_Window;}
-        };
+                virtual GLFWwindow* GetNativeWindow() override { return m_Window; }
+            };
+        }
     }
 }

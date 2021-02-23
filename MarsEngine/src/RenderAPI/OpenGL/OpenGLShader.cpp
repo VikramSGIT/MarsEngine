@@ -150,8 +150,9 @@ namespace ME
 
             void OpenGLShader::unBind()
             {
-                if (Bound)
-                    ME_PROFILE_TRACE_CALL();
+
+                ME_PROFILE_TRACE_CALL();
+
                 if (Bound)
                 {
                     GLLogCall(glUseProgram(0));

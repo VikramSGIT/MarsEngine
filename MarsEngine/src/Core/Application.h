@@ -4,7 +4,7 @@
 #include "GL/glew.h"
 #include "Vender/GLFW/glfw3.h"
 #include "Logger.h"
-#include "Vender/OGLM/oglm.h"
+#include "Vender/glm/glm/glm.hpp"
 
 #include <iostream>
 #include <memory>
@@ -25,30 +25,32 @@
 #include "Window/Events/KeyboardCode.h"
 #include "RenderAPI/Camera.h"
 
-
-class Application
+namespace ME
 {
-private:
-    Window::Layer::LayerStack m_LayerStack;
-    bool m_Running = true;
-    std::unique_ptr<Window::Window> window = std::unique_ptr<Window::Window>(Window::Window::Create({"Mars-Engine", 500, 500}));
-    oglm::Matrix4<ME_DATATYPE> m_MVP, m_Model, m_Projection = oglm::GenOrtho(0.0f, 500.0f, 0.0f, 500.0f, -1.0f, 1.0f);
-    Ref<Camera> camera = CreateRef<Camera>();
-//
-// Needs to get destroyed before glfw terminate
-//
-    Ref<Renderer::RenderAPI> renderer;
-public:
-    Application();
-    ~Application() = default;
-    void Run();
-    void OnEvent(Event::Event& e);
-    bool OnWindowClose();
-    bool OnWindowResize();
-    void METerminate();
+    class Application
+    {
+    private:
+        Window::Layer::LayerStack m_LayerStack;
+        bool m_Running = true;
+        Ref<Window::Window> window;
+        glm::mat4 m_Projection = glm::ortho(0.0f, 500.0f, 0.0f, 500.0f);
+        Ref<Renderer::RenderAPI> renderer;
+    public:
+        Application();
+        ~Application() = default;
+        void Run();
+        void OnEvent(Event::Event& e);
+        bool OnWindowClose();
+        bool OnWindowResize();
+        void METerminate();
 
-    Window::Window& GetWindow() {return *window;}
-    static Application& GetInstance() { return *s_Application;}
 
-    static Application* s_Application;
-};
+
+        Window::Window& GetWindow() { return *window; }
+        static Application& GetInstance() { return *s_Application; }
+
+        static Application* s_Application;
+    };
+
+    static Application* CreateApp();
+}

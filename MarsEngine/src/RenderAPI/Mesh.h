@@ -11,27 +11,28 @@
 #include <memory>
 #include <string>
 #include <algorithm>
+#include <set>
 
 namespace ME
 {
 ////////////////////////////////////// Custom Allocator ///////////////////////////////////////
 //This was made to make the mesh vertex allocation at one place which reduces memory usage a lot
 //Will be implemented later
-/*	template<typename T>
-	class VERTEXAllocator
+	/*template<typename T>
+	class MeshAllocator
 	{
 	public:
 
 		typedef T value_type;
 
-		VERTEXAllocator() = default;
-		template<typename U> constexpr VERTEXAllocator(const VERTEXAllocator<U>& vertexallocator) noexcept
+		MeshAllocator() = default;
+		template<typename U> constexpr MeshAllocator(const VERTEXAllocator<U>& vertexallocator) noexcept
 		{
 			alloc = vertexallocator.alloc;
 			m_Size = vertexallocator.m_Size;
 			m_VertexPointer = vertexallocator.m_VertexPointer;
 		}
-		~VERTEXAllocator() = default;
+		~MeshAllocator() = default;
 
 		T* allocate(const size_t& size)
 		{
@@ -51,9 +52,12 @@ namespace ME
 		T* m_VertexPointer = nullprt;
 
 		friend class MeshQueue;
+//
+//allow itself to access private variables
+//
 		friend class VERTEXAllocator;
-	};
-*/
+	};*/
+
 	struct VERTEX
 	{
 		ME_DATATYPE vertices[3] = { 0.0f, 0.0f, 0.0f };
@@ -84,7 +88,7 @@ namespace ME
 		void TranslateTo(const glm::vec3& XYZ); //transulate the mesh's centroid with to the point specified
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const glm::vec3& XYZ);
-		void Destroy() {}
+		void Destroy() { m_Destroyied = true; }
 
 		inline const std::vector<VERTEX>& GetVertices() const { return m_Vertices; }
 		inline std::string GetName() const { return m_Name; }
@@ -120,7 +124,7 @@ namespace ME
 		std::vector<unsigned int> m_Indices;
 		std::vector<VERTEX> m_ResetVertices;
 		std::string m_Name;
-		bool m_Ready = false, m_Destroy = false;
+		bool m_Ready = false, m_Destroyied = false;
 
 		friend class MeshQueue;
 	};
@@ -162,6 +166,7 @@ namespace ME
 		std::allocator<unsigned int> indexbufferallocator;
 		unsigned int total_vertices = 0, total_indices = 0;
 		Ref<Renderer::VertexBufferLayout> m_Layout = CreateRef<Renderer::VertexBufferLayout>();
+		std::set<unsigned int, ME_DATATYPE> free_vertex;
 	};
 //
 // Commenly used meshes

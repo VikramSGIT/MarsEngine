@@ -1,67 +1,70 @@
 #include "BasicLayer.h"
-namespace Layer
+namespace ME
 {
-    void BasicLayer::SetOnAttach(std::function<void()> func)
+    namespace Layer
     {
+        void BasicLayer::SetOnAttach(std::function<void()> func)
+        {
 
-        ME_PROFILE_TRACE_CALL();
+            ME_PROFILE_TRACE_CALL();
 
-        onattach = std::bind(func);
-    }
+            onattach = std::bind(func);
+        }
 
-    void BasicLayer::SetOnDetach(std::function<void()> func)
-    {
+        void BasicLayer::SetOnDetach(std::function<void()> func)
+        {
 
-        ME_PROFILE_TRACE_CALL();
+            ME_PROFILE_TRACE_CALL();
 
-        ondetach = std::bind(func);
-    }
-    
-    void BasicLayer::SetOnUpdate(std::function<void()> func)
-    {
+            ondetach = std::bind(func);
+        }
 
-        ME_PROFILE_TRACE_CALL();
+        void BasicLayer::SetOnUpdate(std::function<void()> func)
+        {
 
-        onupdate = std::bind(func);
-    }
-    
-    void BasicLayer::SetOnEvent(std::function<void(Event::Event&)> func)
-    {
+            ME_PROFILE_TRACE_CALL();
 
-        ME_PROFILE_TRACE_CALL();
+            onupdate = std::bind(func);
+        }
 
-        onevent = std::bind(func,std::placeholders::_1);
-    }
+        void BasicLayer::SetOnEvent(std::function<void(Event::Event&)> func)
+        {
 
-    void BasicLayer::OnAttach()
-    {
+            ME_PROFILE_TRACE_CALL();
 
-        ME_PROFILE_TRACE_CALL();
+            onevent = std::bind(func, std::placeholders::_1);
+        }
 
-        onattach;
-    }
+        void BasicLayer::OnAttach()
+        {
 
-    void BasicLayer::OnDetach()
-    {
+            ME_PROFILE_TRACE_CALL();
 
-        ME_PROFILE_TRACE_CALL();
+            onattach;
+        }
 
-        ondetach;
-    }
+        void BasicLayer::OnDetach()
+        {
 
-    void BasicLayer::OnUpdate()
-    {
+            ME_PROFILE_TRACE_CALL();
 
-        ME_PROFILE_TRACE_CALL();
+            ondetach;
+        }
 
-        onupdate;
-    }
+        void BasicLayer::OnUpdate()
+        {
 
-    void BasicLayer::OnEvent(Event::Event& e)
-    {
+            ME_PROFILE_TRACE_CALL();
 
-        ME_PROFILE_TRACE_CALL();
+            onupdate;
+        }
 
-        onevent(e);
+        void BasicLayer::OnEvent(Event::Event& e)
+        {
+
+            ME_PROFILE_TRACE_CALL();
+
+            onevent(e);
+        }
     }
 }
