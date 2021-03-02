@@ -6,7 +6,7 @@
 
   MarsEngine is Real-Time 3D Creative Engine. MarsEngine focuses over High Stablity and Portablility. Also MarsEngine targets toward very Low Memeory usage. For now MarEngine is a early build, only libraries are available.
   
-  * <a href="">Getting Started</a>
+  * <a href="https://github.com/VikramSGIT/MarsEngine/wiki">Getting Started</a>
   * <a href="">Documentation</a>
 
 # Making a Game within A Minute
