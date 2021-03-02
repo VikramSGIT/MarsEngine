@@ -1,4 +1,6 @@
-<img src="Branding/MarsEngine/MarsEngine.png">
+<p align="center">
+<img src="Branding/MarsEngine/MarsEngine.png" width="800">
+</p>
 
 # Welcome to MarsEngine
 
