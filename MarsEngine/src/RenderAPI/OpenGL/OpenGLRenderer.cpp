@@ -37,13 +37,18 @@ namespace ME
                 m_clearcolor = color;
             }
 
+            void OpenGLRendererAPI::SetShader(const Ref<Shader>& shader)
+            {
+                m_Shader = shader;
+            }
+
             void OpenGLRendererAPI::Init()
             {
 
                 ME_PROFILE_TRACE_CALL();
-                //
-                // Initiating graphics libraries
-                // Need to add graphics drivers identification
+//
+// Initiating graphics libraries
+// Need to add graphics drivers identification
                 std::stringstream ss;
                 if (glewInit() != GLEW_OK)
                     ME_CORE_ERROR("Can't Impliment GLEW");
@@ -52,9 +57,9 @@ namespace ME
                     ss << "Detected OpenGL Vesrion (using) : " << glGetString(GL_VERSION);
                 ME_CORE_INFO(ss.str());
 #endif
-                //
-                // Enabling blending, typically transparencies
-                //
+//
+// Enabling blending, typically transparencies
+//
                 GLLogCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
                 GLLogCall(glEnable(GL_BLEND));
             }
@@ -92,19 +97,50 @@ namespace ME
                 preprocessing.emplace_back(preprocessdata);
             }
 
-            void OpenGLRendererAPI::SetUpBuffers(const MeshQueue& meshqueue)
+            void OpenGLRendererAPI::SetUpBuffers(MeshQueue& meshqueue)
             {
-                Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE * sizeof(ME_DATATYPE), GL_DYNAMIC_DRAW);
-                Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE * sizeof(unsigned int), GL_DYNAMIC_DRAW);
+                if (!meshqueue.IsReady())
+                {
+                    Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE * sizeof(ME_DATATYPE), GL_DYNAMIC_DRAW);
+                    Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE * sizeof(unsigned int), GL_DYNAMIC_DRAW);
+                    if (meshqueue.GetAllocationMode() == ALLOCMODE::ALLATONE)
+                    {
+                        vertexbufferobj->BufferPostRenderData(meshqueue.GetVertexBuffer(), meshqueue.GetTotalVertices(), 0);
+                        indexbufferobj->BufferPostRenderData(meshqueue.GetIndexBuffer(), meshqueue.GetTotalIndices(), 0);
+                    }
+                    else if (meshqueue.GetAllocationMode() == ALLOCMODE::DISTRIBUTED)
+                    {
+                        std::allocator<unsigned int> iallocator;
+                        Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue.GetLayout();
+                        unsigned int voffset = 0u, ioffset = 0u, indexoffset = 0u;
 
-                vertexbufferobj->BufferPostRenderData(meshqueue.GetVertexBuffer(), meshqueue.GetTotalVertices(), 0);
-                indexbufferobj->BufferPostRenderData(meshqueue.GetIndexBuffer(), meshqueue.GetTotalIndices(), 0);
+                        for (Ref<Mesh> ms : meshqueue)
+                        {
+                            std::pair<ME_DATATYPE const*, unsigned int> vertex = ms->GetVertexData();
+                            vertexbufferobj->BufferPostRenderData(vertex.first, vertex.second * layout->GetTotalCount(), voffset);
+                            voffset += vertex.second * layout->GetTotalCount();
 
-                vertexbufferobj->ClearBufferOnDestroy(false);
-                indexbufferobj->ClearBufferOnDestroy(false);
+                            std::pair<unsigned int const*, unsigned int> index = ms->GetIndexData();
+                            unsigned int* indexbuffer = iallocator.allocate(index.second);
+                            for (size_t i = 0; i < index.second; i++)
+                                indexbuffer[i] = index.first[i] + indexoffset;
 
-                vertexbuffercache.push_back(vertexbufferobj->GetID());
-                indexbuffercache.push_back(indexbufferobj->GetID());
+                            indexbufferobj->BufferPostRenderData(indexbuffer, index.second, ioffset);
+                            iallocator.deallocate(indexbuffer, index.second);
+
+                            ioffset += index.second;
+                            indexoffset += *std::max_element(index.first, index.first + index.second) + 1;
+                            ms->SetReady(true);
+                        }
+                    }
+                    vertexbufferobj->ClearBufferOnDestroy(false);
+                    indexbufferobj->ClearBufferOnDestroy(false);
+
+                    vertexbuffercache.push_back(vertexbufferobj->GetID());
+                    indexbuffercache.push_back(indexbufferobj->GetID());
+
+                    meshqueue.SetReady(true);
+                }
             }
 
             void OpenGLRendererAPI::CheckBufferUpdate(const unsigned int& id)
@@ -120,32 +156,28 @@ namespace ME
                 }
             }
 
-            void OpenGLRendererAPI::Draw(const Ref<Shader>& shader)
+            void OpenGLRendererAPI::OnDraw()
             {
 
                 ME_PROFILE_TRACE_CALL();
-                //
-                // Will Soon Sort out the shaders when Materials Are Implemented
-                //
+//
+// Will Soon Sort out the shaders when Materials Are Implemented
+//
 
-                for (unsigned __int64 i = 0; i < m_RenderQueue.size(); i++)
+                for (size_t i = 0; i < m_RenderQueue.size(); i++)
                 {
-                    //
-                    // Constructing buffers for each meshqueue
-                    //
-                    if (!Ready)
-                    {
-                        if ((i + 1) == m_RenderQueue.size())
-                            Ready = true;
-                        SetUpBuffers(m_RenderQueue[i]);
-                    }
-                    //
-                    // Checks for buffer Update
-                    //
+//
+// Constructing buffers for each meshqueue
+//
+                    
+                    SetUpBuffers(m_RenderQueue[i]);
+//
+// Checks for buffer Update
+//
                     CheckBufferUpdate(i);
-                    //
-                    // Setting up VertexArray for each call, needs to be fixed at higher builds!!
-                    //              
+//
+// Setting up VertexArray for each call, needs to be fixed at higher builds!!
+//              
                     preprocessing.at(i)();
 
                     Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[i]);
@@ -157,7 +189,7 @@ namespace ME
 
                     array->AddBuffer(*vertexbuffer, *m_RenderQueue[i].GetLayout());
 
-                    shader->Bind();
+                    m_Shader->Bind();
                     indexbuffer->Bind();
                     vertexbuffer->Bind();
 
@@ -165,7 +197,7 @@ namespace ME
 
                     vertexbuffer->unBind();
                     indexbuffer->unBind();
-                    shader->unBind();
+                    m_Shader->unBind();
                 }
             }
 
@@ -177,24 +209,13 @@ namespace ME
                 return true;
             }
 
-            Ref<Layer::BasicLayer> OpenGLRendererAPI::GetLayer()
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                Ref<Layer::BasicLayer> layer = CreateRef<Layer::BasicLayer>();
-                layer->SetOnUpdate(std::bind(&OpenGLRendererAPI::OnUpdate, this));
-                layer->SetOnEvent(std::bind(&OpenGLRendererAPI::OnEvent, this, std::placeholders::_1));
-                return layer;
-            }
-
             void OpenGLRendererAPI::OnEvent(Event::Event& e)
             {
 
                 ME_PROFILE_TRACE_CALL();
-                //
-                // Logs out missed event handles
-                //
+//
+// Logs out missed event handles
+//
 #ifdef ME_DEBUG_SHOW_EVENT
                 ME_CORE_INFO(e.ToString());
 #endif

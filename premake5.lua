@@ -1,6 +1,6 @@
 workspace "MarsEngine"
 	architecture "x64"
-	startproject "MarsEngine"
+	startproject "Martian"
 
 	configurations
 	{
@@ -61,7 +61,7 @@ workspace "MarsEngine"
 
 	project "MarsEngine"
 		location "MarsEngine"
-		kind "SharedLib"
+		kind "StaticLib"
 		language "C++"
 		staticruntime "Off"
 
@@ -70,6 +70,9 @@ workspace "MarsEngine"
 
 		files
 		{
+			
+			"MarsEngine/src/Addons/**.cpp",
+			"MarsEngine/src/Addons/**.h",
 			"MarsEngine/src/Core/**.cpp",
 			"MarsEngine/src/Core/**.h",
 			"MarsEngine/src/GL/**.h",
@@ -134,6 +137,7 @@ workspace "MarsEngine"
 		includedirs
 		{
 			"MarsEngine/src/Vender",
+			"MarsEngine/src/Vender/imgui",
 			"MarsEngine/src"
 		}
 		
@@ -164,7 +168,9 @@ workspace "MarsEngine"
 			{
 				"ImGui",
 				"MarsEngine",
-				"opengl32"
+				"opengl32",
+				"glew32s",
+				"glfw3"
 			}
 		
 		filter "configurations:Debug"

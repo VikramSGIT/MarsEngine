@@ -166,7 +166,8 @@ namespace ME
                 ME_PROFILE_TRACE_CALL();
 
                 std::ifstream stream(filepath);
-
+                if (!stream.good())
+                    ME_CORE_ERROR("Can't open Shader File!!");
                 enum class ShaderType
                 {
                     NONE = -1, VERTEX = 0, FRAGMENT = 1

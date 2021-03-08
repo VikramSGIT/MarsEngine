@@ -29,28 +29,26 @@ namespace ME
 {
     class Application
     {
-    private:
-        Window::Layer::LayerStack m_LayerStack;
-        bool m_Running = true;
-        Ref<Window::Window> window;
-        glm::mat4 m_Projection = glm::ortho(0.0f, 500.0f, 0.0f, 500.0f);
-        Ref<Renderer::RenderAPI> renderer;
     public:
         Application();
         ~Application() = default;
         void Run();
-        void OnEvent(Event::Event& e);
-        bool OnWindowClose();
-        bool OnWindowResize();
         void METerminate();
 
-
-
+        Window::Layer::LayerStack* GetLayerStack() { return &m_LayerStack; }
         Window::Window& GetWindow() { return *window; }
         static Application& GetInstance() { return *s_Application; }
 
         static Application* s_Application;
+    private:
+        Window::Layer::LayerStack m_LayerStack;
+        bool m_Running = true;
+        Ref<Window::Window> window;
+
+        void OnEvent(Event::Event& e);
+        bool OnWindowClose();
+        bool OnWindowResize();
     };
 
-    static Application* CreateApp();
+    extern Application* CreateApp();
 }

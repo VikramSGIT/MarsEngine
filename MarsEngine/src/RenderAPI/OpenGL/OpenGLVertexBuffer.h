@@ -22,7 +22,7 @@ namespace ME
                 OpenGLVertexBuffer(const unsigned int& size, const unsigned int& mode);
                 ~OpenGLVertexBuffer();
 
-                void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) override;
+                void BufferPostRenderData(const void* data, const unsigned int& count, const unsigned int& offset) override;
                 void ClearBufferOnDestroy(bool mode) override { ClearBuffer = mode; }
 
                 void Bind() const override;

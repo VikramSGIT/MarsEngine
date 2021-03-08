@@ -29,12 +29,13 @@ namespace ME
                 bool Ready = false, LiveStreamData = true;
                 unsigned int indexoffset = 0;
                 glm::vec4 m_clearcolor;
+                Ref<Shader> m_Shader;
                 std::vector<MeshQueue> m_RenderQueue;
                 std::vector <unsigned int> vertexbuffercache;
                 std::vector<unsigned int> indexbuffercache;
                 std::vector<std::function<void()>> preprocessing;
 
-                void SetUpBuffers(const MeshQueue& meshqueue);
+                void SetUpBuffers(MeshQueue& meshqueue);
                 void CheckBufferUpdate(const unsigned int& id);
                 void ClearBufferCache();
             public:
@@ -42,17 +43,18 @@ namespace ME
                 ~OpenGLRendererAPI();
 
                 virtual void Init() override;
-                virtual void OnUpdate() override;
-                virtual void OnEvent(Event::Event& e) override;
                 virtual void Clear() const override;
                 virtual void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) override;
 
-                virtual bool SwitchAPI(const RenderAPItype api);
-                virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-                virtual void SetClearColor(const glm::vec4& color) override;
-                virtual void Draw(const Ref<Shader>& shader) override;
+                virtual void OnUpdate() override;
+                virtual void OnDraw() override;
+                virtual void OnEvent(Event::Event& e) override;
 
-                virtual inline Ref<Layer::BasicLayer> GetLayer() override;
+                virtual bool SwitchAPI(const RenderAPItype api);
+
+                virtual void SetClearColor(const glm::vec4& color) override;
+                virtual void SetShader(const Ref<Shader>& shader) override;
+                virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
                 virtual inline std::vector<MeshQueue> GetRenderQueue() override { return m_RenderQueue; }
             };
 
