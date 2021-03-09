@@ -53,7 +53,7 @@ namespace ME
                 ME_PROFILE_TRACE_CALL();
 
                 Bind();
-                GLLogCall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, count * sizeof(unsigned int), data));
+                GLLogCall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset * sizeof(unsigned int), count * sizeof(unsigned int), data));
                 unBind();
                 m_Filled += count;
             }

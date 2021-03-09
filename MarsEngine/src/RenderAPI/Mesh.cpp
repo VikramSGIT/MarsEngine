@@ -196,10 +196,24 @@ namespace ME
 // This makes the allocation for the vertexbuffer and indexbuffer easier
 //
 		size_t tempvbuffer = total_vertices, tempibuffer = total_indices;
-		m_Meshes.emplace_back(mesh);
+		if (m_AllocationMode == ALLOCMODE::ALLATONE)
+		{
+			if (!mesh->MemoryBound)
+			{
+				m_Meshes.emplace_back(mesh);
+				total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
+				total_indices += static_cast<unsigned int>(mesh->m_data.isize);
+			}
+			else
+				ME_CORE_ERROR(mesh->m_Name + " has already been added to a memory bound Queue " + mesh->m_Name + " can only be added to distributed Queue!!");
+		}
+		else if(m_AllocationMode == ALLOCMODE::DISTRIBUTED)
+		{
+			m_Meshes.emplace_back(mesh);
+			total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
+			total_indices += static_cast<unsigned int>(mesh->m_data.isize);
+		}
 
-		total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
-		total_indices += static_cast<unsigned int>(mesh->m_data.isize);
 		if (m_AllocationMode == ALLOCMODE::ALLATONE)
 		{
 			if (m_Allocation == ALLOCAT::ONMESHPUSH)
@@ -216,32 +230,18 @@ namespace ME
 //
 // Filling up of vertexbuffer with datas
 //
-					std::vector<VERTEX> vertex = { ms->m_data.vertices, ms->m_data.vertices + ms->m_data.vsize };
-					std::vector<unsigned int> index = { ms->m_data.indices, ms->m_data.indices + ms->m_data.isize };
-					for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
-					{
-						unsigned int offset = 0;
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[1];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[2];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[1];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
-					}
+					std::memcpy(&vertexbuffer[voffset], ms->m_data.vertices, ms->m_data.vsize * m_Layout->GetTotalCount() * sizeof(ME_DATATYPE));
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
-					voffset += static_cast<unsigned int>(vertex.size()) * m_Layout->GetTotalCount();
+					voffset += static_cast<unsigned int>(ms->m_data.vsize) * m_Layout->GetTotalCount();
 
 					ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
-					for (unsigned __int64 j = 0; j < index.size(); j++)
-						indexbuffer[j + ioffset] = index.at(j) + indexoffset;
-					ioffset += static_cast<unsigned int>(index.size());
-					indexoffset += *std::max_element(index.begin(), index.end()) + 1;
+					for (unsigned __int64 j = 0; j < ms->m_data.isize; j++)
+						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+					ioffset += ms->m_data.isize;
+					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -250,7 +250,6 @@ namespace ME
 				indexbufferallocator.deallocate(tempindexbuffer, tempibuffer);
 			}
 		}
-		Ready = false;
 	}
 
 	void MeshQueue::PushMeshes(const std::vector<Ref<Mesh>>& meshes)
@@ -261,17 +260,21 @@ namespace ME
 		size_t tempvbuffer = total_vertices, tempibuffer = total_indices;
 		for (Ref<Mesh> mesh : meshes)
 		{
-			m_Meshes.emplace_back(mesh);
+			if (m_AllocationMode == ALLOCMODE::ALLATONE)
+			{
+				if (!mesh->MemoryBound)
+				{
+					m_Meshes.emplace_back(mesh);
 //
 // This makes the allocation for the vertexbuffer and indexbuffer easier
 //
-			total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
-			total_indices += static_cast<unsigned int>(mesh->m_data.isize);
-		}
-
-		if (m_AllocationMode == ALLOCMODE::ALLATONE)
-		{
-			for (Ref<Mesh> mesh : meshes)
+					total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
+					total_indices += static_cast<unsigned int>(mesh->m_data.isize);
+				}
+				else
+					ME_CORE_ERROR(mesh->m_Name + " has already been bound to Queue. " + mesh->m_Name + " can only be added to distributed Queue!!");
+			}
+			else if (m_AllocationMode == ALLOCMODE::DISTRIBUTED)
 			{
 				m_Meshes.emplace_back(mesh);
 //
@@ -280,7 +283,10 @@ namespace ME
 				total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
 				total_indices += static_cast<unsigned int>(mesh->m_data.isize);
 			}
+		}
 
+		if (m_AllocationMode == ALLOCMODE::ALLATONE)
+		{
 			if (m_Allocation == ALLOCAT::ONMESHPUSH)
 			{
 
@@ -295,32 +301,18 @@ namespace ME
 //
 // Filling up of vertexbuffer with datas
 //
-					std::vector<VERTEX> vertex = { ms->m_data.vertices, ms->m_data.vertices + ms->m_data.vsize };
-					std::vector<unsigned int> index = { ms->m_data.indices, ms->m_data.indices + ms->m_data.isize };
-					for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
-					{
-						unsigned int offset = 0;
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[1];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[2];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[1];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
-					}
+					std::memcpy(&vertexbuffer[voffset], ms->m_data.vertices, ms->m_data.vsize * m_Layout->GetTotalCount() * sizeof(ME_DATATYPE));
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
-					voffset += static_cast<unsigned int>(vertex.size()) * m_Layout->GetTotalCount();
+					voffset += static_cast<unsigned int>(ms->m_data.vsize) * m_Layout->GetTotalCount();
 
 					ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
-					for (unsigned __int64 j = 0; j < index.size(); j++)
-						indexbuffer[j + ioffset] = index.at(j) + indexoffset;
-					ioffset += static_cast<unsigned int>(index.size());
-					indexoffset += *std::max_element(index.begin(), index.end()) + 1;
+					for (size_t j = 0; j < ms->m_data.isize; j++)
+						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+					ioffset += static_cast<unsigned int>(ms->m_data.isize);
+					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -329,31 +321,6 @@ namespace ME
 				indexbufferallocator.deallocate(tempindexbuffer, tempibuffer);
 			}
 		}
-		Ready = false;
-	}
-
-	std::vector<glm::uvec2> MeshQueue::GetUpdate()
-	{
-
-		ME_PROFILE_TRACE_CALL();
-
-		std::vector<glm::uvec2> ranges;
-
-		unsigned int offset = 0;
-		for (Ref<Mesh> ms : m_Meshes)
-		{
-			glm::uvec2 input;
-			if (!ms->IsReady())
-			{
-				input.x = offset;
-				input.y = offset + ms->m_data.vsize * m_Layout->GetTotalCount();
-				ranges.emplace_back(input);
-				ms->SetReady(true);
-			}
-			offset += ms->m_data.vsize * m_Layout->GetTotalCount();
-		}
-
-		return ranges;
 	}
 
 	void MeshQueue::Allocate()
@@ -375,32 +342,18 @@ namespace ME
 //
 // Filling up of vertexbuffer with datas
 //
-					std::vector<VERTEX> vertex = { ms->m_data.vertices, ms->m_data.vertices + ms->m_data.vsize };
-					std::vector<unsigned int> index = { ms->m_data.indices, ms->m_data.indices + ms->m_data.isize };
-					for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
-					{
-						unsigned int offset = 0;
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[1];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[2];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[1];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
-					}
+					std::memcpy(&vertexbuffer[voffset], ms->m_data.vertices, ms->m_data.vsize * m_Layout->GetTotalCount() * sizeof(ME_DATATYPE));
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
-					voffset += static_cast<unsigned int>(ms->m_Vertices.size()) * m_Layout->GetTotalCount();
+					voffset += static_cast<unsigned int>(ms->m_data.vsize) * m_Layout->GetTotalCount();
 
 					ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
-					for (unsigned __int64 j = 0; j < index.size(); j++)
-						indexbuffer[j + ioffset] = index.at(j) + indexoffset;
-					ioffset += static_cast<unsigned int>(index.size());
-					indexoffset += *std::max_element(index.begin(), index.end()) + 1;
+					for (size_t j = 0; j < ms->m_data.isize; j++)
+						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+					ioffset += static_cast<unsigned int>(ms->m_data.isize);
+					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -409,7 +362,8 @@ namespace ME
 				indexbufferallocator.deallocate(tempindexbuffer, total_indices);
 			}
 		}
-		Ready = false;
+		else
+			ME_CORE_ERROR("Can only allocate if Bound Queue");
 	}
 
 	void MeshQueue::ClearBuffer()
@@ -421,6 +375,49 @@ namespace ME
 		indexbufferallocator.deallocate(indexbuffer, total_indices);
 	}
 
+	std::vector<glm::vec<2, unsigned int>> MeshQueue::GetUpdate()
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		std::vector<glm::vec<2, unsigned int>> ranges;
+		if (m_AllocationMode == ALLOCMODE::ALLATONE)
+		{
+			unsigned int offset = 0;
+			for (Ref<Mesh> ms : m_Meshes)
+			{
+				glm::vec2 range;
+				if (!ms->m_Ready)
+				{
+					range.x = offset;
+					range.y = offset + ms->m_data.vsize * m_Layout->GetTotalCount();
+					ranges.emplace_back(range);
+					ms->SetReady(true);
+				}
+				offset += ms->m_data.vsize * m_Layout->GetTotalCount();
+			}
+		}
+		else if (m_AllocationMode == ALLOCMODE::DISTRIBUTED)
+		{
+			size_t i = 0u;
+			glm::vec2 range;
+			unsigned int offset = 0;
+
+			for (; i < m_Meshes.size(); i++)
+			{
+				if (!m_Meshes[i]->m_Ready)
+				{
+					range.x = offset;
+					range.y = i;
+					ranges.emplace_back(range);
+					m_Meshes[i]->SetReady(true);
+				}
+				offset += m_Meshes[i]->m_data.vsize * m_Layout->GetTotalCount();
+			}
+		}
+		return ranges;
+	}
+
 	void MeshQueue::PushAddon(ME::Addon::MeshAddon& addon)
 	{
 
@@ -428,23 +425,25 @@ namespace ME
 		
 		if (m_AllocationMode == ALLOCMODE::ALLATONE)
 		{
-			std::vector<Ref<Mesh>> temp;
-			temp = m_Meshes;
-			m_Meshes.clear();
 			size_t tempvbuffer = total_vertices, tempibuffer = total_indices;
 
 			for (Ref<Mesh> mesh : addon.GetMeshes())
 			{
-				m_Meshes.emplace_back(mesh);
+				if (!mesh->MemoryBound)
+				{
+					m_Meshes.emplace_back(mesh);
 //
 // This makes the allocation for the vertexbuffer and indexbuffer easier
 //
-				total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
-				total_indices += static_cast<unsigned int>(mesh->m_data.isize);
+					total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
+					total_indices += static_cast<unsigned int>(mesh->m_data.isize);
+				}
+				else
+				{
+					ME_CORE_ERROR(mesh->m_Name + " addon has already been bound to a Queue. Can only be added to a distributed Queue");
+					break;
+				}
 			}
-
-			for (Ref<Mesh> mesh : temp)
-				m_Meshes.emplace_back(mesh);
 
 			if (m_Allocation == ALLOCAT::ONMESHPUSH)
 			{
@@ -460,32 +459,18 @@ namespace ME
 //
 // Filling up of vertexbuffer with datas
 //			
-					std::vector<VERTEX> vertex = { ms->m_data.vertices, ms->m_data.vertices + ms->m_data.vsize };
-					std::vector<unsigned int> index = { ms->m_data.indices, ms->m_data.indices + ms->m_data.isize };
-					for (unsigned __int64 i = 0; i < vertex.size() * m_Layout->GetTotalCount(); i += m_Layout->GetTotalCount())
-					{
-						unsigned int offset = 0;
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[1];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).vertices[2];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[0];
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).texturecoord[1];
-
-						vertexbuffer[i + (offset++) + voffset] = vertex.at(i / m_Layout->GetTotalCount()).index;
-					}
+					std::memcpy(&vertexbuffer[voffset], ms->m_data.vertices, ms->m_data.vsize * m_Layout->GetTotalCount() * sizeof(ME_DATATYPE));
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
-					voffset += static_cast<unsigned int>(vertex.size()) * m_Layout->GetTotalCount();
+					voffset += static_cast<unsigned int>(ms->m_Vertices.size()) * m_Layout->GetTotalCount();
 
 					ms->m_Vertices.clear();
-//              
+//                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
-					for (unsigned __int64 j = 0; j < index.size(); j++)
-						indexbuffer[j + ioffset] = index.at(j) + indexoffset;
-					ioffset += static_cast<unsigned int>(index.size());
-					indexoffset += *std::max_element(index.begin(), index.end()) + 1;
+					for (size_t j = 0; j < ms->m_data.isize; j++)
+						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+					ioffset += static_cast<unsigned int>(ms->m_data.isize);
+					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -494,6 +479,24 @@ namespace ME
 				indexbufferallocator.deallocate(tempindexbuffer, tempibuffer);
 			}
 		}
-		Ready = false;
+		else if (m_AllocationMode == ALLOCMODE::DISTRIBUTED)
+		{
+			std::vector<Ref<Mesh>> temp;
+			temp = m_Meshes;
+			m_Meshes.clear();
+
+			for (Ref<Mesh> mesh : addon.GetMeshes())
+			{
+				m_Meshes.emplace_back(mesh);
+//
+// This makes the allocation for the vertexbuffer and indexbuffer easier
+//
+				total_vertices += static_cast<unsigned int>(mesh->m_data.vsize) * m_Layout->GetTotalCount();
+				total_indices += static_cast<unsigned int>(mesh->m_data.isize);
+			}
+
+			for (Ref<Mesh> ms : temp)
+				m_Meshes.emplace_back(ms);
+		}
 	}
 }

@@ -3,7 +3,7 @@
 #include "MarsHeader.h"
 #include "RenderAPI/OpenGL/OpenGLRenderer.h"
 #include "RenderAPI/OpenGL/OpenGLShader.h"
-#include "RenderAPI/OpenGL/OpenGLTexture.h"
+#include "Addons/ParticleSystem.h"
 #include "Window/Layers/Layer.h"
 
 class Martian : public ME::Window::Layer::Layer
@@ -19,5 +19,6 @@ public:
 private:
 	ME::Ref<ME::Renderer::RenderAPI> renderer = ME::CreateRef<ME::Renderer::OpenGL::OpenGLRendererAPI>();
 	ME::Ref<ME::Renderer::Shader> shader;
+	ME::Ref<ME::Addon::ParticleSystem> particlesystem;
 	ME::MeshQueue queue;
 };

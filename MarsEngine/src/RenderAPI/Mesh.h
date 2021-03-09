@@ -119,7 +119,7 @@ namespace ME
 
 		inline unsigned int GetTotalVertices() const { return total_vertices; }
 		inline unsigned int GetTotalIndices() const { return total_indices; }
-		std::vector<glm::uvec2> GetUpdate();
+		std::vector<glm::vec<2, unsigned int>>  GetUpdate();
 
 		std::vector<Ref<Mesh>>::iterator begin() { return m_Meshes.begin(); }
 		std::vector<Ref<Mesh>>::iterator end() { return m_Meshes.end(); }
