@@ -99,8 +99,8 @@
 			Running = false;
 
 		renderer->Draw(shader);
-		window->OnUpdate();
 		renderer->OnUpdate();
+		window->OnUpdate();
 	}
   ```
   * Now run `TheGame.bat` on your working directory.
