@@ -7,3 +7,6 @@
 [submodule "MarsEngine/src/Vender/glm"]
 	path = MarsEngine/src/Vender/glm
 	url = https://github.com/g-truc/glm
+[submodule "MarsEngine/src/Core/MarsEngine_MemoryManagement"]
+	path = MarsEngine/src/Core/MarsEngine_MemoryManagement
+	url = https://github.com/VikramSGIT/MarsEngine_MemoryManagement.git

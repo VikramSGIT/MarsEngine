@@ -5,7 +5,7 @@
 ME::Application* app;
 extern ME::Application* ME::CreateApp()
 {
-	app = new Application;
+	app = allocon<Application>();
 
 	Ref<Martian> marslayer = CreateRef<Martian>();
 	app->GetLayerStack()->PushLayer(marslayer);

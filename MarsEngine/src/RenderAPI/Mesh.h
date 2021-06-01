@@ -140,8 +140,6 @@ namespace ME
 		unsigned int* indexbuffer = nullptr;
 		std::set<unsigned int, ME_DATATYPE> free_vertex;
 		Ref<Renderer::VertexBufferLayout> m_Layout = CreateRef<Renderer::VertexBufferLayout>();
-		std::allocator<ME_DATATYPE> vertexbufferallocator;
-		std::allocator<unsigned int> indexbufferallocator;
 
 		ALLOCAT m_Allocation = ALLOCAT::ONMESHPUSH;
 		ALLOCMODE m_AllocationMode = ALLOCMODE::ALLATONE;

@@ -221,8 +221,8 @@ namespace ME
 				float* tempvertexbuffer = vertexbuffer;
 				unsigned int* tempindexbuffer = indexbuffer;
 
-				vertexbuffer = vertexbufferallocator.allocate(total_vertices);
-				indexbuffer = indexbufferallocator.allocate(total_indices);
+				vertexbuffer = alloc<ME_DATATYPE>(total_vertices);
+				indexbuffer = alloc<unsigned int>(total_indices);
 
 				unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 				for (Ref<Mesh> ms : m_Meshes)
@@ -246,8 +246,8 @@ namespace ME
 					ms->MemoryBound = true;
 					ms->SetReady(true);
 				}
-				vertexbufferallocator.deallocate(tempvertexbuffer, tempvbuffer);
-				indexbufferallocator.deallocate(tempindexbuffer, tempibuffer);
+				dealloc(tempvertexbuffer, tempvbuffer);
+				dealloc(tempindexbuffer, tempibuffer);
 			}
 		}
 	}
@@ -292,8 +292,8 @@ namespace ME
 
 				float* tempvertexbuffer = vertexbuffer;
 				unsigned int* tempindexbuffer = indexbuffer;
-				vertexbuffer = vertexbufferallocator.allocate(total_vertices);
-				indexbuffer = indexbufferallocator.allocate(total_indices);
+				vertexbuffer = alloc<ME_DATATYPE>(total_vertices);
+				indexbuffer = alloc<unsigned int>(total_indices);
 
 				unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 				for (Ref<Mesh> ms : m_Meshes)
@@ -317,8 +317,8 @@ namespace ME
 					ms->MemoryBound = true;
 					ms->SetReady(true);
 				}
-				vertexbufferallocator.deallocate(tempvertexbuffer, tempvbuffer);
-				indexbufferallocator.deallocate(tempindexbuffer, tempibuffer);
+				dealloc(tempvertexbuffer, tempvbuffer);
+				dealloc(tempindexbuffer, tempibuffer);
 			}
 		}
 	}
@@ -333,8 +333,8 @@ namespace ME
 				float* tempvertexbuffer = vertexbuffer;
 				unsigned int* tempindexbuffer = indexbuffer;
 
-				vertexbuffer = vertexbufferallocator.allocate(total_vertices);
-				indexbuffer = indexbufferallocator.allocate(total_indices);
+				vertexbuffer = alloc<ME_DATATYPE>(total_vertices);
+				indexbuffer = alloc<unsigned int>(total_indices);
 
 				unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 				for (Ref<Mesh> ms : m_Meshes)
@@ -358,8 +358,8 @@ namespace ME
 					ms->MemoryBound = true;
 					ms->SetReady(true);
 				}
-				vertexbufferallocator.deallocate(tempvertexbuffer, total_vertices);
-				indexbufferallocator.deallocate(tempindexbuffer, total_indices);
+				dealloc(tempvertexbuffer, total_vertices);
+				dealloc(tempindexbuffer, total_indices);
 			}
 		}
 		else
@@ -371,8 +371,8 @@ namespace ME
 
 		ME_PROFILE_TRACE_CALL();
 
-		vertexbufferallocator.deallocate(vertexbuffer, total_vertices);
-		indexbufferallocator.deallocate(indexbuffer, total_indices);
+		dealloc(vertexbuffer, total_vertices);
+		dealloc(indexbuffer, total_indices);
 	}
 
 	std::vector<glm::vec<2, unsigned int>> MeshQueue::GetUpdate()
@@ -450,8 +450,8 @@ namespace ME
 				float* tempvertexbuffer = vertexbuffer;
 				unsigned int* tempindexbuffer = indexbuffer;
 
-				vertexbuffer = vertexbufferallocator.allocate(total_vertices);
-				indexbuffer = indexbufferallocator.allocate(total_indices);
+				vertexbuffer = alloc<ME_DATATYPE>(total_vertices);
+				indexbuffer = alloc<unsigned int>(total_indices);
 
 				unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
 				for (Ref<Mesh> ms : m_Meshes)
@@ -475,8 +475,8 @@ namespace ME
 					ms->MemoryBound = true;
 					ms->SetReady(true);
 				}
-				vertexbufferallocator.deallocate(tempvertexbuffer, tempvbuffer);
-				indexbufferallocator.deallocate(tempindexbuffer, tempibuffer);
+				dealloc(tempvertexbuffer, tempvbuffer);
+				dealloc(tempindexbuffer, tempibuffer);
 			}
 		}
 		else if (m_AllocationMode == ALLOCMODE::DISTRIBUTED)

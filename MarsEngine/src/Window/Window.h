@@ -9,6 +9,7 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
+
 namespace ME
 {
     namespace Window

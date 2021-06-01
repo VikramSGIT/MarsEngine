@@ -1,12 +1,7 @@
 workspace "MarsEngine"
 	architecture "x64"
+	configurations { "Debug", "Release"}
 	startproject "Martian"
-
-	configurations
-	{
-		"Debug",
-		"Release"
-	}
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
