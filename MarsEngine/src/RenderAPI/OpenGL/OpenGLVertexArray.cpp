@@ -30,7 +30,7 @@ namespace ME
 
                 Bind();
                 vertexbuffer.Bind();
-                const std::vector<VertexBufferElement>& elements = layout.GetElements();
+                const std::vector<VertexBufferElement> elements = layout.GetElements();
                 unsigned int offset = 0;
 
                 for (unsigned int i = 0; i < elements.size(); i++)

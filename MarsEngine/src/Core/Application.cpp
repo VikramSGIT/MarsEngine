@@ -14,6 +14,7 @@ namespace ME
 
     bool Application::OnWindowClose()
     {
+
         ME_PROFILE_TRACE_CALL();
 
         m_Running = false;
@@ -24,6 +25,7 @@ namespace ME
     {
 
         ME_PROFILE_TRACE_CALL();
+
         return true;
     }
 
@@ -58,7 +60,7 @@ namespace ME
 
         ME_PROFILE_TRACE_CALL();
 
-        GetLogger()->SetLogging(true);
+        Logger::GlobalLogger->SetLogging(true);
         window->SetEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
         while (m_Running)

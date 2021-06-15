@@ -35,7 +35,9 @@ namespace ME
 	public:
 		Mesh(const std::string& name)
 		:m_Name(name) { ME_PROFILE_TRACE_CALL(); }
-		~Mesh() = default;
+		Mesh(const Mesh& mesh);
+		Mesh(Mesh&& mesh) noexcept;
+		~Mesh();
 
 		void BufferVertices(const VERTEX* vertex, const unsigned int& count);
 		void BufferIndices(const unsigned int* data, const unsigned int& count);

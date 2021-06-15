@@ -4,6 +4,48 @@ namespace ME
 {
 //////////////////////////////////////// Mesh //////////////////////////////////////////////////
 
+	Mesh::Mesh(const Mesh& mesh)
+		:m_Ready(mesh.m_Ready), m_Destroyied(false), MemoryBound(false), m_Vertices(mesh.m_Vertices),
+		m_Indices(mesh.m_Indices), m_ResetVertices(mesh.m_ResetVertices), m_Name(mesh.m_Name)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		m_data.vsize = mesh.m_data.vsize;
+		m_data.isize = mesh.m_data.isize;
+		if (MemoryBound)
+		{
+			m_data.vertices = alloc<VERTEX>(mesh.m_data.vsize);
+			m_data.indices = alloc<unsigned int>(mesh.m_data.isize);
+			memcpy(m_data.vertices, mesh.m_data.vertices, mesh.m_data.vsize);
+			memcpy(m_data.indices, mesh.m_data.indices, mesh.m_data.isize);
+		}
+	}
+
+	Mesh::Mesh(Mesh&& mesh) noexcept
+		:m_Ready(mesh.m_Ready), m_Destroyied(false), MemoryBound(false), m_Vertices(mesh.m_Vertices),
+		m_Indices(mesh.m_Indices), m_ResetVertices(mesh.m_ResetVertices), m_Name(mesh.m_Name)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		m_data.vsize = mesh.m_data.vsize;
+		m_data.isize = mesh.m_data.isize;
+		if (MemoryBound)
+		{
+			m_data.vertices = alloc<VERTEX>(mesh.m_data.vsize);
+			m_data.indices = alloc<unsigned int>(mesh.m_data.isize);
+			memcpy(m_data.vertices, mesh.m_data.vertices, mesh.m_data.vsize);
+			memcpy(m_data.indices, mesh.m_data.indices, mesh.m_data.isize);
+		}
+	}
+
+	Mesh::~Mesh()
+	{
+		//dealloc(m_data.vertices, m_data.vsize);
+		//dealloc(m_data.indices, m_data.isize);
+	}
+
 	void Mesh::BufferVertices(const VERTEX* vertex, const unsigned int& count)
 	{
 
@@ -346,7 +388,7 @@ namespace ME
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
 					voffset += static_cast<unsigned int>(ms->m_data.vsize) * m_Layout->GetTotalCount();
 
-					ms->m_Vertices.clear();
+					//ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
@@ -463,7 +505,7 @@ namespace ME
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
 					voffset += static_cast<unsigned int>(ms->m_Vertices.size()) * m_Layout->GetTotalCount();
 
-					ms->m_Vertices.clear();
+					//ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //

@@ -10,3 +10,6 @@
 [submodule "MarsEngine/src/Core/MarsEngine_MemoryManagement"]
 	path = MarsEngine/src/Core/MarsEngine_MemoryManagement
 	url = https://github.com/VikramSGIT/MarsEngine_MemoryManagement.git
+[submodule "MarsEngine/src/Core/Memory"]
+	path = MarsEngine/src/Core/Memory
+	url = https://github.com/VikramSGIT/Memory

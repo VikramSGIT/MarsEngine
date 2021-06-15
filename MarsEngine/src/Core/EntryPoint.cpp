@@ -3,16 +3,18 @@
 #include "Application.h"
 int main(int, char**)
 {
+    ME_LOGINIT();
     ME_CORE_WARNING("MARS ENGINE STARTING....");
-    ME::ME_MEMINIT();
+    ME_MEMINIT();
     {
         auto app = ME::CreateApp();
         app->Run();
         ME::dealloc(app, sizeof(ME::Application));
 
-        ME_CORE_WARNING("MARS ENGINE SHUTDOWN....");
         WriteFile("Data.XLS");
     }
-    ME::ME_MEMCLEAR();
+    ME_MEMCLEAR();
+    ME_CORE_WARNING("MARS ENGINE SHUTDOWN....");
+    ME_LOGDEINIT();
     return 0;
 }
