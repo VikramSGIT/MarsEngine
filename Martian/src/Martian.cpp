@@ -20,7 +20,8 @@ void Martian::OnAttach()
 	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
 
 	//queue.SetAllocationMode(ME::ALLOCMODE::DISTRIBUTED);
-	queue.PushMesh(ME::GenRect("Test", { 50.0f, 50.0f }));
+	ME::Ref<ME::Mesh> mesh = ME::GenRect("Aadhav", { 50.0f, 50.0f });
+	queue.PushMesh(mesh);
 
 	/*ME::Addon::ParticleProps props;
 	props.parent = ME::GenRect("Particles System", { 30.0f, 30.0f }, 1.0f);
