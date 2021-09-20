@@ -52,7 +52,6 @@ namespace ME
 		void TranslateTo(const glm::vec3& XYZ); //translate the mesh's centroid to the point specified
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const glm::vec3& XYZ);
-		void Destroy() { m_Destroyied = true; }
 
 		inline const std::vector<VERTEX>& GetVertices() const { return std::vector<VERTEX>(m_data.vertices, m_data.vertices + m_data.vsize); }
 		inline const std::vector<unsigned int>& GetIndices() const { return std::vector<unsigned int>(m_data.indices, m_data.indices + m_data.isize); };
@@ -69,7 +68,7 @@ namespace ME
 			ME_PROFILE_TRACE_CALL();
 
 			glm::mat4 matrix = mat;
-			for (int i = 0; i < mesh->m_data.vsize; i++)
+			for (unsigned int i = 0; i < mesh->m_data.vsize; i++)
 			{
 				VERTEX& vertex = mesh->m_data.vertices[i];
 				glm::vec4 out(vertex.vertices[0], vertex.vertices[1], vertex.vertices[2], 1.0f);
@@ -86,7 +85,7 @@ namespace ME
 
 		struct MeshArray
 		{
-			size_t vsize = 0ull, isize = 0ull;
+			unsigned int vsize = 0ull, isize = 0ull;
 			unsigned int* indices = nullptr;
 			VERTEX* vertices = nullptr;
 		};
@@ -97,7 +96,7 @@ namespace ME
 		std::vector<VERTEX> m_ResetVertices;
 		std::string m_Name;
 
-		bool m_Ready = false, m_Destroyied = false, MemoryBound = false;
+		bool m_Ready = false;
 		friend class MeshQueue;
 	};
 
@@ -105,19 +104,11 @@ namespace ME
 	{
 	public:
 		MeshQueue();
-		void PushMesh(const Ref<Mesh>& mesh);
-		void PushMeshes(const std::vector<Ref<Mesh>>& meshes);
-		void PushAddon(ME::Addon::MeshAddon& addon);
-		void SetAllocateAt(const ALLOCAT& allocateat) { m_Allocation = allocateat; }
-		void SetAllocationMode(const ALLOCMODE& allocmode) { m_AllocationMode = allocmode; }
-		void SetReady(const bool& ready) { Ready = ready; }
+		virtual void PushMesh(const Ref<Mesh>& mesh) = 0;
+		virtual void PushMeshes(const std::vector<Ref<Mesh>>& meshes) = 0;
+		virtual void PushAddon(ME::Addon::MeshAddon& addon) = 0;
 
-		void Allocate();
-		void ClearBuffer();
-
-		inline Ref<Renderer::VertexBufferLayout> GetLayout() const { return m_Layout; }
 		inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }
-		inline ALLOCMODE GetAllocationMode() const { return m_AllocationMode; }
 
 		inline unsigned int GetTotalVertices() const { return total_vertices; }
 		inline unsigned int GetTotalIndices() const { return total_indices; }
@@ -133,22 +124,21 @@ namespace ME
 		std::vector<Ref<Mesh>>::const_reverse_iterator rbegin() const { return m_Meshes.rbegin(); }
 		std::vector<Ref<Mesh>>::const_reverse_iterator rend() const { return m_Meshes.rend(); }
 
-		inline bool IsReady() const { return Ready; }
-		inline const ME_DATATYPE* GetVertexBuffer() const { return vertexbuffer; }
-		inline const unsigned int* GetIndexBuffer() const { return indexbuffer; }
-
 	private:
-		ME_DATATYPE* vertexbuffer = nullptr;
-		unsigned int* indexbuffer = nullptr;
-		std::set<unsigned int, ME_DATATYPE> free_vertex;
 		Ref<Renderer::VertexBufferLayout> m_Layout = CreateRef<Renderer::VertexBufferLayout>();
-
-		ALLOCAT m_Allocation = ALLOCAT::ONMESHPUSH;
-		ALLOCMODE m_AllocationMode = ALLOCMODE::ALLATONE;
 
 		std::vector<Ref<Mesh>> m_Meshes;
 		unsigned int total_vertices = 0, total_indices = 0;
-		bool Ready = false;
+	};
+
+	class StaticQueue : public MeshQueue
+	{
+
+	};
+
+	class DynamicQueue : public MeshQueue
+	{
+
 	};
 //
 // Commenly used meshes

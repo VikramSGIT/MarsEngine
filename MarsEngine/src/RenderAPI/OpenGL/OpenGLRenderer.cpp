@@ -196,7 +196,7 @@ namespace ME
 //
 // Checks for buffer Update
 //
-                    CheckBufferUpdate(i);
+                    CheckBufferUpdate(static_cast<unsigned int>(i));
 //
 // Setting up VertexArray for each call, needs to be fixed at higher builds!!
 //              

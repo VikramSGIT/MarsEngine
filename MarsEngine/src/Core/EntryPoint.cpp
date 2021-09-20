@@ -10,7 +10,6 @@ int main(int, char**)
         auto app = ME::CreateApp();
         app->Run();
         ME::dealloc(app, sizeof(ME::Application));
-
         WriteFile("Data.XLS");
     }
     ME_MEMCLEAR();

@@ -22,4 +22,5 @@ private:
 	ME::Ref<ME::Renderer::Shader> shader;
 	ME::Ref<ME::Addon::ParticleSystem> particlesystem;
 	ME::MeshQueue queue;
+	ME::Ref<ME::Mesh> Player;
 };

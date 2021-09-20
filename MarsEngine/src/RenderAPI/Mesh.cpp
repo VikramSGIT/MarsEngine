@@ -20,6 +20,11 @@ namespace ME
 			memcpy(m_data.vertices, mesh.m_data.vertices, mesh.m_data.vsize);
 			memcpy(m_data.indices, mesh.m_data.indices, mesh.m_data.isize);
 		}
+		else
+		{
+			m_data.vertices = m_Vertices.begin()._Ptr;
+			m_data.indices = m_Indices.begin()._Ptr;
+		}
 	}
 
 	Mesh::Mesh(Mesh&& mesh) noexcept
@@ -37,6 +42,11 @@ namespace ME
 			m_data.indices = alloc<unsigned int>(mesh.m_data.isize);
 			memcpy(m_data.vertices, mesh.m_data.vertices, mesh.m_data.vsize);
 			memcpy(m_data.indices, mesh.m_data.indices, mesh.m_data.isize);
+		}
+		else
+		{
+			m_data.vertices = m_Vertices.begin()._Ptr;
+			m_data.indices = m_Indices.begin()._Ptr;
 		}
 	}
 
@@ -59,7 +69,7 @@ namespace ME
 			m_ResetVertices.emplace_back(vertex[i]);
 		}
 		m_data.vertices = m_Vertices.begin()._Ptr;
-		m_data.vsize = m_Vertices.size();
+		m_data.vsize = static_cast<unsigned int>(m_Vertices.size());
 		m_Ready = false;
 	}
 
@@ -72,7 +82,7 @@ namespace ME
 		for (unsigned int i = 0; i < count; i++)
 			m_Indices.emplace_back(data[i]);
 		m_data.indices = m_Indices.begin()._Ptr;
-		m_data.isize = m_Indices.size();
+		m_data.isize = static_cast<unsigned int>(m_Indices.size());
 		m_Ready = false;
 	}
 
@@ -280,10 +290,15 @@ namespace ME
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
+					unsigned int maxindex = 0;
 					for (unsigned __int64 j = 0; j < ms->m_data.isize; j++)
+					{
 						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+						if (indexbuffer[j + ioffset] > maxindex)
+							maxindex = indexbuffer[j + ioffset];
+					}
 					ioffset += ms->m_data.isize;
-					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
+					indexoffset += maxindex + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -351,10 +366,15 @@ namespace ME
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
+					unsigned int maxindex = 0;
 					for (size_t j = 0; j < ms->m_data.isize; j++)
+					{
 						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+						if (indexbuffer[j + ioffset] > maxindex)
+							maxindex = indexbuffer[j + ioffset];
+					}
 					ioffset += static_cast<unsigned int>(ms->m_data.isize);
-					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
+					indexoffset += maxindex + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -386,16 +406,21 @@ namespace ME
 //
 					std::memcpy(&vertexbuffer[voffset], ms->m_data.vertices, ms->m_data.vsize * m_Layout->GetTotalCount() * sizeof(ME_DATATYPE));
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
-					voffset += static_cast<unsigned int>(ms->m_data.vsize) * m_Layout->GetTotalCount();
+					voffset += ms->m_data.vsize * m_Layout->GetTotalCount();
 
 					//ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
+					unsigned int maxindex = 0;
 					for (size_t j = 0; j < ms->m_data.isize; j++)
+					{
 						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+						if (indexbuffer[j + ioffset] > maxindex)
+							maxindex = indexbuffer[j + ioffset];
+					}
 					ioffset += static_cast<unsigned int>(ms->m_data.isize);
-					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
+					indexoffset += maxindex + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);
@@ -441,16 +466,15 @@ namespace ME
 		}
 		else if (m_AllocationMode == ALLOCMODE::DISTRIBUTED)
 		{
-			size_t i = 0u;
-			glm::vec2 range;
+			glm::vec<2, unsigned int> range;
 			unsigned int offset = 0;
 
-			for (; i < m_Meshes.size(); i++)
+			for (size_t i = 0u; i < m_Meshes.size(); i++)
 			{
 				if (!m_Meshes[i]->m_Ready)
 				{
 					range.x = offset;
-					range.y = i;
+					range.y = static_cast<unsigned int>(i);
 					ranges.emplace_back(range);
 					m_Meshes[i]->SetReady(true);
 				}
@@ -503,16 +527,21 @@ namespace ME
 //			
 					std::memcpy(&vertexbuffer[voffset], ms->m_data.vertices, ms->m_data.vsize * m_Layout->GetTotalCount() * sizeof(ME_DATATYPE));
 					ms->m_data.vertices = (VERTEX*)&vertexbuffer[voffset];
-					voffset += static_cast<unsigned int>(ms->m_Vertices.size()) * m_Layout->GetTotalCount();
+					voffset += ms->m_data.vsize * m_Layout->GetTotalCount();
 
 					//ms->m_Vertices.clear();
 //                  
 // Filling up indexbuffer with data with maintaining offsets of indices
 //
+					unsigned int maxindex = 0;
 					for (size_t j = 0; j < ms->m_data.isize; j++)
+					{
 						indexbuffer[j + ioffset] = ms->m_data.indices[j] + indexoffset;
+						if (indexbuffer[j + ioffset] > maxindex)
+							maxindex = indexbuffer[j + ioffset];
+					}
 					ioffset += static_cast<unsigned int>(ms->m_data.isize);
-					indexoffset += *std::max_element(ms->m_data.indices, ms->m_data.indices + ms->m_data.isize) + 1;
+					indexoffset += maxindex + 1;
 
 					ms->MemoryBound = true;
 					ms->SetReady(true);

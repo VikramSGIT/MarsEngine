@@ -14,23 +14,26 @@ extern ME::Application* ME::CreateApp()
 
 void Martian::OnAttach()
 {
+
+	//app->GetWindow().SetVSync(false);
+
 	renderer->Init();
 	shader = ME::CreateRef<ME::Renderer::OpenGL::OpenGLShader>("C:\\Projects\\MarsEngine\\Martian\\res\\shaders\\Basic.shader");
 	renderer->SetShader(shader);
 	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
 
 	//queue.SetAllocationMode(ME::ALLOCMODE::DISTRIBUTED);
-	ME::Ref<ME::Mesh> mesh = ME::GenRect("Aadhav", { 50.0f, 50.0f });
-	queue.PushMesh(mesh);
+	Player = ME::GenRect("Aadhav", { 50.0f, 50.0f });
+	queue.PushMesh(Player);
 
-	/*ME::Addon::ParticleProps props;
-	props.parent = ME::GenRect("Particles System", { 30.0f, 30.0f }, 1.0f);
+	ME::Addon::ParticleProps props;
+	props.parent = ME::GenRect("Particles System", { 30.0f, 30.0f }, 1);
 	props.count = 10u;
-	props.transform = glm::translate(glm::scale(glm::mat4(), { 0.99f, 0.99f, 1.0f }), { -2.0f, 0.0f, 0.0f });
+	props.transform = glm::translate(glm::mat4(), { 0.1f, 0.0f, 0.0f });
 	props.lifetime = ME::Utils::Time::seconds(10ll);
 
 	particlesystem = ME::CreateRef<ME::Addon::ParticleSystem>(props);
-	queue.PushAddon(*particlesystem);*/
+	queue.PushAddon(*particlesystem);
 
 	renderer->AddRenderSubmition(queue, []() {});
 	glm::mat4 ortho = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
@@ -45,9 +48,16 @@ void Martian::OnDetach()
 void Martian::OnUpdate()
 {
 	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Space))
-	{
-		queue.GetMeshes().at(0)->Translate({ 2.0f, 2.0f, 0.0f });
-	}
+		particlesystem->Emit(Player->GetCentroid());
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Up))
+		Player->Translate({ 0.0f, 3.0f, 0.0f });
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Left))
+		Player->Translate({ -3.0f, 0.0, 0.0f });
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Down))
+		Player->Translate({ 0.0f, -3.0f, 0.0f });
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Right))
+		Player->Translate({ 3.0f, 0.0f, 0.0f });
+
 	//particlesystem->OnUpdate();
 	renderer->OnUpdate();
 }
