@@ -15,14 +15,6 @@
 
 namespace ME
 {
-	enum class ALLOCAT
-	{
-		NONE = 0, ONMESHPUSH, CUSTOM
-	};
-	enum class ALLOCMODE
-	{
-		NONE = 0, ALLATONE, DISTRIBUTED
-	};
 	struct VERTEX
 	{
 		ME_DATATYPE vertices[3] = { 0.0f, 0.0f, 0.0f };
@@ -30,9 +22,54 @@ namespace ME
 		ME_DATATYPE index = 0.0f;
 	};
 
+	struct MeshData
+	{
+		class Vertex
+		{
+		public:
+			VERTEX* begin() { return vertex; }
+			VERTEX* end() { return (vertex + m_Size); }
+
+			const VERTEX* begin() const { return vertex; }
+			const VERTEX* end() const { return (vertex + m_Size); }
+
+			inline unsigned int Size() { return m_Size; }
+			inline VERTEX* GetReset() { return reset_vertex; }
+		private:
+			VERTEX* vertex, * reset_vertex;
+			size_t m_Size;
+
+			friend class StaticQueue;
+			friend class DynamicQueue;
+		};
+
+		class Index
+		{
+		public:
+			unsigned int* begin() { return index; }
+			unsigned int* end() { return (index + m_Size); }
+
+			const unsigned* begin() const { return index; }
+			const unsigned* end() const { return (index + m_Size);; }
+
+
+			inline unsigned int Size() { return m_Size; }
+		private:
+			unsigned int* index;
+			size_t m_Size;
+
+			friend class StaticQueue;
+			friend class DynamicQueue;
+		};
+
+		Vertex vertex;
+		Index index;
+	};
+
 	class Mesh
 	{
 	public:
+
 		Mesh(const std::string& name)
 		:m_Name(name) { ME_PROFILE_TRACE_CALL(); }
 		Mesh(const Mesh& mesh);
@@ -53,51 +90,34 @@ namespace ME
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const glm::vec3& XYZ);
 
-		inline const std::vector<VERTEX>& GetVertices() const { return std::vector<VERTEX>(m_data.vertices, m_data.vertices + m_data.vsize); }
-		inline const std::vector<unsigned int>& GetIndices() const { return std::vector<unsigned int>(m_data.indices, m_data.indices + m_data.isize); };
-		inline const std::pair<ME_DATATYPE const*, unsigned int> GetVertexData() const { return std::make_pair((ME_DATATYPE*)m_data.vertices, m_data.vsize); }
-		inline const std::pair<unsigned int const*, unsigned int> GetIndexData() const { return std::make_pair(m_data.indices, m_data.isize); }
+		inline MeshData GetMeshData() { return m_MeshData; }
 		inline const std::string GetName() const { return m_Name; }
 		const glm::vec3 GetCentroid() const;
 
 		inline bool IsReady() const { return m_Ready; }
 
-		friend Ref<Mesh> operator* (Ref<Mesh>& mesh, const glm::mat4 &mat)
+		Mesh operator* (const glm::mat4 &mat)
 		{
 
 			ME_PROFILE_TRACE_CALL();
 
 			glm::mat4 matrix = mat;
-			for (unsigned int i = 0; i < mesh->m_data.vsize; i++)
+			for (VERTEX& vertex : m_MeshData.vertex)
 			{
-				VERTEX& vertex = mesh->m_data.vertices[i];
 				glm::vec4 out(vertex.vertices[0], vertex.vertices[1], vertex.vertices[2], 1.0f);
 				out = matrix * out;
 				vertex.vertices[0] = out.x;
 				vertex.vertices[1] = out.y;
 				vertex.vertices[2] = out.z;
 			}
-			mesh->m_Ready = false;
-			return mesh;
+			m_Ready = false;
+			return *this;
 		}
 
 	private:
-
-		struct MeshArray
-		{
-			unsigned int vsize = 0ull, isize = 0ull;
-			unsigned int* indices = nullptr;
-			VERTEX* vertices = nullptr;
-		};
-		MeshArray m_data;
-
-		std::vector<VERTEX> m_Vertices;
-		std::vector<unsigned int> m_Indices;
-		std::vector<VERTEX> m_ResetVertices;
+		MeshData m_MeshData;
 		std::string m_Name;
-
 		bool m_Ready = false;
-		friend class MeshQueue;
 	};
 
 	class MeshQueue
@@ -108,36 +128,28 @@ namespace ME
 		virtual void PushMeshes(const std::vector<Ref<Mesh>>& meshes) = 0;
 		virtual void PushAddon(ME::Addon::MeshAddon& addon) = 0;
 
-		inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }
+		virtual inline std::vector<Ref<Mesh>> GetMeshes() const = 0;
 
-		inline unsigned int GetTotalVertices() const { return total_vertices; }
-		inline unsigned int GetTotalIndices() const { return total_indices; }
+		virtual inline unsigned int GetTotalVertices() const = 0;
+		virtual inline unsigned int GetTotalIndices() const = 0;
 		std::vector<glm::vec<2, unsigned int>>  GetUpdate();
 
-		std::vector<Ref<Mesh>>::iterator begin() { return m_Meshes.begin(); }
-		std::vector<Ref<Mesh>>::iterator end() { return m_Meshes.end(); }
-		std::vector<Ref<Mesh>>::reverse_iterator rbegin() { return m_Meshes.rbegin(); }
-		std::vector<Ref<Mesh>>::reverse_iterator rend() { return m_Meshes.rend(); }
+		virtual Ref<Mesh> begin() = 0;
+		virtual Ref<Mesh> end() = 0;
 
-		std::vector<Ref<Mesh>>::const_iterator begin() const { return m_Meshes.begin(); }
-		std::vector<Ref<Mesh>>::const_iterator end() const { return m_Meshes.end(); }
-		std::vector<Ref<Mesh>>::const_reverse_iterator rbegin() const { return m_Meshes.rbegin(); }
-		std::vector<Ref<Mesh>>::const_reverse_iterator rend() const { return m_Meshes.rend(); }
-
-	private:
-		Ref<Renderer::VertexBufferLayout> m_Layout = CreateRef<Renderer::VertexBufferLayout>();
-
-		std::vector<Ref<Mesh>> m_Meshes;
-		unsigned int total_vertices = 0, total_indices = 0;
+		virtual const Ref<Mesh> begin() const = 0;
+		virtual const Ref<Mesh> end() const = 0;
 	};
 
 	class StaticQueue : public MeshQueue
 	{
+	public:
 
 	};
 
 	class DynamicQueue : public MeshQueue
 	{
+	public:
 
 	};
 //

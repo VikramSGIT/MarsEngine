@@ -5,50 +5,10 @@ namespace ME
 //////////////////////////////////////// Mesh //////////////////////////////////////////////////
 
 	Mesh::Mesh(const Mesh& mesh)
-		:m_Ready(mesh.m_Ready), m_Destroyied(false), MemoryBound(false), m_Vertices(mesh.m_Vertices),
-		m_Indices(mesh.m_Indices), m_ResetVertices(mesh.m_ResetVertices), m_Name(mesh.m_Name)
-	{
-
-		ME_PROFILE_TRACE_CALL();
-
-		m_data.vsize = mesh.m_data.vsize;
-		m_data.isize = mesh.m_data.isize;
-		if (MemoryBound)
-		{
-			m_data.vertices = alloc<VERTEX>(mesh.m_data.vsize);
-			m_data.indices = alloc<unsigned int>(mesh.m_data.isize);
-			memcpy(m_data.vertices, mesh.m_data.vertices, mesh.m_data.vsize);
-			memcpy(m_data.indices, mesh.m_data.indices, mesh.m_data.isize);
-		}
-		else
-		{
-			m_data.vertices = m_Vertices.begin()._Ptr;
-			m_data.indices = m_Indices.begin()._Ptr;
-		}
-	}
+		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
 
 	Mesh::Mesh(Mesh&& mesh) noexcept
-		:m_Ready(mesh.m_Ready), m_Destroyied(false), MemoryBound(false), m_Vertices(mesh.m_Vertices),
-		m_Indices(mesh.m_Indices), m_ResetVertices(mesh.m_ResetVertices), m_Name(mesh.m_Name)
-	{
-
-		ME_PROFILE_TRACE_CALL();
-
-		m_data.vsize = mesh.m_data.vsize;
-		m_data.isize = mesh.m_data.isize;
-		if (MemoryBound)
-		{
-			m_data.vertices = alloc<VERTEX>(mesh.m_data.vsize);
-			m_data.indices = alloc<unsigned int>(mesh.m_data.isize);
-			memcpy(m_data.vertices, mesh.m_data.vertices, mesh.m_data.vsize);
-			memcpy(m_data.indices, mesh.m_data.indices, mesh.m_data.isize);
-		}
-		else
-		{
-			m_data.vertices = m_Vertices.begin()._Ptr;
-			m_data.indices = m_Indices.begin()._Ptr;
-		}
-	}
+		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
 
 	Mesh::~Mesh()
 	{
