@@ -8,7 +8,7 @@
 #define ME_MAX_VERTEX_BUFFER_SIZE 1000 * sizeof(ME_DATATYPE) * 24
 #define ME_MAX_INDEX_BUFFER_SIZE 200 * sizeof(unsigned int) * 6
 
-#include "Utils/Intrumentor.h"
+#include "Utilites/Intrumentor.h"
 #include "Vender/glm/glm/glm.hpp"
 #include "Vender/glm/glm/mat4x4.hpp"
 #include "Vender/glm/glm/vec4.hpp"

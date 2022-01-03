@@ -6,8 +6,8 @@
 #include <algorithm>
 
 #include "Addon.h"
-#include "Utils/Timer.h"
-#include "Utils/Random Engine.h"
+#include "Utilites/Timer.h"
+#include "Utilites/Random Engine.h"
 #include "Window/Events/Event.h"
 #include "RenderAPI/Renderer.h"
 

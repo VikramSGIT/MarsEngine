@@ -2,6 +2,7 @@
 
 #include "MarsHeader.h"
 
+#include "Core/Entity.h"
 #include "Buffers.h"
 #include "Shader.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
@@ -12,7 +13,9 @@
 #include <string>
 #include <algorithm>
 #include <set>
-
+/*
+* TODO: Need to implement mesh update call back
+*/
 namespace ME
 {
 	struct VERTEX
@@ -24,14 +27,21 @@ namespace ME
 
 	struct MeshData
 	{
+		MeshData()
+			:vertex(Vertex()), index(Index()) {}
 		class Vertex
 		{
 		public:
+			Vertex()
+				:vertex(nullptr), reset_vertex(nullptr), m_Size(0) {}
+
 			VERTEX* begin() { return vertex; }
 			VERTEX* end() { return (vertex + m_Size); }
 
 			const VERTEX* begin() const { return vertex; }
 			const VERTEX* end() const { return (vertex + m_Size); }
+
+			VERTEX* operator++() { return vertex++; }
 
 			inline unsigned int Size() { return m_Size; }
 			inline VERTEX* GetReset() { return reset_vertex; }
@@ -39,6 +49,7 @@ namespace ME
 			VERTEX* vertex, * reset_vertex;
 			size_t m_Size;
 
+			friend class Mesh;
 			friend class StaticQueue;
 			friend class DynamicQueue;
 		};
@@ -46,6 +57,9 @@ namespace ME
 		class Index
 		{
 		public:
+			Index()
+				:index(nullptr), m_Size(0) {}
+
 			unsigned int* begin() { return index; }
 			unsigned int* end() { return (index + m_Size); }
 
@@ -58,6 +72,7 @@ namespace ME
 			unsigned int* index;
 			size_t m_Size;
 
+			friend class Mesh;
 			friend class StaticQueue;
 			friend class DynamicQueue;
 		};
@@ -66,12 +81,12 @@ namespace ME
 		Index index;
 	};
 
-	class Mesh
+	class Mesh : public Entity
 	{
 	public:
 
 		Mesh(const std::string& name)
-		:m_Name(name) { ME_PROFILE_TRACE_CALL(); }
+			:m_Name(name), m_MeshData(MeshData()), m_Ready(false), m_Static(false) {}
 		Mesh(const Mesh& mesh);
 		Mesh(Mesh&& mesh) noexcept;
 		~Mesh();
@@ -90,7 +105,7 @@ namespace ME
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const glm::vec3& XYZ);
 
-		inline MeshData GetMeshData() { return m_MeshData; }
+		inline const MeshData GetMeshData() const { return m_MeshData; }
 		inline const std::string GetName() const { return m_Name; }
 		const glm::vec3 GetCentroid() const;
 
@@ -117,13 +132,15 @@ namespace ME
 	private:
 		MeshData m_MeshData;
 		std::string m_Name;
-		bool m_Ready = false;
+		bool m_Ready, m_Static;
+
+		friend class StaticQueue;
+		friend class DynamicQueue;
 	};
 
 	class MeshQueue
 	{
 	public:
-		MeshQueue();
 		virtual void PushMesh(const Ref<Mesh>& mesh) = 0;
 		virtual void PushMeshes(const std::vector<Ref<Mesh>>& meshes) = 0;
 		virtual void PushAddon(ME::Addon::MeshAddon& addon) = 0;
@@ -132,6 +149,7 @@ namespace ME
 
 		virtual inline unsigned int GetTotalVertices() const = 0;
 		virtual inline unsigned int GetTotalIndices() const = 0;
+		inline Ref<Renderer::VertexBufferLayout> GetLayout() const { return m_Layout; }
 		std::vector<glm::vec<2, unsigned int>>  GetUpdate();
 
 		virtual Ref<Mesh> begin() = 0;
@@ -139,18 +157,61 @@ namespace ME
 
 		virtual const Ref<Mesh> begin() const = 0;
 		virtual const Ref<Mesh> end() const = 0;
+
+	private:
+		Ref<Renderer::VertexBufferLayout> m_Layout;
 	};
 
 	class StaticQueue : public MeshQueue
 	{
 	public:
+		virtual void PushMesh(const Ref<Mesh>& mesh);
+		virtual void PushMeshes(const std::vector<Ref<Mesh>>& mesh);
+		virtual void PushAddon(ME::Addon::MeshAddon& addon);
 
+		virtual inline std::vector<Ref<Mesh>> GetMeshes() const;
+
+		virtual inline unsigned int GetTotalVertices() const;
+		virtual inline unsigned int GetTotalIndices() const;
+		std::vector<glm::vec<2, unsigned int>>  GetUpdate();
+
+		virtual Ref<Mesh> begin();
+		virtual Ref<Mesh> end();
+
+		virtual const Ref<Mesh> begin() const;
+		virtual const Ref<Mesh> end() const;
+
+		void Allocate();
+
+	private:
+		std::vector<Ref<Mesh>> m_Meshes;
+
+		VERTEX* VertexHead;
+		unsigned int* IndexHead;
+		unsigned int total_vertices, total_indices;
 	};
 
 	class DynamicQueue : public MeshQueue
 	{
 	public:
+		virtual void PushMesh(const Ref<Mesh>& mesh);
+		virtual void PushMeshes(const std::vector<Ref<Mesh>>& mesh);
+		virtual void PushAddon(ME::Addon::MeshAddon& addon);
 
+		virtual inline std::vector<Ref<Mesh>> GetMeshes() const;
+
+		virtual inline unsigned int GetTotalVertices() const;
+		virtual inline unsigned int GetTotalIndices() const;
+		std::vector<glm::vec<2, unsigned int>>  GetUpdate();
+
+		virtual Ref<Mesh> begin();
+		virtual Ref<Mesh> end();
+
+		virtual const Ref<Mesh> begin() const;
+		virtual const Ref<Mesh> end() const;
+
+	private:
+		std::vector<Ref<Mesh>> m_Meshes;
 	};
 //
 // Commenly used meshes
