@@ -1,14 +1,19 @@
 #include "Mesh.h"
 
+/*
+* TODO:  Fix Reset Vertex, makes copy of vertex everytime
+* ERROR: While try to update mesh with new set of vertices (BufferVertices)
+*/
+
 namespace ME
 {
 //////////////////////////////////////// Mesh //////////////////////////////////////////////////
 
 	Mesh::Mesh(const Mesh& mesh)
-		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
+		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData), Ready(true) {}
 
 	Mesh::Mesh(Mesh&& mesh) noexcept
-		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
+		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData), Ready(true) {}
 
 	Mesh::~Mesh()
 	{
@@ -22,18 +27,13 @@ namespace ME
 
 		ME_PROFILE_TRACE_CALL();
 
-		if (count == m_MeshData.vertex.m_Size)
-		{
-			dealloc(m_MeshData.vertex.vertex, m_MeshData.vertex.m_Size);
-			dealloc(m_MeshData.vertex.reset_vertex, m_MeshData.vertex.m_Size);
+		dealloc(m_MeshData.vertex.vertex, m_MeshData.vertex.m_Size);
+		dealloc(m_MeshData.vertex.reset_vertex, m_MeshData.vertex.m_Size);
 
-			m_MeshData.vertex.vertex = alloc<VERTEX>(count);
-			m_MeshData.vertex.m_Size = count;
-		}
+		m_MeshData.vertex.vertex = alloc<VERTEX>(count);
+		m_MeshData.vertex.m_Size = count;
 
-		memcpy(m_MeshData.vertex.vertex, vertex, sizeof(VERTEX) * count);
-
-		m_Ready = false;
+		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX) * count);
 	}
 
 	void Mesh::BufferIndices(const unsigned int* data, const unsigned int& count)
@@ -41,17 +41,12 @@ namespace ME
 
 		ME_PROFILE_TRACE_CALL();
 
-		if (count == m_MeshData.index.m_Size)
-		{
-			dealloc(m_MeshData.index.index, m_MeshData.index.m_Size);
+		dealloc(m_MeshData.index.begin(), m_MeshData.index.m_Size);
 
-			m_MeshData.index.index = alloc<unsigned int>(m_MeshData.index.m_Size);
-			m_MeshData.index.m_Size = count;
-		}
+		m_MeshData.index.index = alloc<unsigned int>(count);
+		m_MeshData.index.m_Size = count;
 
-		memcpy(m_MeshData.index.index, data, sizeof(unsigned int) * count);
-
-		m_Ready = false;
+		memcpy(m_MeshData.index.begin(), data, sizeof(unsigned int) * count);
 	}
 
 	void Mesh::SetReset(const VERTEX* vertex, const unsigned int& count)
@@ -59,7 +54,15 @@ namespace ME
 
 		ME_PROFILE_TRACE_CALL();
 
-		memcpy(m_MeshData.vertex.vertex, vertex, sizeof(VERTEX) * count);
+		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX) * count);
+	}
+
+	void Mesh::SetReset(const std::vector<VERTEX>& vertex)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		memcpy(m_MeshData.vertex.begin(), &vertex[0], sizeof(VERTEX) * vertex.size());
 	}
 
 	void Mesh::Reset()
@@ -67,9 +70,11 @@ namespace ME
 
 		ME_PROFILE_TRACE_CALL();
 
-		memcpy(m_MeshData.vertex.vertex, m_MeshData.vertex.reset_vertex, sizeof(VERTEX) * m_MeshData.vertex.m_Size);
+		memcpy(m_MeshData.vertex.begin(), m_MeshData.vertex.reset_vertex, sizeof(VERTEX) * m_MeshData.vertex.m_Size);
 
-		m_Ready = false;
+		callback(this, m_MeshData.vertex.m_Offset);
+		Ready = false;
+
 	}
 
 	void Mesh::Transform(const glm::mat4& matrix)
@@ -87,7 +92,10 @@ namespace ME
 			vertex.vertices[1] = out.y;
 			vertex.vertices[2] = out.z;
 		}
-		m_Ready = false;
+
+		callback(this, m_MeshData.vertex.m_Offset);
+		Ready = false;
+
 	}
 
 	void Mesh::Translate(const glm::vec3& XYZ)
@@ -101,7 +109,10 @@ namespace ME
 			vertex.vertices[1] += XYZ.y;
 			vertex.vertices[2] += XYZ.z;
 		}
-		m_Ready = false;
+
+		callback(this, m_MeshData.vertex.m_Offset);
+		Ready = false;
+
 	}
 
 	void Mesh::TranslateTo(const glm::vec3& XYZ)
@@ -119,7 +130,10 @@ namespace ME
 			vertex.vertices[1] += distance.y;
 			vertex.vertices[2] += distance.z;
 		}
-		m_Ready = false;
+
+		callback(this, m_MeshData.vertex.m_Offset);
+		Ready = false;
+
 	}
 
 	void Mesh::Rotate(const glm::vec3& degreeXYZ)
@@ -141,7 +155,10 @@ namespace ME
 			vertex.vertices[1] = out.y;
 			vertex.vertices[2] = out.z;
 		}
-		m_Ready = false;
+
+		callback(this, m_MeshData.vertex.m_Offset);
+		Ready = false;
+
 	}
 
 	void Mesh::Scale(const glm::vec3& XYZ)
@@ -160,7 +177,10 @@ namespace ME
 			vertex.vertices[1] = out.y;
 			vertex.vertices[2] = out.z;
 		}
-		m_Ready = false;
+
+		callback(this, m_MeshData.vertex.m_Offset);
+		Ready = false;
+
 	}
 
 	const glm::vec3 Mesh::GetCentroid() const
@@ -184,7 +204,7 @@ namespace ME
 ////////////////////////////////////////// Mesh Queue ////////////////////////////////////////////////
 
 	MeshQueue::MeshQueue()
-		:m_Layout(CreateRef<Renderer::VertexBufferLayout>())
+		:m_Layout(CreateRef<Renderer::VertexBufferLayout>()), total_indices(0), total_vertices(0)
 	{
 		if (m_Layout->GetTotalCount() <= 0)
 		{
@@ -194,92 +214,47 @@ namespace ME
 		}
 	}
 
-	void StaticQueue::PushMesh(const Ref<Mesh>& mesh)
+	void MeshQueue::PushMesh(const Ref<Mesh>& mesh)
 	{
 
 		ME_PROFILE_TRACE_CALL();
 
-		if (!mesh->m_Static)
-		{
-			m_Meshes.emplace_back(mesh);
-			m_Ready = false;
-		}
+		Ref<Mesh> m = mesh;
+		m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
+		m_Meshes.emplace_back(mesh);
+		total_vertices = mesh->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
+		total_indices = mesh->GetMeshData().index.Size();
+		m->Ready = true;
 	}
 
-	void StaticQueue::PushMeshes(const std::vector<Ref<Mesh>>& meshes)
+	void MeshQueue::PushMeshes(const std::vector<Ref<Mesh>>& meshes)
 	{
 
 		ME_PROFILE_TRACE_CALL();
 
 		for (Ref<Mesh> m : meshes)
-			if (!m->m_Static)
-			{
-				m_Meshes.emplace_back(m);
-				m_Ready = false;
-			}
-	}
-
-	void StaticQueue::PushAddon(ME::Addon::MeshAddon& addon)
-	{
-
-		ME_PROFILE_TRACE_CALL();
-
-		for(Ref<Mesh> m : addon.GetMeshes())
-			if (!m->m_Static)
-			{
-				m_Meshes.emplace_back(m);
-				m_Ready = false;
-			}
-	}
-
-	std::vector<glm::vec<2, unsigned int>> StaticQueue::GetUpdate()
-	{
-
-	}
-
-	void StaticQueue::Allocate()
-	{
-		ME_PROFILE_TRACE_CALL();
-
-		dealloc(VertexHead, total_vertices);
-		dealloc(IndexHead, total_indices);
-		VertexHead = alloc<VERTEX>(total_vertices);
-		IndexHead = alloc<unsigned int>(total_indices);
-
-		unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
-		for (Ref<Mesh> ms : m_Meshes)
 		{
-//
-// Filling up of vertexbuffer with datas
-//
-			std::memcpy(&VertexHead[voffset], ms->GetMeshData().vertex.vertex, sizeof(VERTEX) * ms->GetMeshData().vertex.m_Size);
-			dealloc(ms->GetMeshData().vertex.vertex, ms->GetMeshData().vertex.m_Size);
-
-			ms->m_MeshData.vertex.vertex = (VERTEX*)&VertexHead[voffset];
-			voffset += static_cast<unsigned int>(ms->GetMeshData().vertex.m_Size) * GetLayout()->GetTotalCount();
-
-//                  
-// Filling up indexbuffer with data with maintaining offsets of indices
-//
-			unsigned int maxindex = 0;
-			for (unsigned int j = 0; j < ms->GetMeshData().index.m_Size; j++)
-			{
-				IndexHead[j + ioffset] = ms->GetMeshData().index.index[j] + indexoffset;
-				if (IndexHead[j + ioffset] > maxindex)
-					maxindex = IndexHead[j + ioffset];
-			}
-			dealloc(ms->GetMeshData().index.index, ms->GetMeshData().index.m_Size);
-			ms->m_MeshData.index.index = &IndexHead[ioffset];
-
-			ioffset += ms->GetMeshData().index.m_Size;
-			indexoffset += maxindex + 1;
-
-			ms->SetReady(true);
+			m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
+			m_Meshes.emplace_back(m);
+			total_vertices = m->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
+			total_indices = m->GetMeshData().index.Size();
+			m->Ready = true;
 		}
+
 	}
 
-	void DynamicQueue::PushMesh(const Ref<Mesh>& mesh)
+	void MeshQueue::PushAddon(ME::Addon::MeshAddon& addon)
 	{
-		 
+
+		ME_PROFILE_TRACE_CALL();
+
+		for (Ref<Mesh> m : addon.GetMeshes())
+		{
+			m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
+			m_Meshes.emplace_back(m);
+			total_vertices = m->GetMeshData().vertex.Size();
+			total_indices = m->GetMeshData().index.Size();
+			m->Ready = true;
+		}
 	}
 }

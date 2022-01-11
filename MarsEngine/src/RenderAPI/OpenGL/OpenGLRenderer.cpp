@@ -1,5 +1,9 @@
 #include "OpenGLRenderer.h"
 
+/*
+* TODO Setup gpu side updater, so when there is a mesh update can send single mesh push
+*/
+
 namespace ME
 {
     namespace Renderer
@@ -20,8 +24,6 @@ namespace ME
                 ME_PROFILE_TRACE_CALL();
 
                 ClearBufferCache();
-                for (MeshQueue mq : m_RenderQueue)
-                    mq.ClearBuffer();
             }
 
             void OpenGLRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
@@ -97,85 +99,65 @@ namespace ME
                 indexbuffercache.clear();
             }
 
-            void OpenGLRendererAPI::AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata)
+            void OpenGLRendererAPI::AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 m_RenderQueue.push_back(meshqueue);
                 preprocessing.emplace_back(preprocessdata);
+                SetUpBuffers(meshqueue);
             }
 
-            void OpenGLRendererAPI::SetUpBuffers(MeshQueue& meshqueue)
+            void OpenGLRendererAPI::SetUpBuffers(const Ref<MeshQueue>& meshqueue)
             {
 
                 ME_PROFILE_TRACE_CALL();
+                    
+                Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue->GetLayout();
+                unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
+                
+                VERTEX* vertexbuffer = alloc<VERTEX>(meshqueue->GetTotalVertices());
+                unsigned int* indexbuffer = alloc<unsigned int>(meshqueue->GetTotalIndices());
 
-                if (!meshqueue.IsReady())
+
+                for (Ref<Mesh> ms : *meshqueue)
                 {
-                    Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>(ME_MAX_VERTEX_BUFFER_SIZE * sizeof(ME_DATATYPE), GL_DYNAMIC_DRAW);
-                    Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(ME_MAX_INDEX_BUFFER_SIZE * sizeof(unsigned int), GL_DYNAMIC_DRAW);
-                    if (meshqueue.GetAllocationMode() == ALLOCMODE::ALLATONE)
-                    {
-                        vertexbufferobj->BufferPostRenderData(meshqueue.GetVertexBuffer(), meshqueue.GetTotalVertices(), 0);
-                        indexbufferobj->BufferPostRenderData(meshqueue.GetIndexBuffer(), meshqueue.GetTotalIndices(), 0);
-                    }
-                    else if (meshqueue.GetAllocationMode() == ALLOCMODE::DISTRIBUTED)
-                    {
-                        std::allocator<unsigned int> iallocator;
-                        Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue.GetLayout();
-                        unsigned int voffset = 0u, ioffset = 0u, indexoffset = 0u;
+                    ms->GetMeshData().vertex.SetOffset(voffset);
+                    memcpy(vertexbuffer + voffset, ms->GetMeshData().vertex.begin(), sizeof(VERTEX) * ms->GetMeshData().vertex.Size());
+                    voffset += ms->GetMeshData().vertex.Size();
 
-                        for (Ref<Mesh> ms : meshqueue)
-                        {
-                            std::pair<ME_DATATYPE const*, unsigned int> vertex = ms->GetVertexData();
-                            vertexbufferobj->BufferPostRenderData(vertex.first, vertex.second * layout->GetTotalCount(), voffset);
-                            voffset += vertex.second * layout->GetTotalCount();
+                    for (unsigned int i = 0; i < ms->GetMeshData().index.Size(); i++)
+                        indexbuffer[i + ioffset] = ms->GetMeshData().index.begin()[i] + indexoffset;
 
-                            std::pair<unsigned int const*, unsigned int> index = ms->GetIndexData();
-                            unsigned int* indexbuffer = iallocator.allocate(index.second);
-                            for (size_t i = 0; i < index.second; i++)
-                                indexbuffer[i] = index.first[i] + indexoffset;
-
-                            indexbufferobj->BufferPostRenderData(indexbuffer, index.second, ioffset);
-                            iallocator.deallocate(indexbuffer, index.second);
-
-                            ioffset += index.second;
-                            indexoffset += 1 + *std::max_element(index.first, index.first + index.second);
-                            ms->SetReady(true);
-                        }
-                    }
-                    vertexbufferobj->ClearBufferOnDestroy(false);
-                    indexbufferobj->ClearBufferOnDestroy(false);
-
-                    vertexbuffercache.push_back(vertexbufferobj->GetID());
-                    indexbuffercache.push_back(indexbufferobj->GetID());
-                    meshqueue.SetReady(true);
+                    ioffset += ms->GetMeshData().index.Size();
+                    indexoffset += 1 + *std::max_element(ms->GetMeshData().index.begin(), ms->GetMeshData().index.end());
                 }
+
+                Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>((ME_DATATYPE*)vertexbuffer, meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
+                Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(indexbuffer, meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
+
+                dealloc(vertexbuffer, meshqueue->GetTotalVertices());
+                dealloc(indexbuffer, meshqueue->GetTotalIndices());
+                
+                vertexbufferobj->ClearBufferOnDestroy(false);
+                indexbufferobj->ClearBufferOnDestroy(false);
+
+                vertexbuffercache.push_back(vertexbufferobj->GetID());
+                indexbuffercache.push_back(indexbufferobj->GetID());
             }
 
             void OpenGLRendererAPI::CheckBufferUpdate(const unsigned int& id)
             {
-
                 ME_PROFILE_TRACE_CALL();
-                if (m_RenderQueue[id].GetAllocationMode() == ALLOCMODE::ALLATONE)
+
+                for (std::pair<Mesh*, unsigned int> data : m_RenderQueue[id]->GetUpdate())
                 {
-                    for (glm::vec<2, unsigned int> ranges : m_RenderQueue[id].GetUpdate())
-                    {
-                        Ref<VertexBuffer> vb = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
-                        vb->ClearBufferOnDestroy(false);
-                        vb->BufferPostRenderData((m_RenderQueue[id].GetVertexBuffer() + ranges.x), (ranges.y - ranges.x), ranges.x);
-                    }
+                    Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
+                    vertexbuffer->BufferPostRenderData(data.first->GetMeshData().vertex.begin(), m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.first->GetMeshData().vertex.Size(), data.second);
+                    vertexbuffer->ClearBufferOnDestroy(false);
+                    data.first->SetReady(true);
                 }
-                else if(m_RenderQueue[id].GetAllocationMode() == ALLOCMODE::DISTRIBUTED)
-                    for (glm::vec<2, unsigned int> ranges : m_RenderQueue[id].GetUpdate())
-                    {
-                        std::vector<Ref<Mesh>> meshes = m_RenderQueue[id].GetMeshes();
-                        Ref<VertexBuffer> vb = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
-                        vb->ClearBufferOnDestroy(false);
-                        std::pair<float const*, unsigned int> vertex = m_RenderQueue[id].GetMeshes().at(ranges.y)->GetVertexData();
-                        vb->BufferPostRenderData(vertex.first, vertex.second * m_RenderQueue[id].GetLayout()->GetTotalCount(), ranges.x);
-                    }
             }
 
             void OpenGLRendererAPI::OnDraw()
@@ -188,11 +170,6 @@ namespace ME
 
                 for (size_t i = 0; i < m_RenderQueue.size(); i++)
                 {
-//
-// Constructing buffers for each meshqueue
-//
-                    
-                    SetUpBuffers(m_RenderQueue[i]);
 //
 // Checks for buffer Update
 //
@@ -209,13 +186,13 @@ namespace ME
                     vertexbuffer->ClearBufferOnDestroy(false);
                     indexbuffer->ClearBufferOnDestroy(false);
 
-                    array->AddBuffer(*vertexbuffer, *m_RenderQueue[i].GetLayout());
+                    array->AddBuffer(*vertexbuffer, *m_RenderQueue[i]->GetLayout());
 
                     m_Shader->Bind();
                     indexbuffer->Bind();
                     vertexbuffer->Bind();
 
-                    GLLogCall(glDrawElements(GL_TRIANGLES, m_RenderQueue[i].GetTotalIndices(), GL_UNSIGNED_INT, nullptr));
+                    GLLogCall(glDrawElements(GL_TRIANGLES, m_RenderQueue[i]->GetTotalIndices(), GL_UNSIGNED_INT, nullptr));
 
                     vertexbuffer->unBind();
                     indexbuffer->unBind();

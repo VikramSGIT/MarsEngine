@@ -14,7 +14,7 @@ namespace ME
 
                 GLLogCall(glGenBuffers(1, &m_RendererID));
                 GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
-                GLLogCall(glBufferData(GL_ARRAY_BUFFER, size, data, mode));
+                GLLogCall(glBufferData(GL_ARRAY_BUFFER, size * sizeof(ME_DATATYPE), data, mode));
             }
 
             OpenGLVertexBuffer::OpenGLVertexBuffer(const unsigned int& RendererID)

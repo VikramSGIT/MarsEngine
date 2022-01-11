@@ -30,12 +30,12 @@ namespace ME
                 unsigned int indexoffset = 0;
                 glm::vec4 m_clearcolor;
                 Ref<Shader> m_Shader;
-                std::vector<MeshQueue> m_RenderQueue;
+                std::vector<Ref<MeshQueue>> m_RenderQueue;
                 std::vector <unsigned int> vertexbuffercache;
                 std::vector<unsigned int> indexbuffercache;
                 std::vector<std::function<void()>> preprocessing;
 
-                void SetUpBuffers(MeshQueue& meshqueue);
+                void SetUpBuffers(const Ref<MeshQueue>& meshqueue);
                 void CheckBufferUpdate(const unsigned int& id);
                 void ClearBufferCache();
             public:
@@ -44,7 +44,7 @@ namespace ME
 
                 virtual void Init() override;
                 virtual void Clear() const override;
-                virtual void AddRenderSubmition(const MeshQueue& meshqueue, std::function<void()> preprocessdata) override;
+                virtual void AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata) override;
 
                 virtual void OnUpdate() override;
                 virtual void OnDraw() override;
@@ -55,7 +55,7 @@ namespace ME
                 virtual void SetClearColor(const glm::vec4& color) override;
                 virtual void SetShader(const Ref<Shader>& shader) override;
                 virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-                virtual inline std::vector<MeshQueue> GetRenderQueue() override { return m_RenderQueue; }
+                virtual inline std::vector<Ref<MeshQueue>> GetRenderQueue() override { return m_RenderQueue; }
             };
 
         }

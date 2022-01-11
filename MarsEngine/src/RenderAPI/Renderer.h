@@ -1,5 +1,6 @@
 #pragma once
 #include "MarsHeader.h"
+
 #include "Shader.h"
 #include "Mesh.h"
 #include "Window/Layers/Layer.h"
@@ -26,7 +27,7 @@ namespace ME
 
             virtual void Init() = 0;
             virtual void Clear() const = 0;
-            virtual void AddRenderSubmition(const ME::MeshQueue& meshqueue, std::function<void()> preprocessdata) = 0;
+            virtual void AddRenderSubmition(const ME::Ref<ME::MeshQueue>& meshqueue, std::function<void()> preprocessdata) = 0;
 
             virtual void OnEvent(Event::Event& e) = 0;
             virtual void OnUpdate() = 0;
@@ -38,7 +39,7 @@ namespace ME
             virtual void SetShader(const Ref<Shader>& shader) = 0;
 
             inline RenderAPItype GetAPI() { return m_renderapi; };
-            virtual inline std::vector<ME::MeshQueue> GetRenderQueue() = 0;
+            virtual inline std::vector<ME::Ref<ME::MeshQueue>> GetRenderQueue() = 0;
             virtual Window::Layer::Layer& GetLayer() { return m_Layer; }
 
 
