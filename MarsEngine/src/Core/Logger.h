@@ -73,5 +73,5 @@ void DeinitLogger() noexcept;
 #define ME_CORE_MSG(X) Logger::GlobalLogger->LogNormal(X)
 #define ME_CORE_INFO(X) Logger::GlobalLogger->LogInfo(X)
 #define ME_CORE_WARNING(X) Logger::GlobalLogger->LogWarning(X)
-#define ME_CORE_ERROR(X) Logger::GlobalLogger->LogError(X)
-#define ME_CORE_CRITICAL(X) Logger::GlobalLogger->LogCritical(X)
+#define ME_CORE_ERROR(X) { Logger::GlobalLogger->LogError(X); throw X; }
+#define ME_CORE_CRITICAL(X) { Logger::GlobalLogger->LogCritical(X); throw X; }

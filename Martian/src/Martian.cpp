@@ -1,6 +1,7 @@
 #include "Martian.h"
 #include "Core/Application.h"
 #include "Utilites/Timer.h"
+#include "Core/Memory/SafePointer.h"
 
 ME::Application* app;
 extern ME::Application* ME::CreateApp()
@@ -14,7 +15,6 @@ extern ME::Application* ME::CreateApp()
 
 void Martian::OnAttach()
 {
-
 	//app->GetWindow().SetVSync(false);
 
 	renderer->Init();
@@ -60,7 +60,7 @@ void Martian::OnUpdate()
 	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Right))
 		Player->Translate({ 3.0f, 0.0f, 0.0f });
 
-	particlesystem->OnUpdate();
+	//particlesystem->OnUpdate();
 	renderer->OnUpdate();
 }
 

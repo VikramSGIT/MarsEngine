@@ -222,8 +222,8 @@ namespace ME
 		Ref<Mesh> m = mesh;
 		m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
 		m_Meshes.emplace_back(mesh);
-		total_vertices = mesh->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
-		total_indices = mesh->GetMeshData().index.Size();
+		total_vertices += mesh->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
+		total_indices += mesh->GetMeshData().index.Size();
 		m->Ready = true;
 	}
 
@@ -236,8 +236,8 @@ namespace ME
 		{
 			m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
 			m_Meshes.emplace_back(m);
-			total_vertices = m->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
-			total_indices = m->GetMeshData().index.Size();
+			total_vertices += m->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
+			total_indices += m->GetMeshData().index.Size();
 			m->Ready = true;
 		}
 
@@ -252,8 +252,8 @@ namespace ME
 		{
 			m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
 			m_Meshes.emplace_back(m);
-			total_vertices = m->GetMeshData().vertex.Size();
-			total_indices = m->GetMeshData().index.Size();
+			total_vertices += m->GetMeshData().vertex.Size();
+			total_indices += m->GetMeshData().index.Size();
 			m->Ready = true;
 		}
 	}

@@ -1,4 +1,5 @@
 #include "OpenGLRenderer.h"
+#include "Core/Memory/SafePointer.h"
 
 /*
 * TODO Setup gpu side updater, so when there is a mesh update can send single mesh push
@@ -56,7 +57,7 @@ namespace ME
 // Need to add graphics drivers identification
                 std::stringstream ss;
                 if (glewInit() != GLEW_OK)
-                    ME_CORE_ERROR("Can't Impliment GLEW");
+                    ME_CORE_ERROR("Can't Impliment GLEW")
                 else
 #ifdef ME_DEBUG
                     ss << "Detected OpenGL Vesrion (using) : " << glGetString(GL_VERSION);
@@ -117,8 +118,8 @@ namespace ME
                 Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue->GetLayout();
                 unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
                 
-                VERTEX* vertexbuffer = alloc<VERTEX>(meshqueue->GetTotalVertices());
-                unsigned int* indexbuffer = alloc<unsigned int>(meshqueue->GetTotalIndices());
+                SafePointer<VERTEX> vertexbuffer(alloc<VERTEX>(meshqueue->GetTotalVertices()), meshqueue->GetTotalVertices());
+                SafePointer<unsigned int> indexbuffer(alloc<unsigned int>(meshqueue->GetTotalIndices()), meshqueue->GetTotalIndices());
 
 
                 for (Ref<Mesh> ms : *meshqueue)
@@ -137,8 +138,8 @@ namespace ME
                 Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>((ME_DATATYPE*)vertexbuffer, meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
                 Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(indexbuffer, meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
 
-                dealloc(vertexbuffer, meshqueue->GetTotalVertices());
-                dealloc(indexbuffer, meshqueue->GetTotalIndices());
+                dealloc(vertexbuffer.Get(), meshqueue->GetTotalVertices());
+                dealloc(indexbuffer.Get(), meshqueue->GetTotalIndices());
                 
                 vertexbufferobj->ClearBufferOnDestroy(false);
                 indexbufferobj->ClearBufferOnDestroy(false);
