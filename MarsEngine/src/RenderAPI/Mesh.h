@@ -100,7 +100,7 @@ namespace ME
 		void BufferVertices(const VERTEX* vertex, const unsigned int& count);
 		void BufferIndices(const unsigned int* data, const unsigned int& count);
 
-		void SetReset(const VERTEX* vertex, const unsigned int& count);
+		void SetReset(const VERTEX* vertex);
 		void SetReset(const std::vector<VERTEX>& vertices);
 		void SetReady(const bool& ready) { Ready = ready; }
 		void Reset();
@@ -111,8 +111,8 @@ namespace ME
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const glm::vec3& XYZ);
 
-		inline const MeshData GetMeshData() const { return m_MeshData; }
-		inline MeshData GetMeshData() { return m_MeshData; }
+		inline const MeshData const& GetMeshData() const { return m_MeshData; }
+		inline MeshData& GetMeshData() { return m_MeshData; }
 		inline const std::string GetName() const { return m_Name; }
 		inline const bool IsReady() { return Ready; }
 		const glm::vec3 GetCentroid() const;
@@ -184,7 +184,10 @@ namespace ME
 		void MeshCallback(Mesh* mesh, const unsigned int& offset)
 		{
 			if (mesh->Ready)
+			{
 				m_MeshUpdates.emplace_back(mesh, offset);
+				mesh->Ready = true;
+			}
 		}
 
 		Ref<Renderer::VertexBufferLayout> m_Layout;

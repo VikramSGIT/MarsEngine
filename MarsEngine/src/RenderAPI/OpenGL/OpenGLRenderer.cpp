@@ -12,11 +12,10 @@ namespace ME
         namespace OpenGL
         {
             OpenGLRendererAPI::OpenGLRendererAPI()
-                :RenderAPI(RenderAPItype::ME_RENDERER_OPENGL)
+            :RenderAPI(RenderAPItype::ME_RENDERER_OPENGL)
             {
 
                 ME_PROFILE_TRACE_CALL();
-
             }
 
             OpenGLRendererAPI::~OpenGLRendererAPI()
@@ -124,10 +123,11 @@ namespace ME
 
                 for (Ref<Mesh> ms : *meshqueue)
                 {
-                    ms->GetMeshData().vertex.SetOffset(voffset);
                     memcpy(vertexbuffer + voffset, ms->GetMeshData().vertex.begin(), sizeof(VERTEX) * ms->GetMeshData().vertex.Size());
+                    ms->GetMeshData().vertex.SetOffset(voffset);
                     voffset += ms->GetMeshData().vertex.Size();
 
+                    ms->GetMeshData().index.SetOffset(ioffset);
                     for (unsigned int i = 0; i < ms->GetMeshData().index.Size(); i++)
                         indexbuffer[i + ioffset] = ms->GetMeshData().index.begin()[i] + indexoffset;
 
@@ -155,7 +155,9 @@ namespace ME
                 for (std::pair<Mesh*, unsigned int> data : m_RenderQueue[id]->GetUpdate())
                 {
                     Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
-                    vertexbuffer->BufferPostRenderData(data.first->GetMeshData().vertex.begin(), m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.first->GetMeshData().vertex.Size(), data.second);
+                    vertexbuffer->BufferPostRenderData(data.first->GetMeshData().vertex.begin(), 
+                        m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.first->GetMeshData().vertex.Size(), 
+                        m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.second);
                     vertexbuffer->ClearBufferOnDestroy(false);
                     data.first->SetReady(true);
                 }

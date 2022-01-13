@@ -32,8 +32,10 @@ namespace ME
 
 		m_MeshData.vertex.vertex = alloc<VERTEX>(count);
 		m_MeshData.vertex.m_Size = count;
+		m_MeshData.vertex.reset_vertex = alloc<VERTEX>(count);
 
 		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX) * count);
+		memcpy(m_MeshData.vertex.reset_vertex, vertex, sizeof(VERTEX) * count);
 	}
 
 	void Mesh::BufferIndices(const unsigned int* data, const unsigned int& count)
@@ -49,12 +51,12 @@ namespace ME
 		memcpy(m_MeshData.index.begin(), data, sizeof(unsigned int) * count);
 	}
 
-	void Mesh::SetReset(const VERTEX* vertex, const unsigned int& count)
+	void Mesh::SetReset(const VERTEX* vertex)
 	{
 
 		ME_PROFILE_TRACE_CALL();
 
-		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX) * count);
+		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX) * m_MeshData.vertex.m_Size);
 	}
 
 	void Mesh::SetReset(const std::vector<VERTEX>& vertex)

@@ -18,8 +18,6 @@ namespace ME
         };
         class RenderAPI
         {
-        private:
-            RenderAPItype m_renderapi;
         public:
             RenderAPI(RenderAPItype api)
                 :m_renderapi(api), m_Layer(this){}
@@ -55,6 +53,7 @@ namespace ME
                     return nullptr;
                 }
             }
+
         private:
             class RendererLayer : public Window::Layer::Layer
             {
@@ -73,6 +72,7 @@ namespace ME
                 RenderAPI* m_API;
             };
 
+            RenderAPItype m_renderapi;
             RendererLayer m_Layer;
         };
 

@@ -4,6 +4,9 @@
 #include "Core/Memory/SafePointer.h"
 
 ME::Application* app;
+
+std::vector<ME::Ref<ME::Mesh>> obj;
+
 extern ME::Application* ME::CreateApp()
 {
 	app = allocon<Application>();
@@ -22,8 +25,8 @@ void Martian::OnAttach()
 	renderer->SetShader(shader);
 	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
 
-	Player = ME::GenRect("Aadhav", { 100.0f, 100.0f });
-	std::vector<ME::Ref<ME::Mesh>> obj = { ME::GenRect("Aadhav", { 100.0f, 100.0f }), ME::GenRect("Aadhav", { 100.0f, 100.0f }), ME::GenRect("Aadhav", { 100.0f, 100.0f }) };
+	Player = ME::GenRect("Aadhav", { 200.0f, 200.0f });
+	obj = { ME::GenRect("Aadhav", { 200.0f, 100.0f }), ME::GenRect("Aadhav", { 100.0f, 200.0f }) };
 	
 	queue->PushMesh(Player);
 	queue->PushMeshes(obj);
@@ -50,14 +53,14 @@ void Martian::OnDetach()
 void Martian::OnUpdate()
 {
 	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Space))
-		particlesystem->Emit({100.0, 100.0, 0.0});
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Up))
+		obj[0]->Translate({ 2.0f, 2.0, 0.0f });
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::W))
 		Player->Translate({ 0.0f, 3.0f, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Left))
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::A))
 		Player->Translate({ -3.0f, 0.0, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Down))
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::S))
 		Player->Translate({ 0.0f, -3.0f, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Right))
+	if (app->GetWindow().IsKeyPressed(ME::Event::Key::D))
 		Player->Translate({ 3.0f, 0.0f, 0.0f });
 
 	//particlesystem->OnUpdate();
