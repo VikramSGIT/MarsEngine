@@ -16,7 +16,9 @@
 
 #include "RenderAPI/Mesh.h"
 #include "Window/Window.h"
+#include "Window/Input.h"
 #include "Window/Windows/WindowsWindow.h"
+#include "Window/Windows/WindowsInput.h"
 #include "Window/Events/WindowEvent.h"
 #include "Window/Events/MouseEvent.h"
 #include "Window/Events/KeyEvent.h"
@@ -31,23 +33,24 @@ namespace ME
     {
     public:
         Application();
-        ~Application() = default;
+        ~Application();
         void Run();
         void METerminate();
 
         Window::Layer::LayerStack* GetLayerStack() { return &m_LayerStack; }
-        Window::Window& GetWindow() { return *window; }
+        Window::Window& GetWindow() { return *m_Window; }
         static Application& GetInstance() { return *s_Application; }
 
-        static Application* s_Application;
     private:
         Window::Layer::LayerStack m_LayerStack;
         bool m_Running = true;
-        Ref<Window::Window> window;
+        Window::Window* m_Window;
 
         void OnEvent(Event::Event& e);
         bool OnWindowClose();
         bool OnWindowResize();
+
+        static Application* s_Application;
     };
 
     extern Application* CreateApp();

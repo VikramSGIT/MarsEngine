@@ -17,7 +17,6 @@ namespace ME
             {
             public:
                 KeyCode GetkeyCode() const { return m_KeyCode; }
-                virtual void* GetGenericData() const override { return genericdata; }
 
                 EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
             protected:
@@ -38,10 +37,6 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    uint16_t* key = new uint16_t[2];
-                    *key = keycode;
-                    *(key + 1) = repeatcount;
-                    genericdata = (void*)(key);
                 }
 
                 uint16_t GetRepeatCount() const { return m_RepeatCount; }
@@ -66,7 +61,6 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    genericdata = (void*)(new KeyCode(keycode));
                 }
 
 #ifdef ME_DEBUG_SHOW_EVENT
@@ -89,8 +83,6 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    KeyCode key = keycode;
-                    genericdata = (void*)(new KeyCode(keycode));
                 }
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override

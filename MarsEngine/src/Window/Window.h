@@ -32,7 +32,6 @@ namespace ME
         {
         public:
             using EventCallBackFunc = std::function<void(Event::Event&)>;
-            Ref<std::vector<uint16_t>> m_keystack = CreateRef<std::vector<uint16_t>>();
 
             virtual ~Window() = default;
 
@@ -47,22 +46,7 @@ namespace ME
             virtual bool IsVSync() const = 0;
 
             virtual GLFWwindow* GetNativeWindow() = 0;
-
-            virtual bool IsKeyPressed(Event::KeyCode code) const
-            {
-                auto it = std::find(m_keystack->begin(), m_keystack->end(), code);
-                if (it != m_keystack->end())
-                    return true;
-                return false;
-            }
-            virtual bool MouseButtonPressed(Event::KeyCode code) const
-            {
-                auto it = std::find(m_keystack->begin(), m_keystack->end(), code);
-                if (it != m_keystack->end())
-                    return true;
-                return false;
-            }
-            static Ref<Window> Create(const WindowProperty& winprop = WindowProperty());
+            static Window* Create(const WindowProperty& winprop = WindowProperty());
         };
     }
 }

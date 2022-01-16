@@ -23,15 +23,11 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    unsigned int* window = new unsigned int[2];
-                    *window = width;
-                    *(window + 1) = height;
-                    genericdata = (void*)window;
                 }
 
                 unsigned int GetWidth() const { return m_Width; }
                 unsigned int GetHeight() const { return m_Height; }
-                virtual void* GetGenericData() const override { return genericdata; }
+                glm::vec2 GetDimensions() const{ return {m_Width, m_Height}; }
 
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
@@ -50,7 +46,6 @@ namespace ME
             {
             public:
                 WindowClosedEvent() = default;
-                virtual void* GetGenericData() const override { return genericdata; }
 
                 EVENT_CLASS_TYPE(WindowClosed)
                     EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -68,7 +63,6 @@ namespace ME
             {
             public:
                 ApptickEvent() = default;
-                virtual void* GetGenericData() const override { return genericdata; }
 
                 EVENT_CLASS_TYPE(AppTick)
                     EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -86,7 +80,6 @@ namespace ME
             {
             public:
                 AppUpdateEvent() = default;
-                virtual void* GetGenericData() const override { return genericdata; }
 
                 EVENT_CLASS_TYPE(AppUpdate)
                     EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -104,7 +97,6 @@ namespace ME
             {
             public:
                 AppRenderEvent() = default;
-                virtual void* GetGenericData() const override { return genericdata; }
 
                 EVENT_CLASS_TYPE(AppRender)
                     EVENT_CLASS_CATEGORY(EventCategoryApplication)

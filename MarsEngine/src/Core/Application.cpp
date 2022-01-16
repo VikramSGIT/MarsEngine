@@ -4,12 +4,18 @@ namespace ME
     Application* Application::s_Application = nullptr;
 
     Application::Application()
-        :window(Window::Window::Create({ "MarsEngine" }))
+        :m_Window(Window::Window::Create({ "MarsEngine" }))
     {
 
         ME_PROFILE_TRACE_CALL();
 
         s_Application = this;
+    }
+
+    Application::~Application()
+    {
+        delete Window::Input::Input::Get();
+        delete m_Window;
     }
 
     bool Application::OnWindowClose()
@@ -61,7 +67,7 @@ namespace ME
         ME_PROFILE_TRACE_CALL();
 
         Logger::GlobalLogger->SetLogging(true);
-        window->SetEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+        m_Window->SetEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
         while (m_Running)
         {
@@ -70,8 +76,8 @@ namespace ME
                 layer->OnUpdate();
                 layer->OnDraw();
             }
-
-            window->OnUpdate();
+            
+            m_Window->OnUpdate();
         }
         METerminate();
     }

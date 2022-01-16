@@ -4,7 +4,7 @@ namespace ME
 {
     namespace Window
     {
-        Ref<Window> Window::Create(const WindowProperty& winprop)
+        Window* Window::Create(const WindowProperty& winprop)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -12,7 +12,9 @@ namespace ME
             std::stringstream ss;
             ss << "Window Created!! Name: " << winprop.Title << " Dimension: " << winprop.Height << " X " << winprop.Width;
             ME_CORE_WARNING(ss.str());
-            return CreateRef<Windows::WindowsWindow>(winprop);
+            Input::Input::Create();
+
+            return new Windows::WindowsWindow(winprop);
         }
         namespace Windows
         {
@@ -42,7 +44,7 @@ namespace ME
                 m_Data.Title = props.Title;
                 m_Data.Width = props.Width;
                 m_Data.Height = props.Height;
-                m_Data.keystack = m_keystack;
+                m_Data.Input = static_cast<Input::WindowsInput*>(Input::Input::Get())->GetFrameData();
 
                 if (s_GLFWWindowCount == 0)
                 {
@@ -72,7 +74,6 @@ namespace ME
 
                         Event::AppEvent::WindowResizeEvent event(width, height);
                         data.fn(event);
-                        event.DeleteGenericData();
                     });
 
                 glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
@@ -80,87 +81,70 @@ namespace ME
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
                         Event::AppEvent::WindowClosedEvent event;
                         data.fn(event);
-                        event.DeleteGenericData();
                     });
 
                 glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-
-                        switch (action)
-                        {
-                        case GLFW_PRESS:
-                        {
 #ifdef ME_IMGUI
-                            ImGuiIO& io = ImGui::GetIO();
-                            if (!io.WantCaptureKeyboard)
+                        ImGuiIO& io = ImGui::GetIO();
+                        if (!io.WantCaptureKeyboard)
 #endif
+                        {
+                            switch (action)
                             {
-                                auto it = std::find(data.keystack->begin(), data.keystack->end(), key);
-                                if (it == data.keystack->end())
-                                {
-                                    data.keystack->push_back(key);
-                                }
+                            case GLFW_PRESS:
+                            {
+                                Event::KeyEvent::KeyPressedEvent event(key, 0);
+                                keyrepeatcount = 0;
+                                data.Input->m_Keystack.insert(key);
+                                data.fn(event);
+                                break;
                             }
-                            Event::KeyEvent::KeyPressedEvent event(key, 0);
-                            keyrepeatcount = 0;
-                            data.fn(event);
-                            event.DeleteGenericData();
-                            break;
-                        }
-                        case GLFW_RELEASE:
-                        {
-                            auto it = std::find(data.keystack->begin(), data.keystack->end(), key);
-                            if (it != data.keystack->end())
-                                data.keystack->erase(it);
-                            Event::KeyEvent::KeyReleasedEvent event(key);
-                            data.fn(event);
-                            event.DeleteGenericData();
-                            break;
-                        }
-                        case GLFW_REPEAT:
-                        {
-                            Event::KeyEvent::KeyPressedEvent event(key, keyrepeatcount);
-                            keyrepeatcount++;
-                            data.fn(event);
-                            event.DeleteGenericData();
-                            break;
-                        }
+                            case GLFW_RELEASE:
+                            {
+                                Event::KeyEvent::KeyReleasedEvent event(key);
+                                data.Input->m_Keystack.erase(data.Input->m_Keystack.find(key));
+                                data.fn(event);
+                                break;
+                            }
+                            case GLFW_REPEAT:
+                            {
+                                Event::KeyEvent::KeyPressedEvent event(key, keyrepeatcount);
+                                data.Input->m_Keystack.insert(key);
+                                keyrepeatcount++;
+                                data.fn(event);
+                                break;
+                            }
+                            }
                         }
                     });
 
-                glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+                glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int mousecode, int action, int mods)
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-
-                        switch (action)
-                        {
-                        case GLFW_PRESS:
-                        {
 #ifdef ME_IMGUI
-                            ImGuiIO& io = ImGui::GetIO();
-                            if (!io.WantCaptureKeyboard)
+                        ImGuiIO& io = ImGui::GetIO();
+                        if (!io.WantCaptureKeyboard)
 #endif
-                            {
-                                auto it = std::find(data.keystack->begin(), data.keystack->end(), button);
-                                if (it == data.keystack->end())
-                                    data.keystack->push_back(button);
-                            }
-                            Event::Mouse::MouseButtonPressedEvent event(button);
-                            data.fn(event);
-                            event.DeleteGenericData();
-                            break;
-                        }
-                        case GLFW_RELEASE:
                         {
-                            auto it = std::find(data.keystack->begin(), data.keystack->end(), button);
-                            if (it != data.keystack->end())
-                                data.keystack->erase(it);
-                            Event::Mouse::MouseButtonReleasedEvent event(button);
-                            data.fn(event);
-                            event.DeleteGenericData();
-                            break;
-                        }
+                            switch (action)
+                            {
+                            case GLFW_PRESS:
+                            {
+                                Event::Mouse::MouseButtonPressedEvent event(mousecode);
+                                data.Input->m_Mousestack.insert(mousecode);
+                                data.fn(event);
+                                break;
+                            }
+                            case GLFW_RELEASE:
+                            {
+                                Event::Mouse::MouseButtonReleasedEvent event(mousecode);
+                                data.Input->m_Keystack.erase(data.Input->m_Keystack.find(mousecode));
+                                data.fn(event);
+                                break;
+                            }
+                            }
                         }
                     });
 
@@ -168,7 +152,6 @@ namespace ME
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
                         Event::Mouse::MouseScrooledEvent event(X, Y);
-                        event.DeleteGenericData();
                         data.fn(event);
                     });
 
@@ -176,7 +159,7 @@ namespace ME
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
                         Event::Mouse::MouseMovedEvent event(X, Y);
-                        event.DeleteGenericData();
+                        data.Input->m_MousePos = { X, Y };
                         data.fn(event);
                     });
 

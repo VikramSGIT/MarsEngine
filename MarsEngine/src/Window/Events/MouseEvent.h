@@ -23,14 +23,11 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    double* mouse = new double[2];
-                    *mouse = x;
-                    *(mouse + 1) = y;
-                    genericdata = (void*)mouse;
+
                 }
                 const double GetX() const { return m_MouseX; }
                 const double GetY() const { return m_MouseY; }
-                virtual void* GetGenericData() const override { return genericdata; }
+                const glm::vec2 GetPos() const { return { m_MouseX, m_MouseY }; }
 
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
@@ -56,15 +53,10 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    double* mouse = new double[2];
-                    *mouse = offsetX;
-                    *(mouse + 1) = offsetY;
-                    genericdata = (void*)mouse;
                 }
 
                 const double GetOffsetX() const { return m_OffsetX; }
                 const double GetOffsetY() const { return m_OffsetY; }
-                virtual void* GetGenericData() const override { return genericdata; }
 
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
@@ -89,7 +81,6 @@ namespace ME
             public:
 
                 MouseCode GetMouseCode() const { return m_MouseCode; }
-                virtual void* GetGenericData() const override { return genericdata; }
 
                 EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
             };
@@ -103,7 +94,6 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    genericdata = (void*)(new uint16_t(mousecode));
                 }
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
@@ -125,7 +115,6 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-                    genericdata = (void*)(new uint16_t(mousecode));
                 }
 #ifdef ME_DEBUG_SHOW_EVENT  
                 std::string ToString() const override

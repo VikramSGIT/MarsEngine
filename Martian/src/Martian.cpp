@@ -52,17 +52,14 @@ void Martian::OnDetach()
 
 void Martian::OnUpdate()
 {
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::Space))
-		obj[0]->Translate({ 2.0f, 2.0, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::W))
-		Player->Translate({ 0.0f, 3.0f, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::A))
-		Player->Translate({ -3.0f, 0.0, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::S))
-		Player->Translate({ 0.0f, -3.0f, 0.0f });
-	if (app->GetWindow().IsKeyPressed(ME::Event::Key::D))
-		Player->Translate({ 3.0f, 0.0f, 0.0f });
-
+	if (ME::Window::Input::Input::IsKeyPressed(ME::Event::Key::W))
+		Player->Translate({ 0.0, 3.0, 0.0 });
+	if (ME::Window::Input::Input::IsKeyPressed(ME::Event::Key::A))
+		Player->Translate({ -3.0, 0.0, 0.0 });
+	if (ME::Window::Input::Input::IsKeyPressed(ME::Event::Key::S))
+		Player->Translate({ 0.0, -3.0, 0.0 });
+	if (ME::Window::Input::Input::IsKeyPressed(ME::Event::Key::D))
+		Player->Translate({ 3.0, 0.0, 0.0 });
 	//particlesystem->OnUpdate();
 	renderer->OnUpdate();
 }

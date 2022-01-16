@@ -45,60 +45,13 @@ namespace ME
             virtual EventType GetEventType() const = 0;
             virtual const char* GetName() const = 0;
             virtual int GetCategoryFlags() const = 0;
-            virtual void* GetGenericData() const = 0;
 
 #ifdef ME_DEBUG_SHOW_EVENT
             virtual std::string ToString() const { return GetName(); }
 #endif
 
-            bool IsInCategory(EventCategoryFlag category) { return GetCategoryFlags() & category; }
-
-            void* genericdata = nullptr;
-            void DeleteGenericData()
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                if (EventType::WindowClosed == GetEventType()) {}
-                else if (EventType::WindowResized == GetEventType())
-                {
-                    delete[](unsigned int*) genericdata;
-                }
-                else if (EventType::WindowLostFocused == GetEventType()) {}
-                else if (EventType::WindowMoved == GetEventType()) {}
-                else if (EventType::WindowFocused == GetEventType()) {}
-                else if (EventType::AppTick == GetEventType()) {}
-                else if (EventType::AppUpdate == GetEventType()) {}
-                else if (EventType::AppRender == GetEventType()) {}
-                else if (EventType::KeyPressed == GetEventType())
-                {
-                    delete[](uint16_t*) genericdata;
-                }
-                else if (EventType::KeyReleased == GetEventType())
-                {
-                    delete (uint16_t*)genericdata;
-                }
-                else if (EventType::KeyTyped == GetEventType())
-                {
-                    delete (uint16_t*)genericdata;
-                }
-                else if (EventType::MouseButtonPressed == GetEventType())
-                {
-                    delete (uint16_t*)genericdata;
-                }
-                else if (EventType::MouseButtonReleased == GetEventType())
-                {
-                    delete (uint16_t*)genericdata;
-                }
-                else if (EventType::MouseMoved == GetEventType())
-                {
-                    delete[](double*) genericdata;
-                }
-                else if (EventType::MouseScrolled == GetEventType())
-                {
-                    delete[](double*) genericdata;
-                }
-            }
+            bool IsInCategory(const EventCategoryFlag& category) { return GetCategoryFlags() & category; }
+            bool IsInType(const EventType& type) { return GetEventType() == type; }
         };
 
         class EventDispatcher
@@ -110,17 +63,16 @@ namespace ME
             template<typename T, typename F>
             bool Dispatch(const F& func)
             {
-                if (m_Event.GetEventType() == T::GetStaticType())
-                    m_Event.Handled |= func(static_cast<T&>(m_Event));
+                if (m_Event.GetEventType() == T::GetStaticType() && !m_Event.Handled)
+                   m_Event.Handled |= func(static_cast<T&>(m_Event));
 
                 return true;
             }
         private:
             Event& m_Event;
         };
-
 #ifdef ME_DEBUG_SHOW_EVENTSTR
-        inline std::ostream& operator<<(std::ostream& os, const Event& e) { return os << e.ToString(); }
+        inline std::ostream& operator<<(std::ostream& os, const Event& e) { return os << e.GetName(); }
 #endif
 
     }
