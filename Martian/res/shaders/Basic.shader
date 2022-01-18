@@ -13,9 +13,9 @@
 
     void main()
     {
-      gl_Position = u_MVP * position;
-      v_TexCoord = TexCoord;
-      v_index = index;
+        gl_Position = u_MVP * position;
+        v_TexCoord = TexCoord;
+        v_index = index;
     }
 
 
@@ -29,5 +29,9 @@
 
     void main()
     {
-      color = vec4(1.0, 1.0, 1.0, 1.0);
+      if (v_index == 1)
+          color = vec4(0.023, 0.293, 1.0, 1.0);
+      else
+        color = vec4(1.0, 1.0, 1.0, 1.0);
+
     }

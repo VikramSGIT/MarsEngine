@@ -47,7 +47,7 @@ namespace ME
                 {
                     std::string Title;
                     uint32_t Width, Height;
-                    Input::InputData* Input;
+                    InputData* Input;
                     bool VSync;
 
                     EventCallBackFunc fn;

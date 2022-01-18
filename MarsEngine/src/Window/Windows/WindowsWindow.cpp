@@ -44,7 +44,7 @@ namespace ME
                 m_Data.Title = props.Title;
                 m_Data.Width = props.Width;
                 m_Data.Height = props.Height;
-                m_Data.Input = static_cast<Input::WindowsInput*>(Input::Input::Get())->GetFrameData();
+                m_Data.Input = static_cast<WindowsInput*>(Input::Input::Get())->GetFrameData();
 
                 if (s_GLFWWindowCount == 0)
                 {

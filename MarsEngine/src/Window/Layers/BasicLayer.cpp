@@ -3,7 +3,7 @@ namespace ME
 {
     namespace Layer
     {
-        void BasicLayer::SetOnAttach(std::function<void()> func)
+        void EmptyLayer::SetOnAttach(std::function<void()> func)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -11,7 +11,7 @@ namespace ME
             onattach = std::bind(func);
         }
 
-        void BasicLayer::SetOnDetach(std::function<void()> func)
+        void EmptyLayer::SetOnDetach(std::function<void()> func)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -19,7 +19,7 @@ namespace ME
             ondetach = std::bind(func);
         }
 
-        void BasicLayer::SetOnUpdate(std::function<void()> func)
+        void EmptyLayer::SetOnUpdate(std::function<void()> func)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -27,7 +27,7 @@ namespace ME
             onupdate = std::bind(func);
         }
 
-        void BasicLayer::SetOnEvent(std::function<void(Event::Event&)> func)
+        void EmptyLayer::SetOnEvent(std::function<void(Event::Event&)> func)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -35,7 +35,7 @@ namespace ME
             onevent = std::bind(func, std::placeholders::_1);
         }
 
-        void BasicLayer::OnAttach()
+        void EmptyLayer::OnAttach()
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -43,7 +43,7 @@ namespace ME
             onattach;
         }
 
-        void BasicLayer::OnDetach()
+        void EmptyLayer::OnDetach()
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -51,7 +51,7 @@ namespace ME
             ondetach;
         }
 
-        void BasicLayer::OnUpdate()
+        void EmptyLayer::OnUpdate(Timestep ts)
         {
 
             ME_PROFILE_TRACE_CALL();
@@ -59,7 +59,7 @@ namespace ME
             onupdate;
         }
 
-        void BasicLayer::OnEvent(Event::Event& e)
+        void EmptyLayer::OnEvent(Event::Event& e)
         {
 
             ME_PROFILE_TRACE_CALL();

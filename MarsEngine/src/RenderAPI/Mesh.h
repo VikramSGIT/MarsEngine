@@ -111,7 +111,7 @@ namespace ME
 		void Rotate(const glm::vec3& XYZ);
 		void Scale(const glm::vec3& XYZ);
 
-		inline const MeshData const& GetMeshData() const { return m_MeshData; }
+		inline const MeshData& GetMeshData() const { return m_MeshData; }
 		inline MeshData& GetMeshData() { return m_MeshData; }
 		inline const std::string GetName() const { return m_Name; }
 		inline const bool IsReady() { return Ready; }
@@ -158,8 +158,8 @@ namespace ME
 
 		virtual inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }
 
-		virtual inline unsigned int GetTotalVertices() const { return total_vertices; }
-		virtual inline unsigned int GetTotalIndices() const { return total_indices; }
+		virtual inline size_t GetTotalVertices() const { return total_vertices; }
+		virtual inline size_t GetTotalIndices() const { return total_indices; }
 		virtual inline Ref<Renderer::VertexBufferLayout> GetLayout() const { return m_Layout; }
 		virtual const std::vector<std::pair<Mesh*, unsigned int>> GetUpdate()
 		{

@@ -16,7 +16,7 @@ namespace ME
             {
             private:
                 std::vector<Ref<Layer>> m_layerstack;
-                unsigned int m_totallayers = 0;
+                size_t m_TotalLayers = 0;
             public:
                 LayerStack() = default;
                 ~LayerStack();
@@ -35,6 +35,8 @@ namespace ME
                 std::vector<Ref<Layer>>::const_iterator end() const { return m_layerstack.end(); }
                 std::vector<Ref<Layer>>::const_reverse_iterator rbegin() const { return m_layerstack.rbegin(); }
                 std::vector<Ref<Layer>>::const_reverse_iterator rend() const { return m_layerstack.rend(); }
+
+                inline size_t GetTotalLayers() const { return m_TotalLayers; }
             };
         }
     }

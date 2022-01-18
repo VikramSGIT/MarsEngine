@@ -1,10 +1,13 @@
 #include "Application.h"
+#include "Window/Events/WindowEvent.h"
+#include "Window/Windows/WindowsWindow.h"
+
 namespace ME
 {
     Application* Application::s_Application = nullptr;
 
     Application::Application()
-        :m_Window(Window::Window::Create({ "MarsEngine" }))
+        :m_Window(Window::Window::Create({ "MarsEngine" })), m_LastFrameTime(0)
     {
 
         ME_PROFILE_TRACE_CALL();
@@ -71,9 +74,14 @@ namespace ME
 
         while (m_Running)
         {
+
+            float curtime = (float)glfwGetTime(); // TODO: Make it glfw independant
+            Timestep ts = curtime - m_LastFrameTime;
+            m_LastFrameTime = curtime;
+
             for (Ref<Window::Layer::Layer> layer : m_LayerStack)
             {
-                layer->OnUpdate();
+                layer->OnUpdate(ts);
                 layer->OnDraw();
             }
             

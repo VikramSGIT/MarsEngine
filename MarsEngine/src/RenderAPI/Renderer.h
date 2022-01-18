@@ -4,7 +4,6 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "Window/Layers/Layer.h"
-#include "Window/Layers/BasicLayer.h"
 #include "RenderAPI/OpenGL/OpenGLShader.h"
 
 namespace ME
@@ -59,14 +58,12 @@ namespace ME
             {
             public:
                 RendererLayer(RenderAPI* api)
-                    :Layer("Renderer"), m_API(api)
-                {
+                    :Layer("Renderer"), m_API(api) {}
 
-                }
                 virtual void OnAttach() override { m_API->Init(); }
                 virtual void OnDetach() override { m_API->~RenderAPI(); }
                 virtual void OnDraw() override { m_API->OnDraw(); }
-                virtual void OnUpdate() override { m_API->OnUpdate(); }
+                virtual void OnUpdate(Timestep ts) override { m_API->OnUpdate(); }
                 virtual void OnEvent(Event::Event&) override {}
             private:
                 RenderAPI* m_API;

@@ -2,26 +2,27 @@
 #include "MarsHeader.h"
 
 #include "Layer.h"
-#include <functional>
 #include "Window/Events/Event.h"
+
+#include <functional>
 namespace ME
 {
     namespace Layer
     {
-        class BasicLayer : public Window::Layer::Layer
+        class EmptyLayer : public Window::Layer::Layer
         {
         private:
             void EmptyFunction() {}
             void EmptyOnEvent(Event::Event& e) {}
 
-            std::function<void()> onattach = std::bind(&BasicLayer::EmptyFunction, this);
-            std::function<void()> ondetach = std::bind(&BasicLayer::EmptyFunction, this);
-            std::function<void()> onupdate = std::bind(&BasicLayer::EmptyFunction, this);
-            std::function<void(Event::Event&)> onevent = std::bind(&BasicLayer::EmptyOnEvent, this, std::placeholders::_1);
+            std::function<void()> onattach = std::bind(&EmptyLayer::EmptyFunction, this);
+            std::function<void()> ondetach = std::bind(&EmptyLayer::EmptyFunction, this);
+            std::function<void()> onupdate = std::bind(&EmptyLayer::EmptyFunction, this);
+            std::function<void(Event::Event&)> onevent = std::bind(&EmptyLayer::EmptyOnEvent, this, std::placeholders::_1);
         public:
-            BasicLayer()
-                :Layer("OpenGLRenderer") {}
-            ~BasicLayer() = default;
+            EmptyLayer()
+                :Layer("EmptyLayer") {}
+            ~EmptyLayer() = default;
 
             void SetOnAttach(std::function<void()> func);
             void SetOnDetach(std::function<void()> func);
@@ -30,7 +31,7 @@ namespace ME
 
             void OnAttach() override;
             void OnDetach() override;
-            void OnUpdate() override;
+            void OnUpdate(Timestep ts) override;
             void OnEvent(Event::Event& e) override;
         };
     }
