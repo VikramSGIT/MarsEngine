@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MarsHeader.h"
+#include "Core/Memory/Vector.h"
 
 #include "Core/Entity.h"
 #include "Buffers.h"
@@ -11,7 +12,6 @@
 
 #include <memory>
 #include <string>
-#include <algorithm>
 #include <set>
 #include <functional>
 
@@ -153,7 +153,7 @@ namespace ME
 		MeshQueue();
 
 		virtual void PushMesh(const Ref<Mesh>& mesh);
-		virtual void PushMeshes(const std::vector<Ref<Mesh>>& meshes);
+		virtual void PushMeshes(const Vector<Ref<Mesh>>& meshes);
 		virtual void PushAddon(ME::Addon::MeshAddon& addon);
 
 		virtual inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }

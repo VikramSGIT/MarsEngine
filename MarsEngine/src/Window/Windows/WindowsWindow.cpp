@@ -48,11 +48,7 @@ namespace ME
 
                 if (s_GLFWWindowCount == 0)
                 {
-                    if (!glfwInit())
-                    {
-                        ME_CORE_CRITICAL("Could not initialize GLFW!!");
-                    }
-
+                    ME_CORE_CRITICAL(!glfwInit(), "Could not initialize GLFW!!");
                 }
 
                 {

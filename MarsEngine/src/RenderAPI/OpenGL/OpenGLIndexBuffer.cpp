@@ -21,12 +21,9 @@ namespace ME
             {
                 GLClearError();
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
-                if (!GLPrintError("glBindBuffer", __FILE__, __LINE__))
-                {
-                    ME_CORE_CRITICAL("Can't load IndexBuffer with ID");
-                    ClearBuffer = false;
-                    this->~OpenGLIndexBuffer();
-                }
+
+                ME_CORE_CRITICAL(!GLPrintError("glBindBuffer", __FILE__, __LINE__), "Can't load IndexBuffer with ID");
+                ClearBuffer = false;
             }
             OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int size, const unsigned int& mode)
                 :m_Filled(0), m_RendererID(0), Emptyindex(true)

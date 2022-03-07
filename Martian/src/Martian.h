@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MarsHeader.h"
+#include "Core/Memory/Vector.h"
 
 #include "Window/Window.h"
 #include "Window/Input.h"
@@ -26,4 +27,5 @@ private:
 	ME::Ref<ME::Renderer::Shader> shader;
 	ME::Ref<ME::Addon::ParticleSystem> particlesystem;
 	ME::Ref<ME::Mesh> Player;
+	ME::Vector<ME::Ref<ME::Mesh>> obj;
 };

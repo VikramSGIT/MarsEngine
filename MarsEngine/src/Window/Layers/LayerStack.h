@@ -2,8 +2,8 @@
 #include "MarsHeader.h"
 
 #include "Layer.h"
+#include "Core/Memory/Vector.h"
 
-#include <vector>
 #include <algorithm>
 #include <functional>
 namespace ME
@@ -15,7 +15,7 @@ namespace ME
             class LayerStack
             {
             private:
-                std::vector<Ref<Layer>> m_layerstack;
+                Vector<Ref<Layer>> m_layerstack;
                 size_t m_TotalLayers = 0;
             public:
                 LayerStack() = default;
@@ -26,15 +26,15 @@ namespace ME
                 void PopLayer(Ref<Layer> layer);
                 void PopOverlay(Ref<Layer> overlay);
 
-                std::vector<Ref<Layer>>::iterator begin() { return m_layerstack.begin(); }
-                std::vector<Ref<Layer>>::iterator end() { return m_layerstack.end(); }
-                std::vector<Ref<Layer>>::reverse_iterator rbegin() { return m_layerstack.rbegin(); }
-                std::vector<Ref<Layer>>::reverse_iterator rend() { return m_layerstack.rend(); }
+                Ref<Layer>* begin() { return m_layerstack.begin(); }
+                Ref<Layer>* end() { return m_layerstack.end(); }
+                Ref<Layer>* rbegin() { return m_layerstack.rbegin(); }
+                Ref<Layer>* rend() { return m_layerstack.rend(); }
 
-                std::vector<Ref<Layer>>::const_iterator begin() const { return m_layerstack.begin(); }
-                std::vector<Ref<Layer>>::const_iterator end() const { return m_layerstack.end(); }
-                std::vector<Ref<Layer>>::const_reverse_iterator rbegin() const { return m_layerstack.rbegin(); }
-                std::vector<Ref<Layer>>::const_reverse_iterator rend() const { return m_layerstack.rend(); }
+                Ref<Layer>* begin() const { return m_layerstack.begin(); }
+                Ref<Layer>* end() const { return m_layerstack.end(); }
+                Ref<Layer>* rbegin() const { return m_layerstack.rbegin(); }
+                Ref<Layer>* rend() const { return m_layerstack.rend(); }
 
                 inline size_t GetTotalLayers() const { return m_TotalLayers; }
             };

@@ -54,12 +54,10 @@ namespace ME
 //
 // Initiating graphics libraries
 // Need to add graphics drivers identification
-                std::stringstream ss;
-                if (glewInit() != GLEW_OK)
-                    ME_CORE_ERROR("Can't Impliment GLEW")
-                else
+                ME_CORE_ERROR(glewInit() != GLEW_OK, "Can't Impliment GLEW")
 #ifdef ME_DEBUG
-                    ss << "Detected OpenGL Vesrion (using) : " << glGetString(GL_VERSION);
+                std::stringstream ss;
+                ss << "Detected OpenGL Version (using) : " << glGetString(GL_VERSION);
                 ME_CORE_INFO(ss.str());
 #endif
 //

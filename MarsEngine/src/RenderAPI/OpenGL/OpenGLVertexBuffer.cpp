@@ -22,12 +22,9 @@ namespace ME
             {
                 GLClearError();
                 glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
-                if (!GLPrintError("glBindBuffer", __FILE__, __LINE__))
-                {
-                    ME_CORE_CRITICAL("Can't load buffer with ID");
-                    ClearBuffer = false;
-                    this->~OpenGLVertexBuffer();
-                }
+
+                ME_CORE_CRITICAL(!GLPrintError("glBindBuffer", __FILE__, __LINE__), "Can't load buffer with ID");
+
             }
 
             OpenGLVertexBuffer::OpenGLVertexBuffer(const unsigned int& size, const unsigned int& mode)

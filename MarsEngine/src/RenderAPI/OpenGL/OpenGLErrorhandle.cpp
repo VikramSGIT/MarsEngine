@@ -68,7 +68,7 @@ namespace ME
                                 << "\n in file  : " << srcfile
                                 << "\n Error    : " << line.erase(0, 8)
                                 << "\n";
-                            ME_CORE_CRITICAL(ss.str());
+                            ME_CORE_CRITICAL(true, ss.str());
                             return false;
                         }
                     }

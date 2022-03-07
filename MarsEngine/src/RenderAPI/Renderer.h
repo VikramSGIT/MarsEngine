@@ -48,7 +48,7 @@ namespace ME
                 }
                 else
                 {
-                    ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
+                    ME_CORE_ERROR(true, "MarsEngine Only supports OpenGl!");
                     return nullptr;
                 }
             }

@@ -22,7 +22,7 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
-                m_layerstack.emplace(m_layerstack.begin() + m_TotalLayers, layer);
+                m_layerstack.EmplaceBack(layer);
                 layer->OnAttach();
                 m_TotalLayers++;
             }
@@ -32,7 +32,7 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
-                m_layerstack.emplace_back(overlay);
+                m_layerstack.Emplace(m_layerstack.begin(), overlay);
                 overlay->OnAttach();
             }
 
@@ -44,26 +44,9 @@ namespace ME
                 auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_TotalLayers, layer);
                 if (it != m_layerstack.begin() + m_TotalLayers)
                     layer->OnDetach();
-                    m_layerstack.erase(it);
+                    m_layerstack.Erase(it);
                     m_TotalLayers--;
             }
-
-            void LayerStack::PopOverlay(Ref<Layer> overlay)
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_TotalLayers, overlay);
-                if (it != m_layerstack.end())
-                {
-                    overlay->OnDetach();
-                    m_layerstack.erase(it);
-                    overlay.reset();
-                }
-            }
-
-
-
         }
     }
 }

@@ -55,12 +55,12 @@ namespace ME
         dispatcher.Dispatch<Event::AppEvent::WindowClosedEvent>(std::bind(&Application::OnWindowClose, this));
         dispatcher.Dispatch<Event::AppEvent::WindowResizeEvent>(std::bind(&Application::OnWindowResize, this));
 
-        for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+        for (auto it : m_LayerStack)
         {
             if (e.Handled)
                 break;
 
-            (*it)->OnEvent(e);
+            it->OnEvent(e);
         }
     }
 

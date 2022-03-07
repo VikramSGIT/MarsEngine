@@ -36,14 +36,14 @@ namespace ME
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
                     m_UniformLocationCache[name] = location;
                 }
-                if (location != -1)
+
+                ME_CORE_ERROR(location == -1, "Cant pass the Uniforms!!")
+
                 {
                     Bind();
                     GLLogCall(glUniform1i(location, data));
                     unBind();
                 }
-                else
-                    ME_CORE_ERROR("Cant pass the Uniforms!!");
             }
 
             void OpenGLShader::SetUniforms1f(const std::string& name, const float& data)
@@ -58,14 +58,14 @@ namespace ME
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
                     m_UniformLocationCache[name] = location;
                 }
-                if (location != -1)
+
+                ME_CORE_ERROR(location != -1, "Cant pass the Uniforms!!")
+
                 {
                     Bind();
                     GLLogCall(glUniform1f(location, data));
                     unBind();
                 }
-                else
-                    ME_CORE_ERROR("Cant pass the Uniforms!!");
             }
 
             void OpenGLShader::SetUniformsMat4f(const std::string& name, const glm::mat4& matrix)
@@ -166,8 +166,9 @@ namespace ME
                 ME_PROFILE_TRACE_CALL();
 
                 std::ifstream stream(filepath);
-                if (!stream.good())
-                    ME_CORE_ERROR("Can't open Shader File!!");
+
+                ME_CORE_ERROR(!stream.good(), "Can't open Shader File!!");
+
                 enum class ShaderType
                 {
                     NONE = -1, VERTEX = 0, FRAGMENT = 1

@@ -5,8 +5,6 @@
 
 ME::Application* app;
 
-std::vector<ME::Ref<ME::Mesh>> obj;
-
 extern ME::Application* ME::CreateApp()
 {
 	app = allocon<Application>();
@@ -18,7 +16,7 @@ extern ME::Application* ME::CreateApp()
 
 void Martian::OnAttach()
 {
-	//app->GetWindow().SetVSync(false);
+	app->GetWindow().SetVSync(false);
 
 	renderer->Init();
 	shader = ME::CreateRef<ME::Renderer::OpenGL::OpenGLShader>("C:\\Projects\\MarsEngine\\Martian\\res\\shaders\\Basic.shader");
@@ -28,7 +26,7 @@ void Martian::OnAttach()
 	Player = ME::GenRect("Aadhav", { 200.0f, 200.0f });
 	for (int i = 0; i < 200; i += 50)
 	{
-		obj.emplace_back(ME::GenQuad("TileMap", {0.0 + i, 0.0 + i}, {50.0 + i, 0.0 + i}, {50.0 + i, 50.0 + i}, {0.0 + i, 50.0 + i}, 1));
+		obj.EmplaceBack(ME::GenQuad("TileMap", {0.0 + i, 0.0 + i}, {50.0 + i, 0.0 + i}, {50.0 + i, 50.0 + i}, {0.0 + i, 50.0 + i}, 1));
 	}
 	
 	ME::Ref<ME::MeshQueue> queue1 = ME::CreateRef<ME::MeshQueue>(), queue2 = ME::CreateRef<ME::MeshQueue>();

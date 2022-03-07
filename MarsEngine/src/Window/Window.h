@@ -7,8 +7,6 @@
 
 #include <string>
 #include <functional>
-#include <vector>
-#include <algorithm>
 
 namespace ME
 {

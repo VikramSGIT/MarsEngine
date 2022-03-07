@@ -229,7 +229,7 @@ namespace ME
 		m->Ready = true;
 	}
 
-	void MeshQueue::PushMeshes(const std::vector<Ref<Mesh>>& meshes)
+	void MeshQueue::PushMeshes(const Vector<Ref<Mesh>>& meshes)
 	{
 
 		ME_PROFILE_TRACE_CALL();

@@ -12,7 +12,6 @@
 
 #include <sstream>
 #include <memory>
-#include <vector>
 namespace ME
 {
     namespace Window
