@@ -68,7 +68,7 @@
 			if(window->IsKeyPressed(Event::Key::D))
 				speed += forceX;
 			
-			Logo->Transulate(speed / glm::vec3(10.0f, 10.0f, 1.0f));
+			Logo->Translate(speed / glm::vec3(10.0f, 10.0f, 1.0f));
 			timer.Reset();
 		}
 
@@ -77,22 +77,22 @@
 			if(vertex.vertices[0] <= 0.0f)
 			{
 				speed.x = std::abs(speed.x) * e;
-				Logo->Transulate({-vertex.vertices[0], 0.0f, 0.0f});
+				Logo->Translate({-vertex.vertices[0], 0.0f, 0.0f});
 			}
 			else if(vertex.vertices[0] >= 1280.0f)
 			{
 				speed.x = -std::abs(speed.x) * e;
-				Logo->Transulate({1280.0f -vertex.vertices[0], 0.0f, 0.0f});
+				Logo->Translate({1280.0f -vertex.vertices[0], 0.0f, 0.0f});
 			}
 			if(vertex.vertices[1] <= 0.0f)
 			{
 				speed.y = std::abs(speed.y) * e;
-				Logo->Transulate({0.0f, -vertex.vertices[1], 0.0f});
+				Logo->Translate({0.0f, -vertex.vertices[1], 0.0f});
 			}
 			else if(vertex.vertices[1] >= 720.0f)
 			{
 				speed.y = -std::abs(speed.y) * e;
-				Logo->Transulate({0.0f, 720.0f -vertex.vertices[1], 0.0f});
+				Logo->Translate({0.0f, 720.0f -vertex.vertices[1], 0.0f});
 			}
 		}
 		if (glfwWindowShouldClose(window->GetNativeWindow()))
