@@ -1,8 +1,10 @@
-#pragma once
-#include <vector>
+#ifndef ME_BUFFERS
+#define ME_BUFFERS
 
 #include "MarsHeader.h"
 #include "GL/glew.h"
+
+#include <vector>
 
 namespace ME
 {
@@ -109,3 +111,5 @@ namespace ME
         };
     }
 }
+
+#endif

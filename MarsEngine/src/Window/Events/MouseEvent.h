@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_MOUSEEVENT
+#define ME_MOUSEEVENT
+
 #include "MarsHeader.h"
 
 #include "Window/Events/Event.h"
@@ -129,3 +131,5 @@ namespace ME
         }
     }
 }
+
+#endif

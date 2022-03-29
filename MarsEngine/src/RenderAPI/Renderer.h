@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_RENDERER
+#define ME_RENDERER
+
 #include "MarsHeader.h"
 
 #include "Shader.h"
@@ -75,3 +77,5 @@ namespace ME
 
     }
 }
+
+#endif

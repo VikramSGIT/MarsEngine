@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_WINDOWSEVENT
+#define ME_WINDOWSEVENT
+
 #include "MarsHeader.h"
 
 #include "Event.h"
@@ -112,3 +114,5 @@ namespace ME
         }
     }
 }
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_TIMER
+#define ME_TIMER
 
 #include "MarsHeader.h"
 
@@ -388,7 +389,7 @@ namespace ME
 			////////////////////////////////////// Operator Definitions ////////////////////////////////////////////
 			// == operator
 			//
-			template<Precision T, Precision U> bool operator==(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<Precision T, Precision U> bool operator==(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR(true, "Invalid Comparison"); return false; }
 			template<> constexpr  bool operator==<Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time == right.m_Time; }
 			template<> constexpr  bool operator==<Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll == right.m_Time; }
 			template<> constexpr  bool operator==<Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll == right.m_Time; }
@@ -401,7 +402,7 @@ namespace ME
 			//
 			// < operator
 			//
-			template<Precision T, Precision U> bool operator<(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<Precision T, Precision U> bool operator<(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR(true, "Invalid Comparison"); return false; }
 			template<> constexpr  bool operator< <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)		noexcept { return left.m_Time < right.m_Time; }
 			template<> constexpr  bool operator< <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll < right.m_Time; }
 			template<> constexpr  bool operator< <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll < right.m_Time; }
@@ -414,7 +415,7 @@ namespace ME
 			//
 			// > operator
 			//
-			template<Precision T, Precision U> bool operator>(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<Precision T, Precision U> bool operator>(const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR(true, "Invalid Comparison"); return false; }
 			template<> constexpr  bool operator> <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time > right.m_Time; }
 			template<> constexpr  bool operator> <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll > right.m_Time; }
 			template<> constexpr  bool operator> <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll > right.m_Time; }
@@ -427,7 +428,7 @@ namespace ME
 			//
 			// <= operator
 			//
-			template<Precision T, Precision U> bool operator<= (const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<Precision T, Precision U> bool operator<= (const Time<T>& left, const Time<U>& right) { ME_CORE_ERROR(true, "Invalid Comparison"); return false; }
 			template<> constexpr  bool operator<= <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time <= right.m_Time; }
 			template<> constexpr  bool operator<= <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right)	noexcept { return left.m_Time * 1000ll <= right.m_Time; }
 			template<> constexpr  bool operator<= <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right)	noexcept { return left.m_Time * 1000000ll <= right.m_Time; }
@@ -440,7 +441,7 @@ namespace ME
 			//
 			// >= operator
 			//
-			template<Precision T, Precision U> constexpr bool operator>= (const Time<T>& left, const Time<U>& right) noexcept { ME_CORE_ERROR("Invalid Comparison"); return false; }
+			template<Precision T, Precision U> constexpr bool operator>= (const Time<T>& left, const Time<U>& right) noexcept { ME_CORE_ERROR(true, "Invalid Comparison"); return false; }
 			template<> constexpr bool operator>= <Precision::SEC, Precision::SEC>(const Time<Precision::SEC>& left, const Time<Precision::SEC>& right)	noexcept { return left.m_Time >= right.m_Time; }
 			template<> constexpr bool operator>= <Precision::SEC, Precision::MILLI>(const Time<Precision::SEC>& left, const Time<Precision::MILLI>& right) noexcept { return left.m_Time * 1000ll >= right.m_Time; }
 			template<> constexpr bool operator>= <Precision::SEC, Precision::MICRO>(const Time<Precision::SEC>& left, const Time<Precision::MICRO>& right) noexcept { return left.m_Time * 1000000ll >= right.m_Time; }
@@ -454,3 +455,5 @@ namespace ME
 		}
 	}
 }
+
+#endif

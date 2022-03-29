@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_CAMERA
+#define ME_CAMERA
 
 #include "MarsHeader.h"
 
@@ -21,3 +22,5 @@ namespace ME
 		};
 	}
 }
+
+#endif

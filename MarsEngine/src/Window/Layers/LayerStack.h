@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_LAYERSTACK
+#define ME_LAYERSTACK
+
 #include "MarsHeader.h"
 
 #include "Layer.h"
@@ -15,7 +17,7 @@ namespace ME
             class LayerStack
             {
             private:
-                Vector<Ref<Layer>> m_layerstack;
+                std::vector<Ref<Layer>> m_layerstack;
                 size_t m_TotalLayers = 0;
             public:
                 LayerStack() = default;
@@ -26,18 +28,16 @@ namespace ME
                 void PopLayer(Ref<Layer> layer);
                 void PopOverlay(Ref<Layer> overlay);
 
-                Ref<Layer>* begin() { return m_layerstack.begin(); }
-                Ref<Layer>* end() { return m_layerstack.end(); }
-                Ref<Layer>* rbegin() { return m_layerstack.rbegin(); }
-                Ref<Layer>* rend() { return m_layerstack.rend(); }
+                auto begin() { return m_layerstack.begin(); }
+                auto end() { return m_layerstack.end(); }
 
-                Ref<Layer>* begin() const { return m_layerstack.begin(); }
-                Ref<Layer>* end() const { return m_layerstack.end(); }
-                Ref<Layer>* rbegin() const { return m_layerstack.rbegin(); }
-                Ref<Layer>* rend() const { return m_layerstack.rend(); }
+                auto begin() const { return m_layerstack.begin(); }
+                auto end() const { return m_layerstack.end(); }
 
                 inline size_t GetTotalLayers() const { return m_TotalLayers; }
             };
         }
     }
 }
+
+#endif

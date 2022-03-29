@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MARTIAN
+#define MARTIAN
 
 #include "MarsHeader.h"
 #include "Core/Memory/Vector.h"
@@ -27,5 +28,7 @@ private:
 	ME::Ref<ME::Renderer::Shader> shader;
 	ME::Ref<ME::Addon::ParticleSystem> particlesystem;
 	ME::Ref<ME::Mesh> Player;
-	ME::Vector<ME::Ref<ME::Mesh>> obj;
+	std::vector<ME::Ref<ME::Mesh>> obj;
 };
+
+#endif

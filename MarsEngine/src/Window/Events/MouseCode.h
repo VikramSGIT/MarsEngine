@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_MOUSECODE
+#define ME_MOUSECODE
+
 namespace ME
 {
 	namespace Event
@@ -27,3 +29,5 @@ namespace ME
 		}
 	}
 }
+
+#endif

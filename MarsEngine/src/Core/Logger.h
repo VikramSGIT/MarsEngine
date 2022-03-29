@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_LOGGER
+#define ME_LOGGER
 
 #include <iostream>
 #include <ctime>
@@ -75,3 +76,5 @@ void DeinitLogger() noexcept;
 #define ME_CORE_WARNING(X) Logger::GlobalLogger->LogWarning(X)
 #define ME_CORE_ERROR(CND, X) if(CND) { Logger::GlobalLogger->LogError(X); throw X; }
 #define ME_CORE_CRITICAL(CND, X) if(CND) { Logger::GlobalLogger->LogCritical(X); throw X; }
+
+#endif

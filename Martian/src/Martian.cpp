@@ -3,43 +3,44 @@
 #include "Utilites/Timer.h"
 #include "Core/Memory/SafePointer.h"
 
+
 ME::Application* app;
 
 extern ME::Application* ME::CreateApp()
 {
-	app = allocon<Application>();
+	app = allocon<ME::Application>();
 
 	Ref<Martian> marslayer = CreateRef<Martian>();
 	app->GetLayerStack()->PushLayer(marslayer);
 	return app;
 }
 
+using namespace ME;
+
 void Martian::OnAttach()
 {
 	app->GetWindow().SetVSync(false);
 
 	renderer->Init();
-	shader = ME::CreateRef<ME::Renderer::OpenGL::OpenGLShader>("C:\\Projects\\MarsEngine\\Martian\\res\\shaders\\Basic.shader");
+	shader = CreateRef<Renderer::OpenGL::OpenGLShader>("res\\shaders\\Basic.shader");
 	renderer->SetShader(shader);
 	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
 
-	Player = ME::GenRect("Aadhav", { 200.0f, 200.0f });
-	for (int i = 0; i < 200; i += 50)
-	{
-		obj.EmplaceBack(ME::GenQuad("TileMap", {0.0 + i, 0.0 + i}, {50.0 + i, 0.0 + i}, {50.0 + i, 50.0 + i}, {0.0 + i, 50.0 + i}, 1));
-	}
+	Player = GenRect("Aadhav", { 200.0f, 200.0f });
+	for (int i = 0; i < 600; i += 50)
+		obj.emplace_back(GenQuad("TileMap", {0.0 + i, 0.0 + i}, {50.0 + i, 0.0 + i}, {50.0 + i, 50.0 + i}, {0.0 + i, 50.0 + i}, 1));
 	
-	ME::Ref<ME::MeshQueue> queue1 = ME::CreateRef<ME::MeshQueue>(), queue2 = ME::CreateRef<ME::MeshQueue>();
+	Ref<MeshQueue> queue1 = CreateRef<MeshQueue>(), queue2 = CreateRef<MeshQueue>();
 	queue1->PushMesh(Player);
 	queue2->PushMeshes(obj);
 
-	/*ME::Addon::ParticleProps props;
-	props.parent = ME::GenRect("Particles System", { 30.0f, 30.0f }, 1);
+	/*Addon::ParticleProps props;
+	props.parent = GenRect("Particles System", { 30.0f, 30.0f }, 1);
 	props.count = 10u;
 	props.transform = glm::translate(glm::mat4(), { 0.1f, 0.0f, 0.0f });
-	props.lifetime = ME::Utils::Time::seconds(10ll);
+	props.lifetime = Utils::Tiseconds(10ll);
 
-	particlesystem = ME::CreateRef<ME::Addon::ParticleSystem>(props);
+	particlesystem = CreateRef<Addon::ParticleSystem>(props);
 	queue->PushAddon(*particlesystem);*/
 
 	renderer->AddRenderSubmition(queue1, []() {});
@@ -53,17 +54,17 @@ void Martian::OnDetach()
 	renderer.reset();
 }
 
-void Martian::OnUpdate(ME::Timestep ts)
+void Martian::OnUpdate(Timestep ts)
 {
-	if (ME::Window::Input::IsKeyPressed(ME::Event::Key::W))
+	if (Window::Input::IsKeyPressed(Event::Key::W))
 		Player->Translate({ 0.0, 300.0 * ts, 0.0 });
-	if (ME::Window::Input::IsKeyPressed(ME::Event::Key::A))
+	if (Window::Input::IsKeyPressed(Event::Key::A))
 		Player->Translate({ -300.0 * ts, 0.0, 0.0 });
-	if (ME::Window::Input::IsKeyPressed(ME::Event::Key::S))
+	if (Window::Input::IsKeyPressed(Event::Key::S))
 		Player->Translate({ 0.0, -300.0 * ts, 0.0 });
-	if (ME::Window::Input::IsKeyPressed(ME::Event::Key::D))
+	if (Window::Input::IsKeyPressed(Event::Key::D))
 		Player->Translate({ 300.0 * ts, 0.0, 0.0 });
-	if (ME::Window::Input::IsKeyPressed(ME::Event::Key::Space))
+	if (Window::Input::IsKeyPressed(Event::Key::Space))
 		app->GetWindow().SetVSync(!app->GetWindow().IsVSync());
 	//particlesystem->OnUpdate();
 	renderer->OnUpdate();
@@ -74,7 +75,7 @@ void Martian::OnDraw()
 	renderer->OnDraw();
 }
 
-void Martian::OnEvent(ME::Event::Event& e)
+void Martian::OnEvent(Event::Event& e)
 {
-	
+
 }

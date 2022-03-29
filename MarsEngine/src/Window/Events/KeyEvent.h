@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_KEYEVENT
+#define ME_KEYEVENT
+
 #include "MarsHeader.h"
 
 #include "Window/Events/Event.h"
@@ -98,3 +100,5 @@ namespace ME
 
     }
 }
+
+#endif

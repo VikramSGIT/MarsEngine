@@ -10,7 +10,7 @@ namespace ME
             ME_PROFILE_TRACE_CALL();
 
             std::stringstream ss;
-            ss << "Window Created!! Name: " << winprop.Title << " Dimension: " << winprop.Height << " X " << winprop.Width;
+            ss << "Window Created!! Name: " << winprop.Title << " Dimension: " << winprop.Width << " X " << winprop.Height;
             ME_CORE_WARNING(ss.str());
             Input::Input::Create();
 

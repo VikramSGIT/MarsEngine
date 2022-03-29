@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_LAYER
+#define ME_LAYER
+
 #include "MarsHeader.h"
 
 #include "Window/Events/Event.h"
@@ -31,3 +33,5 @@ namespace ME
         }
     }
 }
+
+#endif

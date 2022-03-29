@@ -245,6 +245,22 @@ namespace ME
 
 	}
 
+	void MeshQueue::PushMeshes(const std::vector<Ref<Mesh>>& meshes)
+	{
+
+		ME_PROFILE_TRACE_CALL();
+
+		for (Ref<Mesh> m : meshes)
+		{
+			m->callback = std::bind(&MeshQueue::MeshCallback, this, std::placeholders::_1, std::placeholders::_2);
+			m_Meshes.emplace_back(m);
+			total_vertices += m->GetMeshData().vertex.Size() * m_Layout->GetTotalCount();
+			total_indices += m->GetMeshData().index.Size();
+			m->Ready = true;
+		}
+
+	}
+
 	void MeshQueue::PushAddon(ME::Addon::MeshAddon& addon)
 	{
 

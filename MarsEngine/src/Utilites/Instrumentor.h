@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_INSTRUMENTOR
+#define ME_INTSTUMENTOR
 
 #include <mutex>
 #include <chrono>
@@ -45,4 +46,6 @@ CallTracer tracer##__LINE__(__FUNCTION__)
 #else
 #define ME_PROFILE_TRACE_CALL()
 #define ME_PROFILE_PRINT_CALLSTACK(X)
+#endif
+
 #endif

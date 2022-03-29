@@ -1,7 +1,7 @@
-#pragma once
+#ifndef ME_ADDON
+#define ME_ADDON
 
 #include "MarsHeader.h"
-
 
 namespace ME
 {
@@ -19,3 +19,5 @@ namespace ME
 		};
 	}
 }
+
+#endif

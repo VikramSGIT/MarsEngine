@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_KEYBOARDCODE
+#define ME_KEYBOARDCODE
 
 namespace ME
 {
@@ -145,3 +146,5 @@ namespace ME
 		}
 	}
 }
+
+#endif

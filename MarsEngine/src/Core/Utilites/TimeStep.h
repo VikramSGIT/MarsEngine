@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_TIMESTEP
+#define ME_TIMESTEP
 
 namespace ME
 {
@@ -16,3 +17,5 @@ namespace ME
 		float m_Time;
 	};
 }
+
+#endif

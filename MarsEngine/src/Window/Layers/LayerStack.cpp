@@ -22,7 +22,7 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
-                m_layerstack.EmplaceBack(layer);
+                m_layerstack.emplace_back(layer);
                 layer->OnAttach();
                 m_TotalLayers++;
             }
@@ -32,7 +32,7 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
-                m_layerstack.Emplace(m_layerstack.begin(), overlay);
+                m_layerstack.emplace(m_layerstack.begin(), overlay);
                 overlay->OnAttach();
             }
 
@@ -44,7 +44,7 @@ namespace ME
                 auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_TotalLayers, layer);
                 if (it != m_layerstack.begin() + m_TotalLayers)
                     layer->OnDetach();
-                    m_layerstack.Erase(it);
+                    m_layerstack.erase(it);
                     m_TotalLayers--;
             }
         }

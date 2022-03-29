@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_ENTITY
+#define ME_ENTITY
 
 #include "MarsHeader.h"
 
@@ -19,3 +20,5 @@ namespace ME
 		UUID m_UUID;
 	};
 }
+
+#endif

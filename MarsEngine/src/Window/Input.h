@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_INPUT
+#define ME_INPUT
 
 #include "MarsHeader.h"
 
@@ -31,3 +32,5 @@ namespace ME
 		};
 	}
 }
+
+#endif

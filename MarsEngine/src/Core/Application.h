@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_APPLICATION
+#define ME_APPLICATION
+
 #include "MarsHeader.h"
 
 #include "Logger.h"
@@ -42,3 +44,5 @@ namespace ME
 
     extern Application* CreateApp();
 }
+
+#endif

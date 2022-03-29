@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ME_MESH
+#define ME_MESH
 
 #include "MarsHeader.h"
 #include "Core/Memory/Vector.h"
@@ -146,7 +147,7 @@ namespace ME
 		friend class MeshQueue;
 	};
 
-	class MeshQueue // Render Call batcher
+	class MeshQueue // Render-Call-batcher
 	{
 	public:
 
@@ -154,6 +155,7 @@ namespace ME
 
 		virtual void PushMesh(const Ref<Mesh>& mesh);
 		virtual void PushMeshes(const Vector<Ref<Mesh>>& meshes);
+		virtual void PushMeshes(const std::vector<Ref<Mesh>>& meshes);
 		virtual void PushAddon(ME::Addon::MeshAddon& addon);
 
 		virtual inline std::vector<Ref<Mesh>> GetMeshes() const { return m_Meshes; }
@@ -274,3 +276,5 @@ namespace ME
 // Quickest quad generation with 1x1 size
 	static Ref<Mesh> QuickQuad(const unsigned int& index = 0) { return GenRect("Quad", {1.0f, 1.0f}, index); }
 }
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_IMGUILAYER
+#define ME_IMGUILAYER
+
 #include "MarsHeader.h"
 
 #include "Window/Layers/Layer.h"
@@ -36,3 +38,4 @@ namespace ME
     }
 }
         
+#endif

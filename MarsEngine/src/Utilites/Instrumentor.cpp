@@ -1,4 +1,4 @@
-#include "Intrumentor.h"
+#include "Instrumentor.h"
 
 std::vector<std::string> callstack, calltimer;
 

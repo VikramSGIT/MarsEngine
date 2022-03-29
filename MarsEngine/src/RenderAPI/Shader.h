@@ -1,9 +1,10 @@
-#pragma once
-
-#include <string>
+#ifndef ME_SHADER
+#define ME_SHADER
 
 #include "MarsHeader.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
+
+#include <string>
 
 namespace ME
 {
@@ -25,3 +26,5 @@ namespace ME
 		};
 	}
 }
+
+#endif
