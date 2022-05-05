@@ -1,4 +1,4 @@
-#include "OpenGLRenderer.h"
+#include "OpenGL2DRenderer.h"
 #include "Core/Memory/SafePointer.h"
 
 /*
@@ -11,14 +11,14 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGLRendererAPI::OpenGLRendererAPI()
-            :RenderAPI(RenderAPItype::ME_RENDERER_OPENGL)
+            OpenGL2DRendererAPI::OpenGL2DRendererAPI()
+            :Render2DAPI(Render2DAPItype::ME_RENDERER2D_OPENGL)
             {
 
                 ME_PROFILE_TRACE_CALL();
             }
 
-            OpenGLRendererAPI::~OpenGLRendererAPI()
+            OpenGL2DRendererAPI::~OpenGL2DRendererAPI()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -26,12 +26,12 @@ namespace ME
                 ClearBufferCache();
             }
 
-            void OpenGLRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
+            void OpenGL2DRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
             {
                 glViewport(0, 0, X, Y);
             }
 
-            void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
+            void OpenGL2DRendererAPI::SetClearColor(const glm::vec4& color)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -39,7 +39,7 @@ namespace ME
                 m_clearcolor = color;
             }
 
-            void OpenGLRendererAPI::SetShader(const Ref<Shader>& shader)
+            void OpenGL2DRendererAPI::SetShader(const Ref<Shader2D>& shader)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -47,14 +47,14 @@ namespace ME
                 m_Shader = shader;
             }
 
-            void OpenGLRendererAPI::Init()
+            void OpenGL2DRendererAPI::Init()
             {
 
                 ME_PROFILE_TRACE_CALL();
 //
 // Initiating graphics libraries
 // Need to add graphics drivers identification
-                ME_CORE_ERROR(glewInit() != GLEW_OK, "Can't Impliment GLEW")
+                ME_CORE_CRITICAL(glewInit() != GLEW_OK, "Can't Impliment GLEW")
 #ifdef ME_DEBUG
                 std::stringstream ss;
                 ss << "Detected OpenGL Version (using) : " << glGetString(GL_VERSION);
@@ -67,7 +67,7 @@ namespace ME
                 GLLogCall(glEnable(GL_BLEND));
             }
 
-            void OpenGLRendererAPI::OnUpdate()
+            void OpenGL2DRendererAPI::OnUpdate()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -75,7 +75,7 @@ namespace ME
                 Clear();
             }
 
-            void OpenGLRendererAPI::Clear() const
+            void OpenGL2DRendererAPI::Clear() const
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -84,20 +84,20 @@ namespace ME
                 GLLogCall(glClear(GL_COLOR_BUFFER_BIT));
             }
 
-            void OpenGLRendererAPI::ClearBufferCache()
+            void OpenGL2DRendererAPI::ClearBufferCache()
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 for (unsigned int i : vertexbuffercache)
-                    OpenGLVertexBuffer vb(i);
+                    OpenGL2DVertexBuffer vb(i);
                 vertexbuffercache.clear();
                 for (unsigned int i : indexbuffercache)
-                    OpenGLIndexBuffer ib(i);
+                    OpenGL2DIndexBuffer ib(i);
                 indexbuffercache.clear();
             }
 
-            void OpenGLRendererAPI::AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata)
+            void OpenGL2DRendererAPI::AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -107,12 +107,12 @@ namespace ME
                 SetUpBuffers(meshqueue);
             }
 
-            void OpenGLRendererAPI::SetUpBuffers(const Ref<MeshQueue>& meshqueue)
+            void OpenGL2DRendererAPI::SetUpBuffers(const Ref<MeshQueue>& meshqueue)
             {
 
                 ME_PROFILE_TRACE_CALL();
                     
-                Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue->GetLayout();
+                Ref<ME::Renderer::VertexBufferLayout2D> layout = meshqueue->GetLayout();
                 unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
                 
                 SafePointer<VERTEX> vertexbuffer(alloc<VERTEX>(meshqueue->GetTotalVertices()), meshqueue->GetTotalVertices());
@@ -133,8 +133,8 @@ namespace ME
                     indexoffset += 1 + *std::max_element(ms->GetMeshData().index.begin(), ms->GetMeshData().index.end());
                 }
 
-                Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>((ME_DATATYPE*)vertexbuffer, meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
-                Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(indexbuffer, meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
+                Ref<VertexBuffer2D> vertexbufferobj = CreateRef<OpenGL2DVertexBuffer>((ME_DATATYPE*)vertexbuffer, meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
+                Ref<IndexBuffer2D> indexbufferobj = CreateRef<OpenGL2DIndexBuffer>(indexbuffer, meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
 
                 dealloc(vertexbuffer.Get(), meshqueue->GetTotalVertices());
                 dealloc(indexbuffer.Get(), meshqueue->GetTotalIndices());
@@ -146,13 +146,13 @@ namespace ME
                 indexbuffercache.push_back(indexbufferobj->GetID());
             }
 
-            void OpenGLRendererAPI::CheckBufferUpdate(const unsigned int& id)
+            void OpenGL2DRendererAPI::CheckBufferUpdate(const unsigned int& id)
             {
                 ME_PROFILE_TRACE_CALL();
 
                 for (std::pair<Mesh*, unsigned int> data : m_RenderQueue[id]->GetUpdate())
                 {
-                    Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
+                    Ref<VertexBuffer2D> vertexbuffer = CreateRef<OpenGL2DVertexBuffer>(vertexbuffercache[id]);
                     vertexbuffer->BufferPostRenderData(data.first->GetMeshData().vertex.begin(), 
                         m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.first->GetMeshData().vertex.Size(), 
                         m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.second);
@@ -161,7 +161,7 @@ namespace ME
                 }
             }
 
-            void OpenGLRendererAPI::OnDraw()
+            void OpenGL2DRendererAPI::OnDraw()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -180,9 +180,9 @@ namespace ME
 //              
                     preprocessing.at(i)();
 
-                    Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[i]);
-                    Ref<IndexBuffer> indexbuffer = CreateRef<OpenGLIndexBuffer>(indexbuffercache[i]);
-                    Ref<VertexArray> array = CreateRef<OpenGLVertexArray>();
+                    Ref<VertexBuffer2D> vertexbuffer = CreateRef<OpenGL2DVertexBuffer>(vertexbuffercache[i]);
+                    Ref<IndexBuffer2D> indexbuffer = CreateRef<OpenGL2DIndexBuffer>(indexbuffercache[i]);
+                    Ref<VertexArray2D> array = CreateRef<OpenGL2DVertexArray>();
 
                     vertexbuffer->ClearBufferOnDestroy(false);
                     indexbuffer->ClearBufferOnDestroy(false);
@@ -201,7 +201,7 @@ namespace ME
                 }
             }
 
-            bool OpenGLRendererAPI::SwitchAPI(const RenderAPItype api)
+            bool OpenGL2DRendererAPI::SwitchAPI(const Render2DAPItype api)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -209,7 +209,7 @@ namespace ME
                 return true;
             }
 
-            void OpenGLRendererAPI::OnEvent(Event::Event& e)
+            void OpenGL2DRendererAPI::OnEvent(Event::Event& e)
             {
 
                 ME_PROFILE_TRACE_CALL();

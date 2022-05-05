@@ -1,4 +1,4 @@
-#include "OpenGLTexture.h"
+#include "OpenGL2DTexture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "Vender/stb/stb_image.h"
@@ -9,7 +9,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGLTexture::OpenGLTexture(const std::string filename)
+            OpenGL2DTexture::OpenGL2DTexture(const std::string filename)
                 :m_RendererID(0), m_FilePath(filename), m_LocalBuffer(nullptr), Slot(NULL)
             {
 
@@ -33,7 +33,7 @@ namespace ME
                     stbi_image_free(m_LocalBuffer);
             }
 
-            OpenGLTexture::~OpenGLTexture()
+            OpenGL2DTexture::~OpenGL2DTexture()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -41,7 +41,7 @@ namespace ME
                 GLLogCall(glDeleteTextures(1, &m_RendererID));
             }
 
-            void OpenGLTexture::Bind(unsigned int slot)
+            void OpenGL2DTexture::Bind(unsigned int slot)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -51,7 +51,7 @@ namespace ME
                 GLLogCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
             }
 
-            void OpenGLTexture::unBind() const
+            void OpenGL2DTexture::unBind() const
             {
 
                 ME_PROFILE_TRACE_CALL();

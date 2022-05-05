@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "Mesh2D.h"
 
 /*
 * TODO:  Fix Reset Vertex, makes copy of vertex everytime
@@ -206,7 +206,7 @@ namespace ME
 ////////////////////////////////////////// Mesh Queue ////////////////////////////////////////////////
 
 	MeshQueue::MeshQueue()
-		:m_Layout(CreateRef<Renderer::VertexBufferLayout>()), total_indices(0), total_vertices(0)
+		:m_Layout(CreateRef<Renderer::VertexBufferLayout2D>()), total_indices(0), total_vertices(0)
 	{
 		if (m_Layout->GetTotalCount() <= 0)
 		{

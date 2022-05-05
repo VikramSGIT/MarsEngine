@@ -1,28 +1,30 @@
-#ifndef ME_RENDERER
-#define ME_RENDERER
+#ifndef ME_RENDERER2D
+#define ME_RENDERER2D
+
+#pragma once
 
 #include "MarsHeader.h"
 
-#include "Shader.h"
-#include "Mesh.h"
-#include "Window/Layers/Layer.h"
-#include "RenderAPI/OpenGL/OpenGLShader.h"
+#include "Shader2D.h"
+#include "Modules\2D\Mesh2D.h"
+#include "Window\Layers\Layer.h"
+#include "RenderAPI\OpenGL\OpenGL2D\OpenGL2DShader.h"
 
 namespace ME
 {
     namespace Renderer
     {
-        enum class RenderAPItype
+        enum class Render2DAPItype
         {
             ME_NONE = 0,
-            ME_RENDERER_OPENGL = 1
+            ME_RENDERER2D_OPENGL = 1
         };
-        class RenderAPI
+        class Render2DAPI
         {
         public:
-            RenderAPI(RenderAPItype api)
+            Render2DAPI(Render2DAPItype api)
                 :m_renderapi(api), m_Layer(this){}
-            virtual ~RenderAPI() = default;
+            virtual ~Render2DAPI() = default;
 
             virtual void Init() = 0;
             virtual void Clear() const = 0;
@@ -32,47 +34,47 @@ namespace ME
             virtual void OnUpdate() = 0;
             virtual void OnDraw() = 0;
 
-            virtual bool SwitchAPI(const RenderAPItype api) = 0;
+            virtual bool SwitchAPI(const Render2DAPItype api) = 0;
             virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) = 0;
             virtual void SetClearColor(const glm::vec4& color) = 0;
-            virtual void SetShader(const Ref<Shader>& shader) = 0;
+            virtual void SetShader(const Ref<Shader2D>& shader) = 0;
 
-            inline RenderAPItype GetAPI() { return m_renderapi; };
+            inline Render2DAPItype GetAPI() { return m_renderapi; };
             virtual inline std::vector<ME::Ref<ME::MeshQueue>> GetRenderQueue() = 0;
             virtual Window::Layer::Layer& GetLayer() { return m_Layer; }
 
 
-            Ref<Shader> Create(const std::string& filepath)
+            Ref<Shader2D> Create(const std::string& filepath)
             {
-                if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
+                if (GetAPI() == Render2DAPItype::ME_RENDERER2D_OPENGL)
                 {
-                    return CreateRef<OpenGL::OpenGLShader>(filepath);
+                    return CreateRef<OpenGL::OpenGL2DShader>(filepath);
                 }
                 else
                 {
-                    ME_CORE_ERROR(true, "MarsEngine Only supports OpenGl!");
+                    ME_CORE_CRITICAL(true, "MarsEngine Only supports OpenGL for now!");
                     return nullptr;
                 }
             }
 
         private:
-            class RendererLayer : public Window::Layer::Layer
+            class Renderer2DLayer : public Window::Layer::Layer
             {
             public:
-                RendererLayer(RenderAPI* api)
-                    :Layer("Renderer"), m_API(api) {}
+                Renderer2DLayer(Render2DAPI* api)
+                    :Layer("Renderer2D"), m_API(api) {}
 
                 virtual void OnAttach() override { m_API->Init(); }
-                virtual void OnDetach() override { m_API->~RenderAPI(); }
+                virtual void OnDetach() override { m_API->~Render2DAPI(); }
                 virtual void OnDraw() override { m_API->OnDraw(); }
                 virtual void OnUpdate(Timestep ts) override { m_API->OnUpdate(); }
                 virtual void OnEvent(Event::Event&) override {}
             private:
-                RenderAPI* m_API;
+                Render2DAPI* m_API;
             };
 
-            RenderAPItype m_renderapi;
-            RendererLayer m_Layer;
+            Render2DAPItype m_renderapi;
+            Renderer2DLayer m_Layer;
         };
 
     }

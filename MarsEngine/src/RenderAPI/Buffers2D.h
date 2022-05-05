@@ -32,11 +32,11 @@ namespace ME
             default:               return 0;
             }
         }
-        class VertexBuffer
+        class VertexBuffer2D
         {
         public:
-            VertexBuffer() = default;
-            virtual ~VertexBuffer() = default;
+            VertexBuffer2D() = default;
+            virtual ~VertexBuffer2D() = default;
 
             virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
 
@@ -49,11 +49,11 @@ namespace ME
             virtual inline void ClearBufferOnDestroy(bool mode) = 0;
         };
 
-        class IndexBuffer
+        class IndexBuffer2D
         {
         public:
-            IndexBuffer() = default;
-            virtual ~IndexBuffer() = default;
+            IndexBuffer2D() = default;
+            virtual ~IndexBuffer2D() = default;
 
             virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
 
@@ -75,16 +75,16 @@ namespace ME
             char normalized;
         };
 
-        class VertexBufferLayout
+        class VertexBufferLayout2D
         {
         private:
             std::vector<VertexBufferElement> m_Elements;
             unsigned int m_Stride;
         public:
-            VertexBufferLayout()
+            VertexBufferLayout2D()
                 : m_Stride(0) {};
 
-            ~VertexBufferLayout() {}
+            ~VertexBufferLayout2D() {}
 
             void push(unsigned int type, unsigned int count)
             {
@@ -98,13 +98,13 @@ namespace ME
             inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(ME_DATATYPE); }
         };
 
-        class VertexArray
+        class VertexArray2D
         {
         public:
-            VertexArray() = default;
-            virtual ~VertexArray() = default;
+            VertexArray2D() = default;
+            virtual ~VertexArray2D() = default;
 
-            virtual void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout) = 0;
+            virtual void AddBuffer(const VertexBuffer2D& vertexbuffer, const VertexBufferLayout2D& layout) = 0;
 
             virtual void Bind() const = 0;
             virtual void unBind() const = 0;

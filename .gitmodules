@@ -13,3 +13,6 @@
 [submodule "MarsEngine/src/Core/Memory"]
 	path = MarsEngine/src/Core/Memory
 	url = https://github.com/VikramSGIT/Memory
+[submodule "MarsEngine/src/Vender/spdlog"]
+	path = MarsEngine/src/Vender/spdlog
+	url = https://github.com/gabime/spdlog

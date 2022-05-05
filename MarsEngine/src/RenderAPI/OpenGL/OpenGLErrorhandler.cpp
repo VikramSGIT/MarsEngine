@@ -1,4 +1,4 @@
-#include "OpenGLErrorHandle.h"
+#include "OpenGLErrorHandler.h"
 
 namespace ME
 {

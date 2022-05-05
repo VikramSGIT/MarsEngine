@@ -1,8 +1,8 @@
  #pragma once
  #include "MarsHeader.h"
-#include "RenderAPI/Buffers.h"
+#include "RenderAPI/Buffers2D.h"
  
- #include "OpenGLErrorHandle.h"
+ #include "RenderAPI\OpenGL\OpenGLErrorhandler.h"
  #include "GL/glew.h"
 
 namespace ME
@@ -11,16 +11,16 @@ namespace ME
     {
         namespace OpenGL
         {
-            class OpenGLVertexBuffer : public VertexBuffer
+            class OpenGL2DVertexBuffer : public VertexBuffer2D
             {
             private:
                 unsigned int m_RendererID = 0, m_Filled = 0;
                 bool Emptybuffer, ClearBuffer = true;
             public:
-                OpenGLVertexBuffer(const ME_DATATYPE* data, unsigned int size, unsigned int mode);
-                OpenGLVertexBuffer(const unsigned int& RendererID);
-                OpenGLVertexBuffer(const unsigned int& size, const unsigned int& mode);
-                ~OpenGLVertexBuffer();
+                OpenGL2DVertexBuffer(const ME_DATATYPE* data, unsigned int size, unsigned int mode);
+                OpenGL2DVertexBuffer(const unsigned int& RendererID);
+                OpenGL2DVertexBuffer(const unsigned int& size, const unsigned int& mode);
+                ~OpenGL2DVertexBuffer();
 
                 void BufferPostRenderData(const void* data, const unsigned int& count, const unsigned int& offset) override;
                 void ClearBufferOnDestroy(bool mode) override { ClearBuffer = mode; }

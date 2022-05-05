@@ -1,26 +1,31 @@
+#ifndef ME_OPENGL2DINDEXBUFFER
+#define ME_OPENGL2DINDEXBUFFER
+
 #pragma  once
+
 #include "MarsHeader.h"
-#include "RenderAPI/Buffers.h"
+#include "RenderAPI/Buffers2D.h"
 
 #include "GL/glew.h"
-#include "OpenGLErrorhandle.h"
+#include "RenderAPI/OpenGL/OpenGLErrorhandler.h"
+
 namespace ME
 {
     namespace Renderer
     {
         namespace OpenGL
         {
-            class OpenGLIndexBuffer : public IndexBuffer
+            class OpenGL2DIndexBuffer : public IndexBuffer2D
             {
             private:
                 unsigned int m_RendererID;
                 unsigned int m_Filled;
                 bool Emptyindex, ClearBuffer = true;
             public:
-                OpenGLIndexBuffer(const unsigned int* data, unsigned int count, unsigned int mode);
-                OpenGLIndexBuffer(const unsigned int& RendererID);
-                OpenGLIndexBuffer(const unsigned int size, const unsigned int& mode);
-                ~OpenGLIndexBuffer();
+                OpenGL2DIndexBuffer(const unsigned int* data, unsigned int count, unsigned int mode);
+                OpenGL2DIndexBuffer(const unsigned int& RendererID);
+                OpenGL2DIndexBuffer(const unsigned int size, const unsigned int& mode);
+                ~OpenGL2DIndexBuffer();
 
                 void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) override;
                 void ClearBufferOnDestroy(bool mode) override { ClearBuffer = mode; }
@@ -35,3 +40,5 @@ namespace ME
         }
     }
 }
+
+#endif

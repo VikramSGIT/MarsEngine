@@ -5,8 +5,8 @@
 #include "Core/Memory/Vector.h"
 
 #include "Core/Entity.h"
-#include "Buffers.h"
-#include "Shader.h"
+#include "RenderAPI\Buffers2D.h"
+#include "RenderAPI\Shader2D.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
 #include "Vender/glm/glm/glm.hpp"
 #include "Addons/Addon.h"
@@ -162,7 +162,7 @@ namespace ME
 
 		virtual inline size_t GetTotalVertices() const { return total_vertices; }
 		virtual inline size_t GetTotalIndices() const { return total_indices; }
-		virtual inline Ref<Renderer::VertexBufferLayout> GetLayout() const { return m_Layout; }
+		virtual inline Ref<Renderer::VertexBufferLayout2D> GetLayout() const { return m_Layout; }
 		virtual const std::vector<std::pair<Mesh*, unsigned int>> GetUpdate()
 		{
 			if (m_MeshUpdates.size())
@@ -192,7 +192,7 @@ namespace ME
 			}
 		}
 
-		Ref<Renderer::VertexBufferLayout> m_Layout;
+		Ref<Renderer::VertexBufferLayout2D> m_Layout;
 		std::vector <Ref<Mesh>> m_Meshes;
 		std::vector<std::pair<Mesh*, unsigned int>> m_MeshUpdates;
 

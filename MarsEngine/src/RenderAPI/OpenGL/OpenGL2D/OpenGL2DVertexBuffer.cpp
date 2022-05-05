@@ -1,4 +1,4 @@
-#include "OpenGLVertexBuffer.h"
+#include "OpenGL2DVertexBuffer.h"
 
 namespace ME
 {
@@ -6,7 +6,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGLVertexBuffer::OpenGLVertexBuffer(const ME_DATATYPE* data, unsigned int size, unsigned int mode)
+            OpenGL2DVertexBuffer::OpenGL2DVertexBuffer(const ME_DATATYPE* data, unsigned int size, unsigned int mode)
                 :Emptybuffer(false), m_RendererID(0)
             {
 
@@ -17,7 +17,7 @@ namespace ME
                 GLLogCall(glBufferData(GL_ARRAY_BUFFER, size * sizeof(ME_DATATYPE), data, mode));
             }
 
-            OpenGLVertexBuffer::OpenGLVertexBuffer(const unsigned int& RendererID)
+            OpenGL2DVertexBuffer::OpenGL2DVertexBuffer(const unsigned int& RendererID)
                 :Emptybuffer(true), m_RendererID(RendererID)
             {
                 GLClearError();
@@ -27,7 +27,7 @@ namespace ME
 
             }
 
-            OpenGLVertexBuffer::OpenGLVertexBuffer(const unsigned int& size, const unsigned int& mode)
+            OpenGL2DVertexBuffer::OpenGL2DVertexBuffer(const unsigned int& size, const unsigned int& mode)
                 :Emptybuffer(true), m_RendererID(0)
             {
 
@@ -37,7 +37,7 @@ namespace ME
                 GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
                 GLLogCall(glBufferData(GL_ARRAY_BUFFER, size, nullptr, mode));
             }
-            OpenGLVertexBuffer::~OpenGLVertexBuffer()
+            OpenGL2DVertexBuffer::~OpenGL2DVertexBuffer()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -47,7 +47,7 @@ namespace ME
                     GLLogCall(glDeleteBuffers(1, &m_RendererID));
                 }
             }
-            void OpenGLVertexBuffer::Bind() const
+            void OpenGL2DVertexBuffer::Bind() const
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -55,7 +55,7 @@ namespace ME
                 GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
             }
 
-            void OpenGLVertexBuffer::BufferPostRenderData(const void* data, const unsigned int& count, const unsigned int& offset)
+            void OpenGL2DVertexBuffer::BufferPostRenderData(const void* data, const unsigned int& count, const unsigned int& offset)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -65,7 +65,7 @@ namespace ME
                 unBind();
                 m_Filled += count;
             }
-            void OpenGLVertexBuffer::unBind() const
+            void OpenGL2DVertexBuffer::unBind() const
             {
 
                 ME_PROFILE_TRACE_CALL();

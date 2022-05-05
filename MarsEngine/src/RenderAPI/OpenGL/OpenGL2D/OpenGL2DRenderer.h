@@ -1,15 +1,20 @@
-#pragma once
-#include "MarsHeader.h"
-#include "RenderAPI/Buffers.h"
+#ifndef ME_OPENGL2DRENDERER
+#define ME_OPENGL2DRENDERER
 
-#include "OpenGLVertexArray.h"
-#include "OpenGLIndexBuffer.h"
-#include "OpenGLShader.h"
+#pragma once
+
+#include "MarsHeader.h"
+#include "RenderAPI/Buffers2D.h"
+
+#include "RenderAPI/Renderer2D.h"
+
+#include "OpenGL2DVertexArray.h"
+#include "OpenGL2DIndexBuffer.h"
+#include "OpenGL2DShader.h"
 #include "Window/Layers/BasicLayer.h"
 #include "Vender/glm/glm/glm.hpp"
-#include "RenderAPI/Renderer.h"
 #include "GL/glew.h"
-#include "OpenGLErrorhandle.h"
+#include "RenderAPI\OpenGL\OpenGLErrorhandler.h"
 #include "Core/Logger.h"
 
 #include <iostream>
@@ -23,13 +28,13 @@ namespace ME
     {
         namespace OpenGL
         {
-            class OpenGLRendererAPI : public RenderAPI
+            class OpenGL2DRendererAPI : public Render2DAPI
             {
             private:
                 bool Ready = false, LiveStreamData = true;
                 unsigned int indexoffset = 0;
                 glm::vec4 m_clearcolor;
-                Ref<Shader> m_Shader;
+                Ref<Shader2D> m_Shader;
                 std::vector<Ref<MeshQueue>> m_RenderQueue;
                 std::vector <unsigned int> vertexbuffercache;
                 std::vector<unsigned int> indexbuffercache;
@@ -39,8 +44,8 @@ namespace ME
                 void CheckBufferUpdate(const unsigned int& id);
                 void ClearBufferCache();
             public:
-                OpenGLRendererAPI();
-                ~OpenGLRendererAPI();
+                OpenGL2DRendererAPI();
+                ~OpenGL2DRendererAPI();
 
                 virtual void Init() override;
                 virtual void Clear() const override;
@@ -50,10 +55,10 @@ namespace ME
                 virtual void OnDraw() override;
                 virtual void OnEvent(Event::Event& e) override;
 
-                virtual bool SwitchAPI(const RenderAPItype api);
+                virtual bool SwitchAPI(const Render2DAPItype api);
 
                 virtual void SetClearColor(const glm::vec4& color) override;
-                virtual void SetShader(const Ref<Shader>& shader) override;
+                virtual void SetShader(const Ref<Shader2D>& shader) override;
                 virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
                 virtual inline std::vector<Ref<MeshQueue>> GetRenderQueue() override { return m_RenderQueue; }
             };
@@ -61,3 +66,5 @@ namespace ME
         }
     }
 }
+
+#endif

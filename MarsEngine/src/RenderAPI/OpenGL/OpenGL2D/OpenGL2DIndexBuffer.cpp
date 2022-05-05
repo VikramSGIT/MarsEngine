@@ -1,4 +1,4 @@
-#include "OpenGLIndexBuffer.h"
+#include "OpenGL2DIndexBuffer.h"
 
 namespace ME
 {
@@ -6,7 +6,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int* data, unsigned int count, const unsigned int mode)
+            OpenGL2DIndexBuffer::OpenGL2DIndexBuffer(const unsigned int* data, unsigned int count, const unsigned int mode)
                 :m_Filled(0), m_RendererID(0), Emptyindex(false)
             {
 
@@ -16,7 +16,7 @@ namespace ME
                 GLLogCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID));
                 GLLogCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, mode));
             }
-            OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int& RendererID)
+            OpenGL2DIndexBuffer::OpenGL2DIndexBuffer(const unsigned int& RendererID)
                 :m_Filled(NULL), m_RendererID(RendererID), Emptyindex(true)
             {
                 GLClearError();
@@ -25,7 +25,7 @@ namespace ME
                 ME_CORE_CRITICAL(!GLPrintError("glBindBuffer", __FILE__, __LINE__), "Can't load IndexBuffer with ID");
                 ClearBuffer = false;
             }
-            OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int size, const unsigned int& mode)
+            OpenGL2DIndexBuffer::OpenGL2DIndexBuffer(const unsigned int size, const unsigned int& mode)
                 :m_Filled(0), m_RendererID(0), Emptyindex(true)
             {
                 ME_PROFILE_TRACE_CALL();
@@ -35,7 +35,7 @@ namespace ME
                 GLLogCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, nullptr, mode));
 
             }
-            OpenGLIndexBuffer::~OpenGLIndexBuffer()
+            OpenGL2DIndexBuffer::~OpenGL2DIndexBuffer()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -44,7 +44,7 @@ namespace ME
                     GLLogCall(glDeleteBuffers(1, &m_RendererID));
                 }
             }
-            void OpenGLIndexBuffer::BufferPostRenderData(const void* data, const unsigned int& count, const unsigned int& offset)
+            void OpenGL2DIndexBuffer::BufferPostRenderData(const void* data, const unsigned int& count, const unsigned int& offset)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -54,14 +54,14 @@ namespace ME
                 unBind();
                 m_Filled += count;
             }
-            void OpenGLIndexBuffer::Bind() const
+            void OpenGL2DIndexBuffer::Bind() const
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 GLLogCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID));
             }
-            void OpenGLIndexBuffer::unBind() const
+            void OpenGL2DIndexBuffer::unBind() const
             {
 
                 ME_PROFILE_TRACE_CALL();
