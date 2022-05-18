@@ -1,5 +1,5 @@
 #ifndef ME_WINDOWSINPUT
-#define ME_WINDWOSINPUT
+#define ME_WINDOWSINPUT
 
 #include "MarsHeader.h"
 #include "Window/Input.h"

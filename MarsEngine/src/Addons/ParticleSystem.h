@@ -1,15 +1,16 @@
-#pragma once
+#ifndef ME_PARTICLESYSTEM
+#define ME_PARTICLESYSTEM
 
-#include "MarsHeader.h"
+#pragma once
 
 #include <vector>
 #include <algorithm>
 
 #include "Addon.h"
-#include "Utilites/Timer.h"
-#include "Utilites/Random Engine.h"
+#include "Engine Utilites/Timer.h"
+#include "Engine Utilites/Random Engine.h"
 #include "Window/Events/Event.h"
-#include "RenderAPI/Renderer.h"
+#include "RenderAPI/Renderer2D.h"
 
 namespace ME
 {
@@ -19,21 +20,21 @@ namespace ME
 		{
 			Utils::Time::milliseconds lifetime = 5;
 			unsigned int count = 10;
-			Ref<Mesh> parent;
-			glm::vec3 emitvelocity;
+			Ref<Mesh2D> parent;
+			glm::vec2 emitvelocity;
 			glm::vec4 color;
 			glm::mat4 transform = glm::identity<glm::mat4>();
 		};
-		class ParticleSystem : public MeshAddon
+		class ParticleSystem2D : public MeshAddon2D
 		{
 		public:
-			ParticleSystem(const ParticleProps& props);
-			~ParticleSystem() = default;
+			ParticleSystem2D(const ParticleProps& props);
+			~ParticleSystem2D() = default;
 
-			void Emit(const glm::vec3& veloctiy);
+			void Emit(const glm::vec2& veloctiy);
 			void OnUpdate();
 
-			virtual const std::vector<Ref<Mesh>>& GetMeshes() const override { return m_Children; }
+			virtual const std::vector<Ref<Mesh2D>>& GetMeshes() const override { return m_Children; }
 			inline const size_t GetCount() const { return m_Count; }
 			inline const size_t GetAliveCount() const { return m_AliveParticles; }
 		private:
@@ -51,7 +52,7 @@ namespace ME
 			}
 
 			size_t m_Count, m_AliveParticles;
-			glm::vec3 m_Velocity;
+			glm::vec2 m_Velocity;
 			glm::vec4 m_Color;
 			glm::mat4 m_Transform;
 			Utils::Time::seconds m_Lifetime;
@@ -59,9 +60,11 @@ namespace ME
 			Utils::Time::Timer<Utils::Time::Precision::MICRO> timer;
 			Utils::Random<float> random;
 			std::vector<Particle> m_Particles;
-			std::vector<Ref<Mesh>> m_Children;
-			Ref<Mesh> m_Parent;
+			std::vector<Ref<Mesh2D>> m_Children;
+			Ref<Mesh2D> m_Parent;
 			bool m_Emitting = false;
 		};
 	}
 }
+
+#endif

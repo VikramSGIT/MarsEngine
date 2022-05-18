@@ -1,7 +1,7 @@
 #ifndef ME_UUID
 #define ME_UUID
 
-#include "MarsHeader.h"
+#pragma once
 
 #include <xhash>
 

@@ -32,11 +32,11 @@ namespace ME
             default:               return 0;
             }
         }
-        class VertexBuffer2D
+        class VertexBuffer
         {
         public:
-            VertexBuffer2D() = default;
-            virtual ~VertexBuffer2D() = default;
+            VertexBuffer() = default;
+            virtual ~VertexBuffer() = default;
 
             virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
 
@@ -49,11 +49,11 @@ namespace ME
             virtual inline void ClearBufferOnDestroy(bool mode) = 0;
         };
 
-        class IndexBuffer2D
+        class IndexBuffer
         {
         public:
-            IndexBuffer2D() = default;
-            virtual ~IndexBuffer2D() = default;
+            IndexBuffer() = default;
+            virtual ~IndexBuffer() = default;
 
             virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
 
@@ -75,16 +75,16 @@ namespace ME
             char normalized;
         };
 
-        class VertexBufferLayout2D
+        class VertexBufferLayout
         {
         private:
             std::vector<VertexBufferElement> m_Elements;
             unsigned int m_Stride;
         public:
-            VertexBufferLayout2D()
+            VertexBufferLayout()
                 : m_Stride(0) {};
 
-            ~VertexBufferLayout2D() {}
+            ~VertexBufferLayout() {}
 
             void push(unsigned int type, unsigned int count)
             {
@@ -96,18 +96,6 @@ namespace ME
 
             inline const unsigned int GetStride() const { return m_Stride; }
             inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(ME_DATATYPE); }
-        };
-
-        class VertexArray2D
-        {
-        public:
-            VertexArray2D() = default;
-            virtual ~VertexArray2D() = default;
-
-            virtual void AddBuffer(const VertexBuffer2D& vertexbuffer, const VertexBufferLayout2D& layout) = 0;
-
-            virtual void Bind() const = 0;
-            virtual void unBind() const = 0;
         };
     }
 }

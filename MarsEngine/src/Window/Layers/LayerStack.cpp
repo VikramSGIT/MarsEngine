@@ -1,3 +1,4 @@
+#include "MarsHeader.h"
 #include "LayerStack.h"
 namespace ME
 {
@@ -13,7 +14,6 @@ namespace ME
                 for (Ref<Layer> layer : m_layerstack)
                 {
                     layer->OnDetach();
-                    layer.reset();
                 }
             }
 
@@ -44,8 +44,8 @@ namespace ME
                 auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_TotalLayers, layer);
                 if (it != m_layerstack.begin() + m_TotalLayers)
                     layer->OnDetach();
-                    m_layerstack.erase(it);
-                    m_TotalLayers--;
+                m_layerstack.erase(it);
+                m_TotalLayers--;
             }
         }
     }

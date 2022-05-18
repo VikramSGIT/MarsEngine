@@ -1,22 +1,21 @@
 #ifndef MARTIAN
 #define MARTIAN
 
-#include "MarsHeader.h"
-#include "Core/Memory/Vector.h"
+#pragma once
 
-#include "Window/Window.h"
-#include "Window/Input.h"
-#include "RenderAPI/OpenGL/OpenGLRenderer.h"
-#include "RenderAPI/OpenGL/OpenGLShader.h"
+#include "RenderAPI/OpenGL/OpenGL2D/OpenGL2DRenderer.h"
+#include "RenderAPI\OpenGL\OpenGLShader.h"
 #include "Window/Layers/Layer.h"
-#include "Core/Utilites/TimeStep.h"
-#include "Addons/ParticleSystem.h"
+
+#include "Modules/2D/Mesh2D.h"
 
 class Martian : public ME::Window::Layer::Layer
 {
 public:
 	Martian()
-		:Layer("Martian"), renderer(ME::CreateRef<ME::Renderer::OpenGL::OpenGLRendererAPI>()) {}
+		:Layer("Martian"), renderer(ME::CreateRef<ME::Renderer::OpenGL::OpenGL2DRendererAPI>()) {}
+
+	~Martian() = default;
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
 	virtual void OnUpdate(ME::Timestep ts) override;
@@ -24,11 +23,11 @@ public:
 	virtual void OnEvent(ME::Event::Event& e) override;
 private:
 	
-	ME::Ref<ME::Renderer::RenderAPI> renderer;
+	ME::Ref<ME::Renderer::Render2DAPI> renderer;
 	ME::Ref<ME::Renderer::Shader> shader;
-	ME::Ref<ME::Addon::ParticleSystem> particlesystem;
-	ME::Ref<ME::Mesh> Player;
-	std::vector<ME::Ref<ME::Mesh>> obj;
+	ME::Ref<ME::Mesh2D> Player;
+	ME::Ref<ME::Renderer::OpenGL::OpenGLTexture> tex;
+	std::vector<ME::Ref<ME::Mesh2D>> obj;
 };
 
 #endif

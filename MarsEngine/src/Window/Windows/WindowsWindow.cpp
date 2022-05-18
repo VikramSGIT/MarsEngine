@@ -179,7 +179,10 @@ namespace ME
                 --s_GLFWWindowCount;
 
                 if (s_GLFWWindowCount == 0)
+                {
                     glfwTerminate();
+                    delete Input::Input::Get();
+                }
             }
 
             void WindowsWindow::SetVSync(bool enable)

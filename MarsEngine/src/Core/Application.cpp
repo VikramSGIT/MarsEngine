@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Window/Events/WindowEvent.h"
 #include "Window/Windows/WindowsWindow.h"
+#include "Core/Utilites/Ref.h"
 
 namespace ME
 {
@@ -17,7 +18,6 @@ namespace ME
 
     Application::~Application()
     {
-        delete Window::Input::Input::Get();
         delete m_Window;
     }
 

@@ -1,14 +1,10 @@
-#ifndef ME_OPENGL2DSHADER
-#define ME_OPENGL2DSHADER
-
 #pragma once
-
 #include "MarsHeader.h"
-#include "RenderAPI\Buffers2D.h"
+#include "RenderAPI/Buffers.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
 #include "GL/glew.h"
-#include "RenderAPI\OpenGL\OpenGLErrorhandler.h"
-#include "RenderAPI\Shader2D.h"
+#include "OpenGLErrorHandler.h"
+#include "RenderAPI\Shader.h"
 
 #include <string>
 #include <unordered_map>
@@ -28,7 +24,7 @@ namespace ME
                 std::string FragmentShader;
             };
 
-            class OpenGL2DShader : public Shader2D
+            class OpenGLShader : public Shader
             {
             private:
                 unsigned int m_RendererID;
@@ -41,8 +37,8 @@ namespace ME
                 unsigned int CompileShader(unsigned int type, const std::string& program);
 
             public:
-                OpenGL2DShader(const std::string& filepath);
-                ~OpenGL2DShader();
+                OpenGLShader(const std::string& filepath);
+                ~OpenGLShader();
 
                 void Bind() override;
                 void unBind() override;
@@ -56,5 +52,3 @@ namespace ME
         }
     }
 }
-
-#endif

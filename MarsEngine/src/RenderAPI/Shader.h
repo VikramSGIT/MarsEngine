@@ -1,7 +1,5 @@
-#ifndef ME_SHADER2D
-#define ME_SHADER2D
-
-#pragma once
+#ifndef ME_SHADER
+#define ME_SHADER
 
 #include "MarsHeader.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
@@ -12,10 +10,10 @@ namespace ME
 {
 	namespace Renderer
 	{
-		class Shader2D
+		class Shader
 		{
 		public:
-			virtual ~Shader2D() = default;
+			virtual ~Shader() = default;
 
 			virtual void Bind() = 0;
 			virtual void unBind() = 0;

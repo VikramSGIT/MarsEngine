@@ -1,11 +1,7 @@
-#ifndef ME_OPENGL2DTEXTURE
-#define ME_OPENGL2DTEXTURE
-
 #pragma once
-
 #include "MarsHeader.h"
 
-#include "RenderAPI\OpenGL\OpenGLErrorhandler.h"
+#include "OpenGLErrorHandler.h"
 #include "GL/glew.h"
 
 #include <string>
@@ -23,8 +19,7 @@ namespace ME
                 int BPP = 0;
             };
 
-
-            class OpenGL2DTexture
+            class OpenGLTexture
             {
             private:
                 unsigned int m_RendererID;
@@ -33,8 +28,8 @@ namespace ME
                 Dimension m_Dimension;
                 unsigned int Slot;
             public:
-                OpenGL2DTexture(const std::string filepath);
-                ~OpenGL2DTexture();
+                OpenGLTexture(const std::string filepath);
+                ~OpenGLTexture();
 
                 void Bind(unsigned int slot = 0);
                 void unBind() const;
@@ -45,5 +40,3 @@ namespace ME
         }
     }
 }
-
-#endif

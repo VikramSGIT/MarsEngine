@@ -1,11 +1,12 @@
+#include "MarsHeader.h"
 #include "ParticleSystem.h"
 
 namespace ME
 {
 	namespace Addon
 	{
-		ParticleSystem::ParticleSystem(const ParticleProps& props)
-			:m_Count(props.count), m_Lifetime(props.lifetime), m_AliveParticles(0), m_Velocity({0.0f, 0.0f, 0.0f}), m_Color({0.0f, 0.0f, 0.0f, 0.0f})
+		ParticleSystem2D::ParticleSystem2D(const ParticleProps& props)
+			:m_Count(props.count), m_Lifetime(props.lifetime), m_AliveParticles(0), m_Velocity({0.0f, 0.0f}), m_Color({0.0f, 0.0f, 0.0f, 0.0f})
 			, m_Parent(props.parent) , m_Transform(props.transform)
 		{
 			m_Color = props.color;
@@ -18,12 +19,12 @@ namespace ME
 			for (unsigned int i = 0; i < m_Count; i++)
 			{
 				particle.id = i;
-				m_Children.emplace_back(CreateRef<Mesh>(*m_Parent));
+				m_Children.emplace_back(CreateRef<Mesh2D>(*m_Parent));
 				m_Particles.emplace_back(particle);
 			}
 		}
 
-		void ParticleSystem::Emit(const glm::vec3& veloctiy)
+		void ParticleSystem2D::Emit(const glm::vec2& veloctiy)
 		{
 			if (m_AliveParticles < m_Count)
 			{
@@ -48,7 +49,7 @@ namespace ME
 				m_Children[it->id]->TranslateTo(veloctiy);
 			}
 		}
-		void ParticleSystem::OnUpdate()
+		void ParticleSystem2D::OnUpdate()
 		{
 			if (timer.TimeElapsed()[0] > Utils::Time::microseconds(1ll))
 			{
@@ -56,7 +57,7 @@ namespace ME
 				{
 					m_Particles[i].timeleft.m_Time--;
 					m_Children[i]->Transform(m_Transform);
-					m_Children[i]->Rotate({ 0.0f, 0.0f, random() * 5.0f });
+					m_Children[i]->Rotate(random() * 5.0f);
 				}
 				timer.Reset();
 			}

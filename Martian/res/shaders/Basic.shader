@@ -2,7 +2,7 @@
 
     #version 400 core
 
-    layout(location = 0) in vec4 position;
+    layout(location = 0) in vec3 position;
     layout(location = 1) in vec2 TexCoord;
     layout(location = 2) in float index;
 
@@ -13,7 +13,8 @@
 
     void main()
     {
-        gl_Position = u_MVP * position;
+        vec4 pos = vec4(position, 1);
+        gl_Position = u_MVP * pos;
         v_TexCoord = TexCoord;
         v_index = index;
     }

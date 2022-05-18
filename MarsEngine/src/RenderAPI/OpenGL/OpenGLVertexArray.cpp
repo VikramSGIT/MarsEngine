@@ -1,4 +1,4 @@
-#include "OpenGL2DVertexArray.h"
+#include "OpenGLVertexArray.h"
 
 namespace ME
 {
@@ -6,7 +6,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGL2DVertexArray::OpenGL2DVertexArray()
+            OpenGLVertexArray::OpenGLVertexArray()
                 :m_RendererID(1)
             {
 
@@ -15,7 +15,7 @@ namespace ME
                 //GLLogCall(glGenVertexArrays(1, &m_RendererID));
             }
 
-            OpenGL2DVertexArray::~OpenGL2DVertexArray()
+            OpenGLVertexArray::~OpenGLVertexArray()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -23,7 +23,7 @@ namespace ME
                 //GLLogCall(glDeleteVertexArrays(1, &m_RendererID));
             }
 
-            void OpenGL2DVertexArray::AddBuffer(const VertexBuffer2D& vertexbuffer, const VertexBufferLayout2D& layout)
+            void OpenGLVertexArray::AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -43,7 +43,7 @@ namespace ME
                 vertexbuffer.unBind();
             }
 
-            void OpenGL2DVertexArray::Bind() const
+            void OpenGLVertexArray::Bind() const
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -51,7 +51,7 @@ namespace ME
                 GLLogCall(glBindVertexArray(m_RendererID));
             }
 
-            void OpenGL2DVertexArray::unBind() const
+            void OpenGLVertexArray::unBind() const
             {
 
                 ME_PROFILE_TRACE_CALL();

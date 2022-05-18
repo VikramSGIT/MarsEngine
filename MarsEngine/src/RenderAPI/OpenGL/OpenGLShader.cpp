@@ -1,4 +1,4 @@
-#include "OpenGL2DShader.h"
+#include "OpenGLShader.h"
 
 namespace ME
 {
@@ -6,7 +6,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGL2DShader::OpenGL2DShader(const std::string& filepath)
+            OpenGLShader::OpenGLShader(const std::string& filepath)
                 :m_RendererID(0), m_Filepath(filepath)
             {
                 ME_PROFILE_TRACE_CALL();
@@ -15,7 +15,7 @@ namespace ME
                 m_RendererID = CreateShader(src.VertexShader, src.FragmentShader);
             }
 
-            OpenGL2DShader::~OpenGL2DShader()
+            OpenGLShader::~OpenGLShader()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -23,7 +23,7 @@ namespace ME
                 GLLogCall(glDeleteProgram(m_RendererID));
             }
 
-            void OpenGL2DShader::SetUniforms1i(const  std::string& name, const int& data)
+            void OpenGLShader::SetUniforms1i(const  std::string& name, const int& data)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -46,7 +46,7 @@ namespace ME
                 }
             }
 
-            void OpenGL2DShader::SetUniforms1f(const std::string& name, const float& data)
+            void OpenGLShader::SetUniforms1f(const std::string& name, const float& data)
             {
                 ME_PROFILE_TRACE_CALL();
 
@@ -59,7 +59,7 @@ namespace ME
                     m_UniformLocationCache[name] = location;
                 }
 
-                ME_CORE_CRITICAL(location != -1, "Cant pass the Uniforms!!")
+                ME_CORE_ERROR(location != -1, "Cant pass the Uniforms!!")
 
                 {
                     Bind();
@@ -68,7 +68,7 @@ namespace ME
                 }
             }
 
-            void OpenGL2DShader::SetUniformsMat4f(const std::string& name, const glm::mat4& matrix)
+            void OpenGLShader::SetUniformsMat4f(const std::string& name, const glm::mat4& matrix)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -91,7 +91,7 @@ namespace ME
                     std::cout << "Cant pass the Uniforms!!" << std::endl;
             }
 
-            void OpenGL2DShader::SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4)
+            void OpenGLShader::SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -114,7 +114,7 @@ namespace ME
                     std::cout << "Cant pass the Uniforms!!" << std::endl;
             }
 
-            void OpenGL2DShader::SetUniforms3f(const std::string& name, const float* data)
+            void OpenGLShader::SetUniforms3f(const std::string& name, const float* data)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -137,7 +137,7 @@ namespace ME
                     std::cout << "Cant pass the Uniforms!!" << std::endl;
             }
 
-            void OpenGL2DShader::Bind()
+            void OpenGLShader::Bind()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -148,7 +148,7 @@ namespace ME
                 }
             }
 
-            void OpenGL2DShader::unBind()
+            void OpenGLShader::unBind()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -160,14 +160,14 @@ namespace ME
                 }
             }
 
-            ShaderSource OpenGL2DShader::PharseShader(const std::string& filepath)
+            ShaderSource OpenGLShader::PharseShader(const std::string& filepath)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 std::ifstream stream(filepath);
 
-                ME_CORE_CRITICAL(!stream.good(), "Can't open Shader File!!");
+                ME_CORE_ERROR(!stream.good(), "Can't open Shader File!!");
 
                 enum class ShaderType
                 {
@@ -194,7 +194,7 @@ namespace ME
                 return { ss[0].str(), ss[1].str() };
             }
 
-            unsigned int OpenGL2DShader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+            unsigned int OpenGLShader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -214,7 +214,7 @@ namespace ME
                 return program;
             }
 
-            unsigned int OpenGL2DShader::CompileShader(unsigned int type, const std::string& program)
+            unsigned int OpenGLShader::CompileShader(unsigned int type, const std::string& program)
             {
 
                 ME_PROFILE_TRACE_CALL();
