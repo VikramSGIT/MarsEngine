@@ -6,11 +6,15 @@
 #define ME_ENTITYINIT() ME::InitEntityDB()
 #define ME_ENTITYCLEAR() ME::DestroyEntityDB()
 
-#define ME_CLASS_CONNECT(X) getName=[]()-> const char* {return X;}; InitEntity()
+#define ME_CLASS_CONNECT(X)											\
+public: \
+virtual bool isValid(const size_t& id = typeid(X).hash_code()) override { return typeid(X).hash_code() == id; }	\
+virtual const char* getName() override {return typeid(X).name();}
 
 #include "Utilites/UUID.h"
 
 #include <set>
+#include <unordered_map>
 
 namespace ME
 {
@@ -23,6 +27,7 @@ namespace ME
 	class Entity
 	{
 	public:
+		bool valid;
 		Entity();
 		virtual ~Entity();
 
@@ -30,11 +35,10 @@ namespace ME
 
 		bool operator==(const Entity& right) const { return m_UUID == right.m_UUID; }
 
-		void InitEntity();
-		const char* (*getName)(void);
+		virtual bool isValid(const size_t&) = 0;
+		virtual const char* getName() = 0;
 	private:
 		UUID m_UUID;
-
 		friend class EntityDB;
 	};
 
@@ -53,14 +57,10 @@ namespace ME
 			return nullptr;
 		}
 
-		inline size_t getAlive() { return m_Database.size(); } 
-		inline bool validate(const char* name) { return m_NameBase.end() != m_NameBase.find(name); }
-
+		inline size_t getAlive() { return m_Database.size(); }
 	private:
 		std::set<Entity*> m_Database;
-		std::set<std::string> m_NameBase;
-		friend class Entity;
-
+		
 		static EntityDB* s_EntityDB;
 
 		friend class Entity;

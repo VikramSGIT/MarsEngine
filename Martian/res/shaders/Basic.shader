@@ -24,15 +24,18 @@
 
     #version 400 core
 
+
     in vec2 v_TexCoord; 
     in float v_index;
     layout(location = 0) out vec4 color;
+
+    uniform sampler2D u_Texture;
 
     void main()
     {
       if (v_index == 1)
           color = vec4(0.023, 0.293, 1.0, 1.0);
       else
-        color = vec4(1.0, 1.0, 1.0, 1.0);
+        color = texture(u_Texture, v_TexCoord);
 
     }

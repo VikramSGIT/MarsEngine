@@ -115,6 +115,8 @@ namespace ME
 			m_ControlBlock = nullptr;
 		}
 
+		inline T* ptr() { return (T*)m_ControlBlock->Obj; }
+
 		T& operator*() { return *reinterpret_cast<T*>(m_ControlBlock->Obj); }
 		T* operator->() { return reinterpret_cast<T*>(m_ControlBlock->Obj); }
 		T const& operator*() const { return *reinterpret_cast<T*>(m_ControlBlock->Obj); }

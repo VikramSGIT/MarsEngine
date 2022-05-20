@@ -88,14 +88,11 @@ namespace ME
 	};
 
 	class Mesh : public Entity
-	{
+	{	ME_CLASS_CONNECT(Mesh)
 	public:
 
 		Mesh(const std::string& name)
-			:m_Name(name), m_MeshData(MeshData()), Ready(true) 
-		{
-			ME_CLASS_CONNECT("Mesh");
-		}
+			:m_Name(name), m_MeshData(MeshData()), Ready(true) {}
 		Mesh(const Mesh& mesh);
 		Mesh(Mesh&& mesh) noexcept;
 		~Mesh();

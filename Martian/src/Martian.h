@@ -4,6 +4,7 @@
 #pragma once
 
 #include "RenderAPI/OpenGL/OpenGL2D/OpenGL2DRenderer.h"
+#include "RenderAPI/OpenGL/OpenGLTexture.h"
 #include "RenderAPI\OpenGL\OpenGLShader.h"
 #include "Window/Layers/Layer.h"
 

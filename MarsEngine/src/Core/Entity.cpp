@@ -14,18 +14,16 @@ void ME::DestroyEntityDB()
 { 
 	ME_CORE_ERROR(ME::EntityDB::s_EntityDB->m_Database.size() != 0, std::to_string(ME::EntityDB::s_EntityDB->m_Database.size()).c_str());
 	for (auto a : ME::EntityDB::s_EntityDB->m_Database)
-		std::cout << a->getName() << std::endl;
+		std::cout << a->getName() << std::endl; //replace it with logger macros
 
 	delete ME::EntityDB::s_EntityDB;
 }
 
-void ME::Entity::InitEntity()
+
+ME::Entity::Entity()
 {
-	EntityDB::s_EntityDB->m_NameBase.insert(getName());
 	EntityDB::s_EntityDB->m_Database.insert(this);
 }
-
-ME::Entity::Entity() :getName(nullptr) {}
 
 ME::Entity::~Entity()
 {

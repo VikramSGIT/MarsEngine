@@ -102,7 +102,7 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
-                m_RenderQueue.push_back(meshqueue);
+                m_RenderQueue.emplace_back(meshqueue);
                 preprocessing.emplace_back(preprocessdata);
                 SetUpBuffers(meshqueue);
             }

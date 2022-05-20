@@ -8,30 +8,24 @@
 
 namespace ME
 {
-	template <typename upstreammemory = alloc_dealloc_UpstreamMemory> class String : public Entity
-	{
+	template <typename upstreammemory = ME::alloc_dealloc_UpstreamMemory> class String : public Entity
+	{	ME_CLASS_CONNECT(String)
 	public:	
-		String()
-			:m_Size(0), m_String((char*)upstreammemory::stref->allocate(1, "STRING: Allocating String"))
-		{
-			ME_CLASS_CONNECT("String");
 
+		String()
+			:m_Size(0), m_String((char*)upstreammemory::stref->allocate(1, "STRING: Allocating String")) 
+		{
 			m_String = '\0';
 		}
 
 		String(const char* string)
 			:m_Size(strlen(string))
 		{
-			ME_CLASS_CONNECT("String");
- 
 			m_String = (char*)upstreammemory::stref->allocate(m_Size + 1, "STRING: Allocating String");
 			memcpy(m_String, string, m_Size + 1);
 		}
 		String(const String& string)
 		{
-
-			ME_CLASS_CONNECT("String");
-
 			upstreammemory::stref->deallocate(m_String, m_Size + 1, "STRING: Deallocating old String");
 			m_Size = string.m_Size;
 			m_String = (char*)upstreammemory::stref->allocate(m_Size + 1, "STRING: Allocating String");
