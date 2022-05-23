@@ -18,9 +18,9 @@ namespace ME
 
 	Mesh2D::~Mesh2D()
 	{
-		dealloc(m_MeshData.vertex.vertex, m_MeshData.vertex.m_Size);
-		dealloc(m_MeshData.vertex.reset_vertex, m_MeshData.vertex.m_Size);
-		dealloc(m_MeshData.index.index, m_MeshData.index.m_Size);
+		dealloc(m_MeshData.vertex.vertex, m_MeshData.vertex.m_Size * sizeof(VERTEX2D));
+		dealloc(m_MeshData.vertex.reset_vertex, m_MeshData.vertex.m_Size * sizeof(VERTEX2D));
+		dealloc(m_MeshData.index.index, m_MeshData.index.m_Size* sizeof(unsigned int));
 	}
 
 	void Mesh2D::BufferVertices(const VERTEX2D* vertex, const unsigned int& count)
@@ -31,9 +31,9 @@ namespace ME
 		dealloc(m_MeshData.vertex.vertex, m_MeshData.vertex.m_Size);
 		dealloc(m_MeshData.vertex.reset_vertex, m_MeshData.vertex.m_Size);
 
-		m_MeshData.vertex.vertex = alloc<VERTEX2D>(count);
+		m_MeshData.vertex.vertex = allocarr<VERTEX2D>(count);
 		m_MeshData.vertex.m_Size = count;
-		m_MeshData.vertex.reset_vertex = alloc<VERTEX2D>(count);
+		m_MeshData.vertex.reset_vertex = allocarr<VERTEX2D>(count);
 
 		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX2D) * count);
 		memcpy(m_MeshData.vertex.reset_vertex, vertex, sizeof(VERTEX2D) * count);
@@ -46,7 +46,7 @@ namespace ME
 
 		dealloc(m_MeshData.index.begin(), m_MeshData.index.m_Size);
 
-		m_MeshData.index.index = alloc<unsigned int>(count);
+		m_MeshData.index.index = allocarr<unsigned int>(count);
 		m_MeshData.index.m_Size = count;
 
 		memcpy(m_MeshData.index.begin(), data, sizeof(unsigned int) * count);

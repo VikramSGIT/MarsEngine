@@ -69,7 +69,6 @@ namespace ME
 
         ME_PROFILE_TRACE_CALL();
 
-        Logger::GlobalLogger->SetLogging(true);
         m_Window->SetEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
         while (m_Running)

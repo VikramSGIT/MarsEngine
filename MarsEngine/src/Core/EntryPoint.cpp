@@ -9,7 +9,7 @@ int main(int, char**)
 {
     ME_LOGINIT();
     ME_CORE_INFO("MARS ENGINE STARTING....");
-    ME_MEMINIT();
+    ME_MEM_INIT();
     ME_ENTITYINIT();
     {
         ME::String s = "Hi";
@@ -18,7 +18,7 @@ int main(int, char**)
         ME::dealloc(app, sizeof(ME::Application));
     }
     ME_ENTITYCLEAR();
-    ME_MEMCLEAR();
+    ME_MEM_CLEAR();
     ME_CORE_INFO("MARS ENGINE SHUTDOWN....");
     ME_LOGDEINIT();
     return 0;

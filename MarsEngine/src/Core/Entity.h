@@ -8,7 +8,7 @@
 
 #define ME_CLASS_CONNECT(X)											\
 public: \
-virtual bool isValid(const size_t& id = typeid(X).hash_code()) override { return typeid(X).hash_code() == id; }	\
+virtual bool isValid(const type_info& id = typeid(X)) override { return typeid(X) == id; }	\
 virtual const char* getName() override {return typeid(X).name();}
 
 #include "Utilites/UUID.h"
@@ -27,7 +27,6 @@ namespace ME
 	class Entity
 	{
 	public:
-		bool valid;
 		Entity();
 		virtual ~Entity();
 
@@ -35,7 +34,7 @@ namespace ME
 
 		bool operator==(const Entity& right) const { return m_UUID == right.m_UUID; }
 
-		virtual bool isValid(const size_t&) = 0;
+		virtual bool isValid(const type_info& = typeid(Entity)) = 0;
 		virtual const char* getName() = 0;
 	private:
 		UUID m_UUID;

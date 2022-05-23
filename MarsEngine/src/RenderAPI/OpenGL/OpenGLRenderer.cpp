@@ -128,8 +128,8 @@ namespace ME
                 Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue->GetLayout();
                 unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
                 
-                SafePointer<VERTEX> vertexbuffer(alloc<VERTEX>(meshqueue->GetTotalVertices()), meshqueue->GetTotalVertices());
-                SafePointer<unsigned int> indexbuffer(alloc<unsigned int>(meshqueue->GetTotalIndices()), meshqueue->GetTotalIndices());
+                SafePointer<VERTEX> vertexbuffer(allocarr<VERTEX>(meshqueue->GetTotalVertices()), meshqueue->GetTotalVertices());
+                SafePointer<unsigned int> indexbuffer(allocarr<unsigned int>(meshqueue->GetTotalIndices()), meshqueue->GetTotalIndices());
 
 
                 for (Ref<Mesh> ms : *meshqueue)
@@ -149,8 +149,8 @@ namespace ME
                 Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>((ME_DATATYPE*)vertexbuffer, meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
                 Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(indexbuffer, meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
 
-                dealloc(vertexbuffer.Get(), meshqueue->GetTotalVertices());
-                dealloc(indexbuffer.Get(), meshqueue->GetTotalIndices());
+                dealloc(vertexbuffer.Get(), meshqueue->GetTotalVertices() * sizeof(VERTEX));
+                dealloc(indexbuffer.Get(), meshqueue->GetTotalIndices() * sizeof(unsigned int));
                 
                 vertexbufferobj->ClearBufferOnDestroy(false);
                 indexbufferobj->ClearBufferOnDestroy(false);

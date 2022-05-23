@@ -23,6 +23,8 @@ void Martian::OnAttach()
 {
 	app->GetWindow().SetVSync(true);
 
+	auto a = alloc<VERTEX2D>();
+
 	renderer->Init();
 	shader = CreateRef<Renderer::OpenGL::OpenGLShader>("res\\shaders\\Basic.shader");
 	renderer->SetShader(shader);
@@ -42,18 +44,12 @@ void Martian::OnAttach()
 			shader->SetUniforms1i("u_Texture", tex->GetSlot());
 		});
 
-	Mesh2D* ms = (Mesh2D*)Player.ptr();
-	std::cout << ms->isValid() << std::endl;
-
 	renderer->AddRenderSubmition(queue2, []() {});
 	glm::mat4 ortho = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
 	shader->SetUniformsMat4f("u_MVP", ortho);
 }
 
-void Martian::OnDetach()
-{
-	renderer.reset();
-}
+void Martian::OnDetach() {}
 
 void Martian::OnUpdate(Timestep ts)
 {

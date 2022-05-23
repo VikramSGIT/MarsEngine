@@ -66,7 +66,7 @@ namespace ME
 				if (m_ControlBlock->Count == 0)
 				{
 					((T*)m_ControlBlock->Obj)->~T();
-					upstreammemory::stref->deallocate(m_ControlBlock, m_ControlBlock->Size, "REF: Deallocating Control Block");
+					upstreammemory::stref->deallocate(m_ControlBlock, m_ControlBlock->Size, std::string("REF: Deallocating Control Block for ") + typeid(T).name());
 				}
 			}
 		}
@@ -132,7 +132,7 @@ namespace ME
 	template<typename T, typename ...Args, typename upstreammemory = alloc_dealloc_UpstreamMemory> auto CreateRef(Args&& ...args) 
 	{
 		Ref<T, upstreammemory> ref;
-		ref.m_ControlBlock = (ControlBlock<T, upstreammemory>*)(upstreammemory::stref->allocate(sizeof(ControlBlock<T, upstreammemory>), "REF: Allocating Control Block"));
+		ref.m_ControlBlock = (ControlBlock<T, upstreammemory>*)(upstreammemory::stref->allocate(sizeof(ControlBlock<T, upstreammemory>), std::string("REF: Allocating Control Block for ") + typeid(T).name()));
 		ref.m_ControlBlock->Count = 1;
 		ref.m_ControlBlock->Size = sizeof(ControlBlock<T, upstreammemory>);
 		new (ref.m_ControlBlock->Obj) T(args...);
