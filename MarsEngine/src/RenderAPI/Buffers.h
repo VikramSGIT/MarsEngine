@@ -1,9 +1,12 @@
 #ifndef ME_BUFFERS
 #define ME_BUFFERS
 
-#include "MarsHeader.h"
-#include "GL/glew.h"
+#pragma once
 
+#include "MarsHeader.h"
+#include "Core/Utilites/Ref.h"
+
+#include "GL/glew.h"
 #include <vector>
 
 namespace ME
@@ -32,11 +35,11 @@ namespace ME
             default:               return 0;
             }
         }
-        class VertexBuffer
+        class Vertexbuffer
         {
         public:
-            VertexBuffer() = default;
-            virtual ~VertexBuffer() = default;
+            Vertexbuffer() = default;
+            virtual ~Vertexbuffer() = default;
 
             virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
 
@@ -47,13 +50,25 @@ namespace ME
             virtual inline unsigned int GetFilledSize() const = 0;
             virtual inline unsigned int GetID() const = 0;
             virtual inline void ClearBufferOnDestroy(bool mode) = 0;
+
+            template<typename ...args> static Ref<Vertexbuffer> Create(args... Args)
+            {
+                switch (RenderAPI::GetAPI())
+                {
+                case RenderAPItype::ME_RENDERER_OPENGL:
+                case RenderAPItype::ME_RENDERER_OPENGL2D:
+                    return CreateRef<OpenGL::OpenGLVertexBuffer>(Args...);
+                default:ME_CORE_CRITICAL(true, "Unknow Render API type");
+                }
+                return nullptr;
+            }
         };
 
-        class IndexBuffer
+        class Indexbuffer
         {
         public:
-            IndexBuffer() = default;
-            virtual ~IndexBuffer() = default;
+            Indexbuffer() = default;
+            virtual ~Indexbuffer() = default;
 
             virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
 
@@ -64,6 +79,29 @@ namespace ME
             virtual inline unsigned int GetFilledSize() const = 0;
             virtual inline unsigned int GetID() const = 0;
             virtual inline void ClearBufferOnDestroy(bool mode) = 0;
+
+            template<typename ...args> static Ref<Indexbuffer> Create(args... Args)
+            {
+                switch (RenderAPI::GetAPI())
+                {
+                case RenderAPItype::ME_RENDERER_OPENGL:
+                case RenderAPItype::ME_RENDERER_OPENGL2D:
+                    return CreateRef<OpenGL::OpenGLIndexBuffer>(Args...);
+                default:ME_CORE_CRITICAL(true, "Unknow Render API type");
+                }
+                return nullptr;
+            }
+        };
+
+        struct FramebufferSpecification
+        {
+            uint32_t Height, Width, Samples = 1;
+        };
+
+        class Framebuffer
+        {
+        public:
+            static Ref<Framebuffer> Create(const FramebufferSpecification&);
         };
         //
         // OpenGL stuffs need to be hidden

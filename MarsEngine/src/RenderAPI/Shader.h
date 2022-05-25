@@ -1,8 +1,8 @@
 #ifndef ME_SHADER
 #define ME_SHADER
 
-#include "MarsHeader.h"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
+#include "Core/Utilites/Ref.h"
 
 #include <string>
 
@@ -23,6 +23,8 @@ namespace ME
 			virtual void SetUniforms1i(const std::string& name, const int& data) = 0;
 			virtual void SetUniforms1f(const  std::string& name, const float& data) = 0;
 			virtual void SetUniformsMat4f(const  std::string& name, const glm::mat4& matrix) = 0;
+
+			static Ref<Shader> Create(const std::string& filename);
 		};
 	}
 }

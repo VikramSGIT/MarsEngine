@@ -6,7 +6,7 @@
 #include "MarsHeader.h"
 #include "RenderAPI/Buffers.h"
 
-#include "RenderAPI/Renderer2D.h"
+#include "RenderAPI/Renderer.h"
 
 #include "RenderAPI\OpenGL\OpenGLVertexArray.h"
 #include "RenderAPI\OpenGL\OpenGLIndexBuffer.h"
@@ -28,7 +28,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            class OpenGL2DRendererAPI : public Render2DAPI
+            class OpenGL2DRendererAPI : public RenderAPI
             {
             private:
                 bool Ready = false, LiveStreamData = true;
@@ -47,20 +47,18 @@ namespace ME
                 OpenGL2DRendererAPI();
                 ~OpenGL2DRendererAPI();
 
-                virtual void Init() override;
-                virtual void Clear() const override;
                 virtual void AddRenderSubmition(const Ref<MeshQueue2D>& meshqueue, std::function<void()> preprocessdata) override;
+                virtual void AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata) override { ME_CORE_ERROR(true, "3D MeshQueue submitted to 2D Renderer"); }
 
-                virtual void OnUpdate() override;
+                virtual void OnAttach() override;
+                virtual void OnDetach() override;
+                virtual void OnUpdate(Timestep ts) override;
                 virtual void OnDraw() override;
                 virtual void OnEvent(Event::Event& e) override;
-
-                virtual bool SwitchAPI(const Render2DAPItype api);
 
                 virtual void SetClearColor(const glm::vec4& color) override;
                 virtual void SetShader(const Ref<Shader>& shader) override;
                 virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-                virtual inline std::vector<Ref<MeshQueue2D>> GetRenderQueue() override { return m_RenderQueue; }
             };
 
         }

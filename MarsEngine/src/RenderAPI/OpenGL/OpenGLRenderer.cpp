@@ -27,7 +27,6 @@ namespace ME
             OpenGLRendererAPI::OpenGLRendererAPI()
             :RenderAPI(RenderAPItype::ME_RENDERER_OPENGL)
             {
-
                 ME_PROFILE_TRACE_CALL();
             }
 
@@ -36,7 +35,6 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
-                ClearBufferCache();
             }
 
             void OpenGLRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
@@ -60,7 +58,7 @@ namespace ME
                 m_Shader = shader;
             }
 
-            void OpenGLRendererAPI::Init()
+            void OpenGLRendererAPI::OnAttach()
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -80,15 +78,7 @@ namespace ME
                 GLLogCall(glEnable(GL_BLEND));
             }
 
-            void OpenGLRendererAPI::OnUpdate()
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                Clear();
-            }
-
-            void OpenGLRendererAPI::Clear() const
+            void OpenGLRendererAPI::OnUpdate(Timestep ts)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -146,8 +136,8 @@ namespace ME
                     indexoffset += 1 + *std::max_element(ms->GetMeshData().index.begin(), ms->GetMeshData().index.end());
                 }
 
-                Ref<VertexBuffer> vertexbufferobj = CreateRef<OpenGLVertexBuffer>((ME_DATATYPE*)vertexbuffer, meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
-                Ref<IndexBuffer> indexbufferobj = CreateRef<OpenGLIndexBuffer>(indexbuffer, meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
+                Ref<Vertexbuffer> vertexbufferobj = Vertexbuffer::Create((ME_DATATYPE*)vertexbuffer.Get(), meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
+                Ref<Indexbuffer> indexbufferobj = Indexbuffer::Create(indexbuffer.Get(), meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
 
                 dealloc(vertexbuffer.Get(), meshqueue->GetTotalVertices() * sizeof(VERTEX));
                 dealloc(indexbuffer.Get(), meshqueue->GetTotalIndices() * sizeof(unsigned int));
@@ -165,13 +155,20 @@ namespace ME
 
                 for (std::pair<Mesh*, unsigned int> data : m_RenderQueue[id]->GetUpdate())
                 {
-                    Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[id]);
+                    Ref<Vertexbuffer> vertexbuffer = Vertexbuffer::Create(vertexbuffercache[id]);
                     vertexbuffer->BufferPostRenderData(data.first->GetMeshData().vertex.begin(), 
                         m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.first->GetMeshData().vertex.Size(), 
                         m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.second);
                     vertexbuffer->ClearBufferOnDestroy(false);
                     data.first->SetReady(true);
                 }
+            }
+
+            void OpenGLRendererAPI::OnDetach()
+            {
+                ME_PROFILE_TRACE_CALL();
+
+                ClearBufferCache();
             }
 
             void OpenGLRendererAPI::OnDraw()
@@ -193,8 +190,8 @@ namespace ME
 //              
                     preprocessing.at(i)();
 
-                    Ref<VertexBuffer> vertexbuffer = CreateRef<OpenGLVertexBuffer>(vertexbuffercache[i]);
-                    Ref<IndexBuffer> indexbuffer = CreateRef<OpenGLIndexBuffer>(indexbuffercache[i]);
+                    Ref<Vertexbuffer> vertexbuffer = Vertexbuffer::Create(vertexbuffercache[i]);
+                    Ref<Indexbuffer> indexbuffer = Indexbuffer::Create(indexbuffercache[i]);
                     Ref<OpenGLVertexArray> array = CreateRef<OpenGLVertexArray>();
 
                     vertexbuffer->ClearBufferOnDestroy(false);

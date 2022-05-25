@@ -2,6 +2,9 @@
 #include "Window/Events/WindowEvent.h"
 #include "Window/Windows/WindowsWindow.h"
 #include "Core/Utilites/Ref.h"
+#include "Logger.h"
+#include "Vender/glm/glm/glm.hpp"
+#include "Utilites/TimeStep.h"
 
 namespace ME
 {
@@ -10,7 +13,6 @@ namespace ME
     Application::Application()
         :m_Window(Window::Window::Create({ "MarsEngine" })), m_LastFrameTime(0)
     {
-
         ME_PROFILE_TRACE_CALL();
 
         s_Application = this;
@@ -73,7 +75,6 @@ namespace ME
 
         while (m_Running)
         {
-
             float curtime = (float)glfwGetTime(); // TODO: Make it glfw independant
             Timestep ts = curtime - m_LastFrameTime;
             m_LastFrameTime = curtime;
@@ -82,8 +83,8 @@ namespace ME
             {
                 layer->OnUpdate(ts);
                 layer->OnDraw();
+
             }
-            
             m_Window->OnUpdate();
         }
         METerminate();

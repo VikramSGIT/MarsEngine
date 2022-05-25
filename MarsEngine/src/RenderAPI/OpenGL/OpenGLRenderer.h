@@ -33,11 +33,12 @@ namespace ME
                 OpenGLRendererAPI();
                 ~OpenGLRendererAPI();
 
-                virtual void Init() override;
-                virtual void Clear() const override;
                 virtual void AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata) override;
+                virtual void AddRenderSubmition(const Ref<MeshQueue2D>& meshqueue, std::function<void()> preprocessdata) override { ME_CORE_ERROR(true, "2D MeshQueue submitted to 3D Renderer"); }
 
-                virtual void OnUpdate() override;
+                virtual void OnAttach() override;
+                virtual void OnDetach() override;
+                virtual void OnUpdate(Timestep ts) override;
                 virtual void OnDraw() override;
                 virtual void OnEvent(Event::Event& e) override;
 
@@ -46,7 +47,6 @@ namespace ME
                 virtual void SetClearColor(const glm::vec4& color) override;
                 virtual void SetShader(const Ref<Shader>& shader) override;
                 virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
-                virtual inline std::vector<Ref<MeshQueue>> GetRenderQueue() override { return m_RenderQueue; }
             };
 
         }

@@ -13,7 +13,7 @@ int main(int, char**)
     ME_ENTITYINIT();
     {
         ME::String s = "Hi";
-        auto app = ME::CreateApp();
+        auto app = ME::Application::CreateApp();
         app->Run();
         ME::dealloc(app, sizeof(ME::Application));
     }

@@ -10,7 +10,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            class OpenGLIndexBuffer : public IndexBuffer
+            class OpenGLIndexBuffer : public Indexbuffer
             {
             private:
                 unsigned int m_RendererID;

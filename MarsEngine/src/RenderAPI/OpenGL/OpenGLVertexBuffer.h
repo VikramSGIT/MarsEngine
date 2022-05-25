@@ -11,7 +11,7 @@ namespace ME
     {
         namespace OpenGL
         {
-            class OpenGLVertexBuffer : public VertexBuffer
+            class OpenGLVertexBuffer : public Vertexbuffer
             {
             private:
                 unsigned int m_RendererID = 0, m_Filled = 0;

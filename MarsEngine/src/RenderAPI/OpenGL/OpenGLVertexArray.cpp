@@ -23,7 +23,7 @@ namespace ME
                 //GLLogCall(glDeleteVertexArrays(1, &m_RendererID));
             }
 
-            void OpenGLVertexArray::AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout)
+            void OpenGLVertexArray::AddBuffer(const Vertexbuffer& vertexbuffer, const VertexBufferLayout& layout)
             {
 
                 ME_PROFILE_TRACE_CALL();

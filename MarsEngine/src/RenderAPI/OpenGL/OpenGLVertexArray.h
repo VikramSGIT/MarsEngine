@@ -20,7 +20,7 @@ namespace ME
                 OpenGLVertexArray();
                 ~OpenGLVertexArray();
 
-                void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout);
+                void AddBuffer(const Vertexbuffer& vertexbuffer, const VertexBufferLayout& layout);
 
                 void Bind() const;
                 void unBind() const;

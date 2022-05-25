@@ -3,16 +3,12 @@
 
 #include "MarsHeader.h"
 
-#include "Logger.h"
-#include "Vender/glm/glm/glm.hpp"
-#include "Utilites/TimeStep.h"
 #include "Window/Layers/LayerStack.h"
 #include "Window/Window.h"
+#include "RenderAPI/Renderer.h"
 
-#include <iostream>
 #include <memory>
 #include <functional>
-
 
 namespace ME
 {
@@ -26,8 +22,9 @@ namespace ME
 
         Window::Layer::LayerStack* GetLayerStack() { return &m_LayerStack; }
         Window::Window& GetWindow() { return *m_Window; }
-        static Application& GetInstance() { return *s_Application; }
 
+        static Application& GetInstance() { return *s_Application; }
+        static Application* CreateApp();
     private:
         Window::Layer::LayerStack m_LayerStack;
         bool m_Running = true;
@@ -42,7 +39,6 @@ namespace ME
         static Application* s_Application;
     };
 
-    extern Application* CreateApp();
 }
 
 #endif

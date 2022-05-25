@@ -1,6 +1,7 @@
 #include "MarsHeader.h"
 #include "Martian.h"
 
+#include "RenderAPI/Renderer.h"
 #include "Modules/Mesh.h"
 #include "Core/Application.h"
 #include "Core/Utilites/TimeStep.h"
@@ -8,7 +9,7 @@
 
 ME::Application* app;
 
-extern ME::Application* ME::CreateApp()
+ME::Application* ME::Application::CreateApp()
 {
 	app = allocon<ME::Application>();
 
@@ -19,14 +20,18 @@ extern ME::Application* ME::CreateApp()
 
 using namespace ME;
 
+Martian::Martian()
+	:Layer("Martian")
+{
+	renderer = ME::Renderer::RenderAPI::Create(ME::Renderer::RenderAPItype::ME_RENDERER_OPENGL2D);
+	app->GetLayerStack()->PushLayer(renderer);
+}
+
 void Martian::OnAttach()
 {
 	app->GetWindow().SetVSync(true);
 
-	auto a = alloc<VERTEX2D>();
-
-	renderer->Init();
-	shader = CreateRef<Renderer::OpenGL::OpenGLShader>("res\\shaders\\Basic.shader");
+	shader = Renderer::Shader::Create("res\\shaders\\Basic.shader");
 	renderer->SetShader(shader);
 	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
 
@@ -49,7 +54,10 @@ void Martian::OnAttach()
 	shader->SetUniformsMat4f("u_MVP", ortho);
 }
 
-void Martian::OnDetach() {}
+void Martian::OnDetach() 
+{
+
+}
 
 void Martian::OnUpdate(Timestep ts)
 {
@@ -71,13 +79,10 @@ void Martian::OnUpdate(Timestep ts)
 		app->GetWindow().SetVSync(!app->GetWindow().IsVSync());
 	if (Window::Input::IsKeyPressed(Event::Key::Escape))
 		Player->Reset();
-
-	renderer->OnUpdate();
 }
 
 void Martian::OnDraw()
 {
-	renderer->OnDraw();
 }
 
 void Martian::OnEvent(Event::Event& e)
