@@ -7,9 +7,12 @@
 #include <string>
 #include <sstream>
 
-#define GLLogCall(x) GLClearError();\
-        x;\
-        GLPrintError(#x, __FILE__, __LINE__)
+#define GLLogCall(x)\
+        {\
+            GLClearError();\
+            x;\
+            GLPrintError(#x, __FILE__, __LINE__);\
+        }
 namespace ME
 {
     namespace Renderer

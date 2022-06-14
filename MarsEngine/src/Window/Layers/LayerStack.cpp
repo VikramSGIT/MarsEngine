@@ -1,51 +1,51 @@
 #include "MarsHeader.h"
 #include "LayerStack.h"
+
+#include <algorithm>
 namespace ME
 {
     namespace Window
     {
-        namespace Layer
+        LayerStack::~LayerStack()
         {
-            LayerStack::~LayerStack()
+
+            ME_PROFILE_TRACE_CALL();
+
+            for (Ref<Layer> layer : m_layerstack)
+                layer->OnDetach();
+        }
+
+        void LayerStack::PushLayer(const Ref<Layer>& layer)
+        {
+
+            ME_PROFILE_TRACE_CALL();
+
+            Ref<Layer> ref = layer;
+            m_layerstack.emplace_back(layer);
+            ref->OnAttach();
+        }
+
+        void LayerStack::PushOverlay(const Ref<Layer>& overlay)
+        {
+
+            ME_PROFILE_TRACE_CALL();
+
+            Ref<Layer> ref = overlay;
+            m_layerstack.emplace(m_layerstack.begin(), ref);
+            ref->OnAttach();
+        }
+
+        void LayerStack::PopLayer(const Ref<Layer>& layer)
+        {
+
+            ME_PROFILE_TRACE_CALL();
+
+            Ref<Layer> ref = layer;
+            auto it = std::find(m_layerstack.begin(), m_layerstack.end(), layer);
+            if (it != m_layerstack.end())
             {
-
-                ME_PROFILE_TRACE_CALL();
-
-                for (Ref<Layer> layer : m_layerstack)
-                {
-                    layer->OnDetach();
-                }
-            }
-
-            void LayerStack::PushLayer(Ref<Layer> layer)
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                m_layerstack.emplace_back(layer);
-                layer->OnAttach();
-                m_TotalLayers++;
-            }
-
-            void LayerStack::PushOverlay(Ref<Layer> overlay)
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                m_layerstack.emplace(m_layerstack.begin(), overlay);
-                overlay->OnAttach();
-            }
-
-            void LayerStack::PopLayer(Ref<Layer> layer)
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_TotalLayers, layer);
-                if (it != m_layerstack.begin() + m_TotalLayers)
-                    layer->OnDetach();
+                ref->OnDetach();
                 m_layerstack.erase(it);
-                m_TotalLayers--;
             }
         }
     }

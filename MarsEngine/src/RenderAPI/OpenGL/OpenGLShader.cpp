@@ -1,4 +1,10 @@
+#include "MarsHeader.h"
 #include "OpenGLShader.h"
+
+#include "OpenGLErrorHandler.h"
+#include "GL/glew.h"
+
+#include <sstream>
 
 namespace ME
 {
@@ -6,13 +12,13 @@ namespace ME
     {
         namespace OpenGL
         {
-            OpenGLShader::OpenGLShader(const std::string& filepath)
+            OpenGLShader::OpenGLShader(const string& filepath)
                 :m_RendererID(0), m_Filepath(filepath)
             {
                 ME_PROFILE_TRACE_CALL();
 
                 ShaderSource src = PharseShader(filepath);
-                m_RendererID = CreateShader(src.VertexShader, src.FragmentShader);
+                m_RendererID = CreateShader(src.VertexShader.c_str(), src.FragmentShader.c_str());
             }
 
             OpenGLShader::~OpenGLShader()
@@ -23,18 +29,18 @@ namespace ME
                 GLLogCall(glDeleteProgram(m_RendererID));
             }
 
-            void OpenGLShader::SetUniforms1i(const  std::string& name, const int& data)
+            void OpenGLShader::SetUniforms1i(const string& name, const int& data)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 int location;
-                if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                /*if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                     location = m_UniformLocationCache[name];
-                else
+                else*/
                 {
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
-                    m_UniformLocationCache[name] = location;
+                    //m_UniformLocationCache[name] = location;
                 }
 
                 ME_CORE_ERROR(location == -1, "Cant pass the Uniforms!!")
@@ -46,17 +52,17 @@ namespace ME
                 }
             }
 
-            void OpenGLShader::SetUniforms1f(const std::string& name, const float& data)
+            void OpenGLShader::SetUniforms1f(const string& name, const float& data)
             {
                 ME_PROFILE_TRACE_CALL();
 
                 int location;
-                if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                /*if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                     location = m_UniformLocationCache[name];
-                else
+                else*/
                 {
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
-                    m_UniformLocationCache[name] = location;
+                    //m_UniformLocationCache[name] = location;
                 }
 
                 ME_CORE_ERROR(location != -1, "Cant pass the Uniforms!!")
@@ -68,18 +74,18 @@ namespace ME
                 }
             }
 
-            void OpenGLShader::SetUniformsMat4f(const std::string& name, const glm::mat4& matrix)
+            void OpenGLShader::SetUniformsMat4f(const string& name, const glm::mat4& matrix)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 int location;
-                if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                /*if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                     location = m_UniformLocationCache[name];
-                else
+                else*/
                 {
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
-                    m_UniformLocationCache[name] = location;
+                    //m_UniformLocationCache[name] = location;
                 }
                 if (location != -1)
                 {
@@ -91,18 +97,18 @@ namespace ME
                     std::cout << "Cant pass the Uniforms!!" << std::endl;
             }
 
-            void OpenGLShader::SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4)
+            void OpenGLShader::SetUniforms4f(const string& name, const float& f1, const float& f2, const float& f3, const float& f4)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 int location;
-                if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                /*if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                     location = m_UniformLocationCache[name];
-                else
+                else*/
                 {
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
-                    m_UniformLocationCache[name] = location;
+                    //m_UniformLocationCache[name] = location;
                 }
                 if (location != -1)
                 {
@@ -114,18 +120,18 @@ namespace ME
                     std::cout << "Cant pass the Uniforms!!" << std::endl;
             }
 
-            void OpenGLShader::SetUniforms3f(const std::string& name, const float* data)
+            void OpenGLShader::SetUniforms3f(const string& name, const float* data)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
                 int location;
-                if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+                /*if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                     location = m_UniformLocationCache[name];
-                else
+                else*/
                 {
                     location = GLValidUniformLocation(m_RendererID, name.c_str());
-                    m_UniformLocationCache[name] = location;
+                    //m_UniformLocationCache[name] = location;
                 }
                 if (location != -1)
                 {
@@ -141,31 +147,22 @@ namespace ME
             {
 
                 ME_PROFILE_TRACE_CALL();
-                if (!Bound)
-                {
-                    GLLogCall(glUseProgram(m_RendererID));
-                    Bound = true;
-                }
+                GLLogCall(glUseProgram(m_RendererID));
             }
 
             void OpenGLShader::unBind()
             {
 
                 ME_PROFILE_TRACE_CALL();
-
-                if (Bound)
-                {
-                    GLLogCall(glUseProgram(0));
-                    Bound = false;
-                }
+                GLLogCall(glUseProgram(0));
             }
 
-            ShaderSource OpenGLShader::PharseShader(const std::string& filepath)
+            ShaderSource OpenGLShader::PharseShader(const string& filepath)
             {
 
                 ME_PROFILE_TRACE_CALL();
 
-                std::ifstream stream(filepath);
+                std::ifstream stream(filepath.c_str());
 
                 ME_CORE_ERROR(!stream.good(), "Can't open Shader File!!");
 
@@ -189,12 +186,12 @@ namespace ME
                             Mode = ShaderType::FRAGMENT;
                     }
                     else
-                        ss[(int)Mode] << line << "\n";
+                        ss[(int)Mode] << line << '\n';
                 }
-                return { ss[0].str(), ss[1].str() };
+                return { ss[0].str().c_str(), ss[1].str().c_str() };
             }
 
-            unsigned int OpenGLShader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+            unsigned int OpenGLShader::CreateShader(const string& vertexShader, const string& fragmentShader)
             {
 
                 ME_PROFILE_TRACE_CALL();
@@ -214,7 +211,7 @@ namespace ME
                 return program;
             }
 
-            unsigned int OpenGLShader::CompileShader(unsigned int type, const std::string& program)
+            unsigned int OpenGLShader::CompileShader(unsigned int type, const string& program)
             {
 
                 ME_PROFILE_TRACE_CALL();

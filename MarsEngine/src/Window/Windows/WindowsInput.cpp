@@ -1,19 +1,10 @@
+#include "MarsHeader.h"
 #include "WindowsInput.h"
 
 namespace ME
 {
 	namespace Window
 	{
-		Input* Input::s_Instance = nullptr;
-
-		Input* Input::Create()
-		{
-			//if (s_Instance != nullptr)
-				Input::s_Instance = new WindowsInput();
-
-			return Input::s_Instance;
-		}
-
 		bool WindowsInput::IsKeyPressedImpl(const int& keycode)
 		{
 			return m_InputData.m_Keystack.find(keycode) != m_InputData.m_Keystack.end();

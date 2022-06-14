@@ -1,9 +1,12 @@
+#include "MarsHeader.h"
 #include "OpenGL2DRenderer.h"
-#include "Core/Memory/SafePointer.h"
 
-/*
-* TODO Setup gpu side updater, so when there is a mesh update can send single mesh push
-*/
+#include "Core/Logger.h"
+#include "RenderAPI/OpenGL/OpenGLErrorhandler.h"
+#include "RenderAPI/OpenGL/OpenGLShader.h"
+
+#include "GL/glew.h"
+#include <algorithm>
 
 namespace ME
 {
@@ -12,10 +15,16 @@ namespace ME
         namespace OpenGL
         {
             OpenGL2DRendererAPI::OpenGL2DRendererAPI()
-            :RenderAPI(RenderAPItype::ME_RENDERER_OPENGL2D), m_clearcolor(1.0, 1.0, 1.0, 1.0)
+                :RenderAPI(RenderAPItype::ME_RENDERER_OPENGL2D), m_clearcolor(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }),
+                    vertex_id(0), index_id(0), m_TotalVertices(0), m_TotalIndices(0), m_NextIndex(0)
             {
 
                 ME_PROFILE_TRACE_CALL();
+
+                m_Layout = CreateRef<VertexbufferLayout>();
+                m_Layout->push(GL_FLOAT, 2);
+                m_Layout->push(GL_FLOAT, 2);
+                m_Layout->push(GL_FLOAT, 1);
             }
 
             OpenGL2DRendererAPI::~OpenGL2DRendererAPI()
@@ -28,6 +37,11 @@ namespace ME
             void OpenGL2DRendererAPI::SetViewPortSize(const unsigned int& X, const unsigned int& Y)
             {
                 glViewport(0, 0, X, Y);
+            }
+
+            void OpenGL2DRendererAPI::PushUpdate(Mesh2D* mesh)
+            {
+                m_Update.emplace_back(mesh);
             }
 
             void OpenGL2DRendererAPI::SetClearColor(const glm::vec4& color)
@@ -55,20 +69,41 @@ namespace ME
 // Need to add graphics drivers identification
                 ME_CORE_CRITICAL(glewInit() != GLEW_OK, "Can't Impliment GLEW")
 #ifdef ME_DEBUG
-                std::stringstream ss;
-                ss << "Detected OpenGL Version (using) : " << glGetString(GL_VERSION);
-                ME_CORE_INFO(ss.str());
+                ME_CORE_INFO("Detected OpenGL Version (using) : {}", glGetString(GL_VERSION));
 #endif
 //
 // Enabling blending, typically transparencies
 //
                 GLLogCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
                 GLLogCall(glEnable(GL_BLEND));
+
+                GLLogCall(glGenBuffers(1, &vertex_id));
+                GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, vertex_id));
+                GLLogCall(glBufferData(GL_ARRAY_BUFFER, ME_OPENGL_MAXVERTEXBUFFER * sizeof(VERTEX2D), nullptr, GL_DYNAMIC_DRAW));
+
+                GLLogCall(glGenBuffers(1, &index_id));
+                GLLogCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_id));
+                GLLogCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, ME_OPENGL_MAXINDEXBUFFER * sizeof(unsigned int), nullptr, GL_DYNAMIC_DRAW));
+
+                GLLogCall(glBindVertexArray(1));
+
+                unsigned int offset = 0;
+
+                auto& elements = m_Layout->GetElements();
+
+                for (unsigned int j = 0; j < elements.size(); j++)
+                {
+                    auto element = elements[j];
+                    GLLogCall(glEnableVertexAttribArray(j));
+                    GLLogCall(glVertexAttribPointer(j, element.count, element.type, element.normalized, m_Layout->GetStride(), (const void*)offset));
+                    offset += GetElementSize(element.type) * element.count;
+                }
             }
 
             void OpenGL2DRendererAPI::OnDetach()
             {
-                ClearBufferCache();
+                GLLogCall(glDeleteBuffers(1, &vertex_id));
+                GLLogCall(glDeleteBuffers(1, &index_id));
             }
 
             void OpenGL2DRendererAPI::OnUpdate(Timestep ts)
@@ -76,84 +111,17 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
+                GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, vertex_id));
+                for (auto ms : m_Update)
+                {
+                    GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, ms->GetMeshData().vertex.GetOffset() * sizeof(VERTEX2D),
+                        ms->GetMeshData().vertex.Size() * sizeof(VERTEX2D),
+                        ms->GetMeshData().vertex.begin()));
+                }
+                m_Update.clear();
+
                 GLLogCall(glClearColor(m_clearcolor.x, m_clearcolor.y, m_clearcolor.z, m_clearcolor.w));
                 GLLogCall(glClear(GL_COLOR_BUFFER_BIT));
-            }
-
-            void OpenGL2DRendererAPI::ClearBufferCache()
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                for (unsigned int i : vertexbuffercache)
-                    OpenGLVertexBuffer vb(i);
-                vertexbuffercache.clear();
-                for (unsigned int i : indexbuffercache)
-                    OpenGLIndexBuffer ib(i);
-                indexbuffercache.clear();
-            }
-
-            void OpenGL2DRendererAPI::AddRenderSubmition(const Ref<MeshQueue2D>& meshqueue, std::function<void()> preprocessdata)
-            {
-
-                ME_PROFILE_TRACE_CALL();
-
-                m_RenderQueue.emplace_back(meshqueue);
-                preprocessing.emplace_back(preprocessdata);
-                SetUpBuffers(meshqueue);
-            }
-
-            void OpenGL2DRendererAPI::SetUpBuffers(const Ref<MeshQueue2D>& meshqueue)
-            {
-
-                ME_PROFILE_TRACE_CALL();
-                    
-                Ref<ME::Renderer::VertexBufferLayout> layout = meshqueue->GetLayout();
-                unsigned int voffset = 0, ioffset = 0, indexoffset = 0;
-                
-                SafePointer<VERTEX2D> vertexbuffer(allocarr<VERTEX2D>(meshqueue->GetTotalVertices()), meshqueue->GetTotalVertices());
-                SafePointer<unsigned int> indexbuffer(allocarr<unsigned int>(meshqueue->GetTotalIndices()), meshqueue->GetTotalIndices());
-
-                for (Ref<Mesh2D> ms : *meshqueue)
-                {
-                    memcpy(vertexbuffer + voffset, ms->GetMeshData().vertex.begin(), sizeof(VERTEX2D) * ms->GetMeshData().vertex.Size());
-                    ms->GetMeshData().vertex.SetOffset(voffset);
-                    voffset += ms->GetMeshData().vertex.Size();
-
-                    ms->GetMeshData().index.SetOffset(ioffset);
-                    for (unsigned int i = 0; i < ms->GetMeshData().index.Size(); i++)
-                        indexbuffer[i + ioffset] = ms->GetMeshData().index.begin()[i] + indexoffset;
-
-                    ioffset += ms->GetMeshData().index.Size();
-                    indexoffset += 1 + *std::max_element(ms->GetMeshData().index.begin(), ms->GetMeshData().index.end());
-                }
-
-                Ref<Vertexbuffer> vertexbufferobj = Vertexbuffer::Create((ME_DATATYPE*)vertexbuffer.Get(), meshqueue->GetTotalVertices(), GL_DYNAMIC_DRAW);
-                Ref<Indexbuffer> indexbufferobj = Indexbuffer::Create(indexbuffer.Get(), meshqueue->GetTotalIndices(), GL_DYNAMIC_DRAW);
-
-                dealloc(vertexbuffer.Get(), meshqueue->GetTotalVertices() * sizeof(VERTEX2D));
-                dealloc(indexbuffer.Get(), meshqueue->GetTotalIndices() * sizeof(unsigned int));
-                
-                vertexbufferobj->ClearBufferOnDestroy(false);
-                indexbufferobj->ClearBufferOnDestroy(false);
-
-                vertexbuffercache.push_back(vertexbufferobj->GetID());
-                indexbuffercache.push_back(indexbufferobj->GetID());
-            }
-
-            void OpenGL2DRendererAPI::CheckBufferUpdate(const unsigned int& id)
-            {
-                ME_PROFILE_TRACE_CALL();
-
-                for (std::pair<Mesh2D*, unsigned int> data : m_RenderQueue[id]->GetUpdate())
-                {
-                    Ref<Vertexbuffer> vertexbuffer = Vertexbuffer::Create(vertexbuffercache[id]);
-                    vertexbuffer->BufferPostRenderData(data.first->GetMeshData().vertex.begin(), 
-                        m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.first->GetMeshData().vertex.Size(), 
-                        m_RenderQueue[id]->GetLayout()->GetTotalCount() * data.second);
-                    vertexbuffer->ClearBufferOnDestroy(false);
-                    data.first->SetReady(true);
-                }
             }
 
             void OpenGL2DRendererAPI::OnDraw()
@@ -163,49 +131,88 @@ namespace ME
 //
 // Will Soon Sort out the shaders when Materials Are Implemented
 //
-
-                for (size_t i = 0; i < m_RenderQueue.size(); i++)
-                {
-//
-// Checks for buffer Update
-//
-                    CheckBufferUpdate(static_cast<unsigned int>(i));
-//
 // Setting up VertexArray for each call, needs to be fixed at higher builds!!
-//              
-                    preprocessing.at(i)();
+//                  
+                GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, vertex_id));
+                GLLogCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_id));
 
-                    Ref<Vertexbuffer> vertexbuffer = Vertexbuffer::Create(vertexbuffercache[i]);
-                    Ref<Indexbuffer> indexbuffer = Indexbuffer::Create(indexbuffercache[i]);
-                    Ref<OpenGLVertexArray> array = CreateRef<OpenGLVertexArray>();
+                //framebuffer->Bind();
+                m_Shader->Bind();
 
-                    vertexbuffer->ClearBufferOnDestroy(false);
-                    indexbuffer->ClearBufferOnDestroy(false);
-
-                    array->AddBuffer(*vertexbuffer, *m_RenderQueue[i]->GetLayout());
-
-                    m_Shader->Bind();
-                    indexbuffer->Bind();
-                    vertexbuffer->Bind();
-
-                    GLLogCall(glDrawElements(GL_TRIANGLES, m_RenderQueue[i]->GetTotalIndices(), GL_UNSIGNED_INT, nullptr));
-
-                    vertexbuffer->unBind();
-                    indexbuffer->unBind();
-                    m_Shader->unBind();
-                }
+                GLLogCall(glDrawElements(GL_TRIANGLES, m_TotalIndices, GL_UNSIGNED_INT, nullptr));
             }
 
             void OpenGL2DRendererAPI::OnEvent(Event::Event& e)
             {
 
                 ME_PROFILE_TRACE_CALL();
-//
-// Logs out missed event handles
-//
-#ifdef ME_DEBUG_SHOW_EVENT
-                ME_CORE_INFO(e.ToString());
-#endif
+
+            }
+            void OpenGL2DRendererAPI::AddMesh(const Ref<Mesh2D>& mesh)
+            {
+                Ref<Mesh2D> ms = mesh;
+                m_Meshes.emplace_back(ms);
+                ms->GetMeshData().vertex.SetOffset(m_TotalVertices);
+                ms->GetMeshData().index.SetOffset(m_TotalIndices);
+                ms->GetMeshData().index.SetIndexOffset(m_NextIndex);
+
+                GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, vertex_id));
+                GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, m_TotalVertices * sizeof(VERTEX2D),
+                    ms->GetMeshData().vertex.Size() * sizeof(VERTEX2D),
+                    ms->GetMeshData().vertex.begin()));
+
+                unsigned int max = 0;
+                unsigned int* local = alloc<unsigned int>(ms->GetMeshData().index.Size());
+                for (unsigned int i = 0; i < ms->GetMeshData().index.Size(); i++)
+                {
+                    unsigned int j = ms->GetMeshData().index.begin()[i];
+                    max < j ? max = j : max;
+                    local[i] = j + m_NextIndex;
+                }
+
+                GLLogCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_id));
+                GLLogCall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, m_TotalIndices * sizeof(unsigned int),
+                    ms->GetMeshData().index.Size() * sizeof(unsigned int), local));
+
+                dealloc(local);
+
+                m_NextIndex += (max + 1);
+                m_TotalVertices += ms->GetMeshData().vertex.Size();
+                m_TotalIndices += ms->GetMeshData().index.Size();
+            }
+            void OpenGL2DRendererAPI::AddMesh(const std::vector<Ref<Mesh2D>>& meshes)
+            {
+                for (Ref<Mesh2D> ms : meshes)
+                {
+                    m_Meshes.emplace_back(ms);
+                    ms->GetMeshData().vertex.SetOffset(m_TotalVertices);
+                    ms->GetMeshData().index.SetOffset(m_TotalIndices);
+                    ms->GetMeshData().index.SetIndexOffset(m_NextIndex);
+
+                    GLLogCall(glBindBuffer(GL_ARRAY_BUFFER, vertex_id));
+                    GLLogCall(glBufferSubData(GL_ARRAY_BUFFER, m_TotalVertices * sizeof(VERTEX2D),
+                        ms->GetMeshData().vertex.Size() * sizeof(VERTEX2D),
+                        ms->GetMeshData().vertex.begin()));
+
+                    unsigned int max = 0;
+                    unsigned int* local = alloc<unsigned int>(ms->GetMeshData().index.Size());
+                    for (unsigned int i = 0; i < ms->GetMeshData().index.Size(); i++)
+                    {
+                        unsigned int j = ms->GetMeshData().index.begin()[i];
+                        max < j ? max = j : max;
+                        local[i] = j + m_NextIndex;
+                    }
+
+                    GLLogCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_id));
+                    GLLogCall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, m_TotalIndices * sizeof(unsigned int),
+                        ms->GetMeshData().index.Size() * sizeof(unsigned int), local));
+
+                    dealloc(local);
+
+                    m_NextIndex += (max + 1);
+                    m_TotalVertices += ms->GetMeshData().vertex.Size();
+                    m_TotalIndices += ms->GetMeshData().index.Size();
+                }
             }
         }
     }

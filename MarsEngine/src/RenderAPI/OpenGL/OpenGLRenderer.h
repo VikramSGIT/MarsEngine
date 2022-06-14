@@ -5,8 +5,8 @@
 
 #include "OpenGLShader.h"
 #include "RenderAPI/Renderer.h"
-
-#include <vector>
+#include "Core/Utilites/Ref.h"
+#include "Core/Utilites/Vector.h"
 
 namespace ME
 {
@@ -16,37 +16,38 @@ namespace ME
         {
             class OpenGLRendererAPI : public RenderAPI
             {
-            private:
-                bool Ready = false, LiveStreamData = true;
-                unsigned int indexoffset = 0;
-                glm::vec4 m_clearcolor;
-                Ref<OpenGLShader> m_Shader;
-                std::vector<Ref<MeshQueue>> m_RenderQueue;
-                std::vector <unsigned int> vertexbuffercache;
-                std::vector<unsigned int> indexbuffercache;
-                std::vector<std::function<void()>> preprocessing;
-
-                void SetUpBuffers(const Ref<MeshQueue>& meshqueue);
-                void CheckBufferUpdate(const unsigned int& id);
-                void ClearBufferCache();
             public:
                 OpenGLRendererAPI();
                 ~OpenGLRendererAPI();
 
-                virtual void AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata) override;
-                virtual void AddRenderSubmition(const Ref<MeshQueue2D>& meshqueue, std::function<void()> preprocessdata) override { ME_CORE_ERROR(true, "2D MeshQueue submitted to 3D Renderer"); }
-
+                virtual void AddFramebuffer(const FramebufferSpecification& framebuffer);
                 virtual void OnAttach() override;
                 virtual void OnDetach() override;
                 virtual void OnUpdate(Timestep ts) override;
                 virtual void OnDraw() override;
                 virtual void OnEvent(Event::Event& e) override;
 
-                virtual bool SwitchAPI(const RenderAPItype api);
+                virtual void AddMesh(const Ref<Mesh2D>& mesh) override;
+                virtual void AddMesh(const std::vector<Ref<Mesh2D>>& meshes) override;
+                virtual void AddMesh(const Ref<Mesh>& mesh) override;
+                virtual void AddMesh(const std::vector<Ref<Mesh>>& meshes) override;
 
+                virtual void PushUpdate(Mesh* mesh) override;
+                virtual void PushUpdate(Mesh2D* mesh) override;
                 virtual void SetClearColor(const glm::vec4& color) override;
                 virtual void SetShader(const Ref<Shader>& shader) override;
                 virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
+
+                Ref<Framebuffer> framebuffer;
+            private:
+                unsigned int vertex_id, index_id, m_TotalIndices, m_TotalVertices, m_NextIndex;
+                FramebufferSpecification m_FrameSpec;
+                glm::vec4 m_clearcolor;
+                Ref<Shader> m_Shader;
+                Vector <Ref<Mesh>> m_Meshes, m_Mesh2D;
+                Vector <Mesh*> m_Update;
+                Vector <Mesh2D*> m_Update2D;
+                Ref<VertexbufferLayout> m_Layout;
             };
 
         }

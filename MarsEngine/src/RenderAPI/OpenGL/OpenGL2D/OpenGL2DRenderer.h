@@ -3,24 +3,11 @@
 
 #pragma once
 
-#include "MarsHeader.h"
 #include "RenderAPI/Buffers.h"
-
 #include "RenderAPI/Renderer.h"
-
-#include "RenderAPI\OpenGL\OpenGLVertexArray.h"
-#include "RenderAPI\OpenGL\OpenGLIndexBuffer.h"
-#include "RenderAPI\OpenGL\OpenGLShader.h"
-#include "Window/Layers/BasicLayer.h"
+#include "RenderAPI/Shader.h"
 #include "Vender/glm/glm/glm.hpp"
-#include "GL/glew.h"
-#include "RenderAPI\OpenGL\OpenGLErrorhandler.h"
-#include "Core/Logger.h"
-
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <vector>
+#include "Core/Utilites/Vector.h"
 
 namespace ME
 {
@@ -30,25 +17,9 @@ namespace ME
         {
             class OpenGL2DRendererAPI : public RenderAPI
             {
-            private:
-                bool Ready = false, LiveStreamData = true;
-                unsigned int indexoffset = 0;
-                glm::vec4 m_clearcolor;
-                Ref<Shader> m_Shader;
-                std::vector<Ref<MeshQueue2D>> m_RenderQueue;
-                std::vector <unsigned int> vertexbuffercache;
-                std::vector<unsigned int> indexbuffercache;
-                std::vector<std::function<void()>> preprocessing;
-
-                void SetUpBuffers(const Ref<MeshQueue2D>& meshqueue);
-                void CheckBufferUpdate(const unsigned int& id);
-                void ClearBufferCache();
             public:
                 OpenGL2DRendererAPI();
                 ~OpenGL2DRendererAPI();
-
-                virtual void AddRenderSubmition(const Ref<MeshQueue2D>& meshqueue, std::function<void()> preprocessdata) override;
-                virtual void AddRenderSubmition(const Ref<MeshQueue>& meshqueue, std::function<void()> preprocessdata) override { ME_CORE_ERROR(true, "3D MeshQueue submitted to 2D Renderer"); }
 
                 virtual void OnAttach() override;
                 virtual void OnDetach() override;
@@ -56,9 +27,26 @@ namespace ME
                 virtual void OnDraw() override;
                 virtual void OnEvent(Event::Event& e) override;
 
+                virtual void AddMesh(const Ref<Mesh2D>& mesh) override;
+                virtual void AddMesh(const std::vector<Ref<Mesh2D>>& meshes) override;
+                virtual void AddMesh(const Ref<Mesh>& mesh) override { ME_CORE_ERROR(true, "3D Mesh submitted to 2D Renderer"); }
+                virtual void AddMesh(const std::vector<Ref<Mesh>>& meshes) override { ME_CORE_ERROR(true, "3D Mesh submitted to 2D Renderer"); }
+                virtual void AddFramebuffer(const FramebufferSpecification& framebufferspec) override {}
+
+                virtual void PushUpdate(Mesh* mesh) override { ME_CORE_ERROR(true, "3D Mesh submitted to 2D Renderer"); };
+                virtual void PushUpdate(Mesh2D* mesh) override;
                 virtual void SetClearColor(const glm::vec4& color) override;
                 virtual void SetShader(const Ref<Shader>& shader) override;
                 virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) override;
+
+            private:
+                unsigned int vertex_id, index_id, m_TotalVertices, m_TotalIndices, m_NextIndex;
+                FramebufferSpecification spec;
+                glm::vec4 m_clearcolor;
+                Ref<Shader> m_Shader;
+                Vector <Mesh2D*> m_Update;
+                Vector <Ref<Mesh2D>> m_Meshes;
+                Ref<VertexbufferLayout> m_Layout;
             };
 
         }

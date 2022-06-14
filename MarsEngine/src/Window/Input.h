@@ -1,7 +1,10 @@
 #ifndef ME_INPUT
 #define ME_INPUT
 
+#pragma once
+
 #include "MarsHeader.h"
+#include "Core/Utilites/Ref.h"
 
 #include "Vender/glm/glm/glm.hpp"
 

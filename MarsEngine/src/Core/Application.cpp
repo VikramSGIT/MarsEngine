@@ -1,3 +1,5 @@
+#include "MarsHeader.h"
+
 #include "Application.h"
 #include "Window/Events/WindowEvent.h"
 #include "Window/Windows/WindowsWindow.h"
@@ -6,6 +8,7 @@
 #include "Vender/glm/glm/glm.hpp"
 #include "Utilites/TimeStep.h"
 
+#include <functional>
 namespace ME
 {
     Application* Application::s_Application = nullptr;
@@ -45,7 +48,14 @@ namespace ME
 
         ME_PROFILE_TRACE_CALL();
 
-        m_LayerStack.~LayerStack();
+        m_LayerStack.clear();
+        m_RenderAPI.reset();
+    }
+
+    void Application::setRenderAPI(const Ref<Renderer::RenderAPI>& api)
+    {
+        m_RenderAPI = api;
+        m_LayerStack.PushLayer(api);
     }
 
     void Application::OnEvent(Event::Event& e)
@@ -65,7 +75,15 @@ namespace ME
             it->OnEvent(e);
         }
     }
+    void Application::UpdateNotification(Mesh* mesh)
+    {
+        m_RenderAPI->PushUpdate(mesh);
+    }
 
+    void Application::UpdateNotification(Mesh2D* mesh)
+    {
+        m_RenderAPI->PushUpdate(mesh);
+    }
     void Application::Run()
     {
 
@@ -75,16 +93,16 @@ namespace ME
 
         while (m_Running)
         {
-            float curtime = (float)glfwGetTime(); // TODO: Make it glfw independant
+            double curtime = glfwGetTime(); // TODO: Make it glfw independent
             Timestep ts = curtime - m_LastFrameTime;
             m_LastFrameTime = curtime;
 
-            for (Ref<Window::Layer::Layer> layer : m_LayerStack)
-            {
+            for (Ref<Window::Layer> layer : m_LayerStack)
                 layer->OnUpdate(ts);
+
+            for (Ref<Window::Layer> layer : m_LayerStack)
                 layer->OnDraw();
 
-            }
             m_Window->OnUpdate();
         }
         METerminate();

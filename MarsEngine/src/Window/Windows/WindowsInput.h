@@ -1,7 +1,8 @@
 #ifndef ME_WINDOWSINPUT
 #define ME_WINDOWSINPUT
 
-#include "MarsHeader.h"
+#pragma once
+
 #include "Window/Input.h"
 #include "Window/Events/KeyboardCode.h"
 #include "Window/Events/MouseCode.h"

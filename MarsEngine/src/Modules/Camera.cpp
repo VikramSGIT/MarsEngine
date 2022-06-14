@@ -1,18 +1,14 @@
+#include "MarsHeader.h"
 #include "Camera.h"
 
 namespace ME
 {
-	namespace Renderer
+	Camera::Camera(const glm::mat4& pv)
+		:m_PV(pv) {}
+
+	Camera::~Camera()
 	{
-		Camera::Camera()
-		{
 
-		}
-
-		Camera::~Camera()
-		{
-
-		}
 	}
 }
 

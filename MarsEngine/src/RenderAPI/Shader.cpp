@@ -8,7 +8,7 @@ namespace ME
 {
 	namespace Renderer
 	{
-		Ref<Shader> ME::Renderer::Shader::Create(const std::string& filename)
+		Ref<Shader> ME::Renderer::Shader::Create(const string& filename)
 		{
 			switch (RenderAPI::GetAPI())
 			{

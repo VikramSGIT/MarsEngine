@@ -9,9 +9,7 @@ namespace ME
 
             ME_PROFILE_TRACE_CALL();
 
-            std::stringstream ss;
-            ss << "Window Created!! Name: " << winprop.Title << " Dimension: " << winprop.Width << " X " << winprop.Height;
-            ME_CORE_WARNING(ss.str());
+            ME_CORE_WARNING("Window Created!! Name: {} Dimension: {} x {}", winprop.Title, winprop.Width, winprop.Height);
             Input::Input::Create();
 
             return new Windows::WindowsWindow(winprop);
@@ -44,7 +42,7 @@ namespace ME
                 m_Data.Title = props.Title;
                 m_Data.Width = props.Width;
                 m_Data.Height = props.Height;
-                m_Data.Input = static_cast<WindowsInput*>(Input::Input::Get())->GetFrameData();
+                m_Data.Input = ((WindowsInput*)(&*Input::Input::Get()))->GetFrameData();
 
                 if (s_GLFWWindowCount == 0)
                 {
@@ -84,7 +82,7 @@ namespace ME
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 #ifdef ME_IMGUI
                         ImGuiIO& io = ImGui::GetIO();
-                        if (!io.WantCaptureKeyboard)
+                        if (!io.WantTextInput)
 #endif
                         {
                             switch (action)
@@ -100,15 +98,13 @@ namespace ME
                             case GLFW_RELEASE:
                             {
                                 Event::KeyEvent::KeyReleasedEvent event(key);
-                                data.Input->m_Keystack.erase(data.Input->m_Keystack.find(key));
-                                data.fn(event);
+                                data.Input->m_Keystack.erase(key);
                                 break;
                             }
                             case GLFW_REPEAT:
                             {
-                                Event::KeyEvent::KeyPressedEvent event(key, keyrepeatcount);
-                                data.Input->m_Keystack.insert(key);
                                 keyrepeatcount++;
+                                Event::KeyEvent::KeyPressedEvent event(key, keyrepeatcount);
                                 data.fn(event);
                                 break;
                             }
@@ -119,28 +115,22 @@ namespace ME
                 glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int mousecode, int action, int mods)
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-#ifdef ME_IMGUI
-                        ImGuiIO& io = ImGui::GetIO();
-                        if (!io.WantCaptureKeyboard)
-#endif
+                        switch (action)
                         {
-                            switch (action)
-                            {
-                            case GLFW_PRESS:
-                            {
-                                Event::Mouse::MouseButtonPressedEvent event(mousecode);
-                                data.Input->m_Mousestack.insert(mousecode);
-                                data.fn(event);
-                                break;
-                            }
-                            case GLFW_RELEASE:
-                            {
-                                Event::Mouse::MouseButtonReleasedEvent event(mousecode);
-                                data.Input->m_Keystack.erase(data.Input->m_Keystack.find(mousecode));
-                                data.fn(event);
-                                break;
-                            }
-                            }
+                        case GLFW_PRESS:
+                        {
+                            Event::Mouse::MouseButtonPressedEvent event(mousecode);
+                            data.Input->m_Mousestack.insert(mousecode);
+                            data.fn(event);
+                            break;
+                        }
+                        case GLFW_RELEASE:
+                        {
+                            Event::Mouse::MouseButtonReleasedEvent event(mousecode);
+                            data.Input->m_Mousestack.erase(mousecode);
+                            data.fn(event);
+                            break;
+                        }
                         }
                     });
 
@@ -181,7 +171,7 @@ namespace ME
                 if (s_GLFWWindowCount == 0)
                 {
                     glfwTerminate();
-                    delete Input::Input::Get();
+                    delete Input::Get();
                 }
             }
 

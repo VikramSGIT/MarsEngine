@@ -7,135 +7,131 @@
 namespace ME
 {
 	/**
-	 Ref is Reference smart pointer built over the Allocator system of MarsEngine. This class allows the user to have
+	 Ref is Reference smart pointer built over the Allocator system for MarsEngine. This class allows the user to have
 	 multiple reference of a pointer.
-	 TODO: Need to make a better implementation for UpstreamMemory initializer.
+	 TODO: Make this thread safe
 	**/
-	template<typename T, typename upstreammemory = alloc_dealloc_UpstreamMemory> class ControlBlock
+	template<typename T, typename upstreammemory = alloc_dealloc_UpstreamMemory> struct ControlBlock
 	{
-	public:
-		ControlBlock()
-			:Count(0), Size(0) {}
-
-		void inc() { Count++; }
-		void dec() { Count--; }
-
-		int Count, Size;
+		size_t Count;
 		char Obj[sizeof(T)];
 	};
 	template<typename T, typename upstreammemory = alloc_dealloc_UpstreamMemory> class Ref
 	{
 	public:
-		ControlBlock<T, upstreammemory>* m_ControlBlock;
 
-		Ref() :m_ControlBlock(nullptr){}
+		typedef ControlBlock<T, upstreammemory> block;
+		T* Ptr;
 
-		Ref(nullptr_t) :m_ControlBlock(nullptr) {}
+		Ref() :Ptr(nullptr){}
+
+		Ref(nullptr_t) :Ptr(nullptr) {}
 
 		Ref (const Ref& other)
 		{
-			m_ControlBlock = other.m_ControlBlock;
-			if(m_ControlBlock != nullptr)
-				m_ControlBlock->inc();
+			Ptr = other.Ptr;
+			if (Ptr != nullptr)
+				getControlBlock()->Count++;
 		}
 
 		Ref(Ref&& other) noexcept
 		{
-			m_ControlBlock = other.m_ControlBlock;
-			other.m_ControlBlock = nullptr;
+			Ptr = other.Ptr;
+			other.Ptr = nullptr;
 		}
 
 		template<typename U> Ref(const Ref<U, upstreammemory>& other)
 		{
-			m_ControlBlock = reinterpret_cast<ControlBlock<T, upstreammemory>*>(other.m_ControlBlock);
-			if (m_ControlBlock != nullptr)
-				m_ControlBlock->inc();
+			Ptr = reinterpret_cast<T*>(other.Ptr);
+			if (Ptr != nullptr)
+				getControlBlock()->Count++;
 		}
 
 		template<typename U> Ref(Ref<U, upstreammemory>&& other) noexcept
 		{
-			m_ControlBlock = reinterpret_cast<ControlBlock<T, upstreammemory>*>(other.m_ControlBlock);
-			other.m_ControlBlock = nullptr;
+			Ptr = reinterpret_cast<T*>(other.Ptr);
+			other.Ptr = nullptr;
 		}
 
 		~Ref()
 		{
-			if (m_ControlBlock != nullptr)
+			if (Ptr != nullptr)
 			{
-				m_ControlBlock->dec();
-				if (m_ControlBlock->Count == 0)
+				getControlBlock()->Count--;
+				if (getControlBlock()->Count == 0)
 				{
-					((T*)m_ControlBlock->Obj)->~T();
-					upstreammemory::stref->deallocate(m_ControlBlock, m_ControlBlock->Size, std::string("REF: Deallocating Control Block for ") + typeid(T).name());
+					Ptr->~T();
+					upstreammemory::stref->deallocate(getControlBlock(), std::string("REF: Deallocating Control Block for ") + typeid(T).name());
 				}
 			}
 		}
 
 		Ref& operator=(const Ref& other)
 		{
-			m_ControlBlock = other.m_ControlBlock;
-			if (m_ControlBlock != nullptr)
-				m_ControlBlock->inc();
+			Ptr = other.Ptr;
+			if (Ptr != nullptr)
+				getControlBlock()->Count++;
 
 			return *this;
 		}
 
 		Ref& operator=(Ref&& other) noexcept
 		{
-			m_ControlBlock = other.m_ControlBlock;
-			other.m_ControlBlock = nullptr;
+			Ptr = other.Ptr;
+			other.Ptr = nullptr;
 
 			return *this;
 		}
 
 		template<typename U> Ref& operator=(const Ref<U, upstreammemory>& other)
 		{
-			m_ControlBlock = reinterpret_cast<ControlBlock<T, upstreammemory>*>(other.m_ControlBlock);
-			if (m_ControlBlock != nullptr)
-				m_ControlBlock->inc();
+			Ptr = reinterpret_cast<T*>(other.Ptr);
+			if (Ptr != nullptr)
+				getControlBlock()->Count++;
 
 			return *this;
 		}
 
 		template<typename U> Ref& operator=(Ref<U, upstreammemory>&& other)
 		{
-			m_ControlBlock = reinterpret_cast<ControlBlock<T, upstreammemory>*>(other.m_ControlBlock);
-			other.m_ControlBlock = nullptr;
+			Ptr = reinterpret_cast<T*>(other.Ptr);
+			other.Ptr = nullptr;
 
 			return *this;
 		}
 
 		void reset()
 		{
-			if (m_ControlBlock->Count == 1)
+			if (getControlBlock()->Count == 1)
 			{
-				((T*)m_ControlBlock->Obj)->~T();
-				upstreammemory::stref->deallocate(m_ControlBlock, sizeof(ControlBlock<T, upstreammemory>), "REF: Deallocating Control Block");
+				Ptr->~T();
+				upstreammemory::stref->deallocate(getControlBlock(), "REF: Deallocating Control Block ");
 			}
-			m_ControlBlock = nullptr;
+			Ptr = nullptr;
 		}
 
-		inline T* ptr() { return (T*)m_ControlBlock->Obj; }
+		inline T* ptr() { return Ptr; }
 
-		T& operator*() { return *reinterpret_cast<T*>(m_ControlBlock->Obj); }
-		T* operator->() { return reinterpret_cast<T*>(m_ControlBlock->Obj); }
-		T const& operator*() const { return *reinterpret_cast<T*>(m_ControlBlock->Obj); }
-		T const* operator->() const { return reinterpret_cast<T*>(m_ControlBlock->Obj); }
-		bool operator==(const Ref& other) { return other.m_ControlBlock == m_ControlBlock; }
-		bool operator!=(const Ref& other) { return other.m_ControlBlock != m_ControlBlock; }
-		template<typename U> bool operator==(const Ref<U, upstreammemory>& other) { return other.m_ControlBlock == m_ControlBlock; }
-		template<typename U> bool operator!=(const Ref<U, upstreammemory>& other) { return other.m_ControlBlock != m_ControlBlock; }
+		T& operator*() { return *Ptr; }
+		T* operator->() { return Ptr; }
+		T const& operator*() const { return *Ptr; }
+		T const* operator->() const { return Ptr; }
+		bool operator==(const Ref& other) { return other.Ptr == Ptr; }
+		bool operator!=(const Ref& other) { return other.Ptr != Ptr; }
+		template<typename U> bool operator==(const Ref<U, upstreammemory>& other) { return other.Ptr == Ptr; }
+		template<typename U> bool operator!=(const Ref<U, upstreammemory>& other) { return other.Ptr != Ptr; }
 	private:
-		friend Ref;
-		template<typename T, typename ...Args, typename upstreammemory> friend auto CreateRef(Args&& ...args);
+
+		block* getControlBlock() { return ((block*)((char*)Ptr - sizeof(size_t))); }
+		template<typename T, typename ...Args, typename upstreammemory> friend Ref<T, upstreammemory> CreateRef(Args&& ...args);
 	};
-	template<typename T, typename ...Args, typename upstreammemory = alloc_dealloc_UpstreamMemory> auto CreateRef(Args&& ...args) 
+	template<typename T, typename ...Args, typename upstreammemory = alloc_dealloc_UpstreamMemory> Ref<T, upstreammemory> CreateRef(Args&& ...args)
 	{
 		Ref<T, upstreammemory> ref;
-		ref.m_ControlBlock = (ControlBlock<T, upstreammemory>*)(upstreammemory::stref->allocate(sizeof(ControlBlock<T, upstreammemory>), std::string("REF: Allocating Control Block for ") + typeid(T).name()));
-		ref.m_ControlBlock->Count = 1;
-		ref.m_ControlBlock->Size = sizeof(ControlBlock<T, upstreammemory>);
-		new (ref.m_ControlBlock->Obj) T(args...);
+		ControlBlock<T, upstreammemory>* ptr = (ControlBlock<T, upstreammemory>*)(upstreammemory::stref->allocate(sizeof(ControlBlock<T, upstreammemory>), std::string("REF: Allocating Control Block for ") + typeid(T).name()));
+		ref.Ptr = (T*)ptr->Obj;
+		ptr->Count = 1;
+		new (ref.Ptr) T(args...);
 
 		return ref;
 	}

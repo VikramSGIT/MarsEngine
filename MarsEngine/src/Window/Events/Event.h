@@ -1,9 +1,10 @@
 #ifndef ME_EVENT
 #define ME_EVENT
 
+#pragma once
+
 #include "MarsHeader.h"
 
-#include <functional>
 #include <iostream>
 
 #define BIT(X) (1<<X)
@@ -54,6 +55,8 @@ namespace ME
 
             bool IsInCategory(const EventCategoryFlag& category) { return GetCategoryFlags() & category; }
             bool IsInType(const EventType& type) { return GetEventType() == type; }
+        protected:
+            friend class WindowsWindow;
         };
 
         class EventDispatcher
@@ -77,6 +80,7 @@ namespace ME
         inline std::ostream& operator<<(std::ostream& os, const Event& e) { return os << e.GetName(); }
 #endif
 
+        void throwEvent(Event& e);
     }
 }
 

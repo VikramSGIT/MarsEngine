@@ -15,6 +15,7 @@ virtual const char* getName() override {return typeid(X).name();}
 
 #include <set>
 #include <unordered_map>
+#include <typeinfo>
 
 namespace ME
 {

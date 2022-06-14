@@ -1,11 +1,13 @@
 #include "MarsHeader.h"
 #include "Martian.h"
 
-#include "RenderAPI/Renderer.h"
-#include "Modules/Mesh.h"
 #include "Core/Application.h"
-#include "Core/Utilites/TimeStep.h"
 #include "Window/Input.h"
+#include "Window/Events/WindowEvent.h"
+
+#include "Vender/imgui/imgui.h"
+#include "Core/Memory/Scope.h"
+#include "Core/Utilites/Vector.h"
 
 ME::Application* app;
 
@@ -21,42 +23,98 @@ ME::Application* ME::Application::CreateApp()
 using namespace ME;
 
 Martian::Martian()
-	:Layer("Martian")
-{
-	renderer = ME::Renderer::RenderAPI::Create(ME::Renderer::RenderAPItype::ME_RENDERER_OPENGL2D);
-	app->GetLayerStack()->PushLayer(renderer);
-}
+	:Layer("Martian"), m_ViewportSize({ app->GetWindow().GetWidth(), app->GetWindow().GetHeight()}) {}
 
 void Martian::OnAttach()
 {
 	app->GetWindow().SetVSync(true);
+	renderer = ME::Renderer::RenderAPI::Create(ME::Renderer::RenderAPItype::ME_RENDERER_OPENGL2D);
+	app->setRenderAPI(renderer);
+	imgui = CreateRef<Window::imguiLayer>();
+	//app->GetLayerStack()->PushLayer(imgui);
+
+	//renderer->framebuffer = Renderer::Framebuffer::Create({});
+	background = CreateRef<ME::Rectangle>("Background", glm::vec2{ 1280, 720 }, 3);
+	/*imgui->SetDrawData([this]() -> void
+		{
+			static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+			// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+			// because it would be confusing to have two docking targets within each others.
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->GetWorkPos());
+			ImGui::SetNextWindowSize(viewport->GetWorkSize());
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+
+			ImGui::Begin("Martian", nullptr, window_flags);
+			ImGui::PopStyleVar(2);
+
+			// DockSpace
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+			{
+				ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+				ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+			}
+
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("File"))
+				{
+					// Disabling fullscreen would allow the window to be moved to the front of other windows,
+					// which we can't undo at the moment without finer window depth/z control.
+					ImGui::MenuItem("New", NULL, nullptr);
+					ImGui::MenuItem("Open", NULL, nullptr);
+					ImGui::Separator();
+					if (ImGui::MenuItem("Quit")) { Event::throwEvent(Event::AppEvent::WindowClosedEvent()); };
+					ImGui::EndMenu();
+
+				}
+
+				ImGui::EndMenuBar();
+			}
+			
+			ImGui::ShowDemoWindow();
+
+            ImGui::End();
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
+			ImGui::Begin("Editor");
+			ImVec2 s = ImGui::GetContentRegionAvail();
+			if (m_ViewportSize != glm::vec2{ s.x, s.y })
+			{
+				m_ViewportSize = { s.x, s.y };
+				renderer->framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+				background->Set(m_ViewportSize);
+			}
+			ImGui::Image((void*)renderer->framebuffer->getColorAttachment(), s, ImVec2{0, 1}, ImVec2{1, 0});
+			ImGui::End();
+			ImGui::PopStyleVar();
+
+		});*/
 
 	shader = Renderer::Shader::Create("res\\shaders\\Basic.shader");
 	renderer->SetShader(shader);
 	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
 
-	Player = GenRect2D("Aadhav", {200.0f, 200.0f});  
+	Player = CreateRef<ME::Rectangle>("Aadhav", glm::vec2{200.0f, 200.0f});
 	for (int i = 0; i < 600; i += 50)
 		obj.emplace_back(GenQuad2D("TileMap", {0.0 + i, 0.0 + i}, {50.0 + i, 0.0 + i}, {50.0 + i, 50.0 + i}, {0.0 + i, 50.0 + i}, 1));
 	
-	Ref<MeshQueue2D> queue1 = CreateRef<MeshQueue2D>(), queue2 = CreateRef<MeshQueue2D>();
-	queue1->PushMesh(Player);
-	queue2->PushMeshes(obj);
+	renderer->AddMesh((Ref<Mesh2D>(background)));
+	renderer->AddMesh(obj);
+	renderer->AddMesh(Player);
 	tex = CreateRef<Renderer::OpenGL::OpenGLTexture>("res\\textures\\android.png");
-	renderer->AddRenderSubmition(queue1, [this]()
-		{
-			tex->Bind();
-			shader->SetUniforms1i("u_Texture", tex->GetSlot());
-		});
+	tex->Bind();
+	shader->SetUniforms1i("u_Texture", tex->GetSlot());
 
-	renderer->AddRenderSubmition(queue2, []() {});
-	glm::mat4 ortho = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
-	shader->SetUniformsMat4f("u_MVP", ortho);
-}
-
-void Martian::OnDetach() 
-{
-
+	m_Camera = CreateRef<Camera>(glm::ortho(0.0f, m_ViewportSize.x, 0.0f, m_ViewportSize.y, -1.0f, 1.0f));
 }
 
 void Martian::OnUpdate(Timestep ts)
@@ -79,13 +137,11 @@ void Martian::OnUpdate(Timestep ts)
 		app->GetWindow().SetVSync(!app->GetWindow().IsVSync());
 	if (Window::Input::IsKeyPressed(Event::Key::Escape))
 		Player->Reset();
+
+	m_Camera->SetProjectionViewMat(glm::ortho(0.0f, m_ViewportSize.x, 0.0f, m_ViewportSize.y, -1.0f, 1.0f));
+	shader->SetUniformsMat4f("u_MVP", *m_Camera);
 }
 
-void Martian::OnDraw()
-{
-}
-
-void Martian::OnEvent(Event::Event& e)
-{
-
-}
+void Martian::OnDraw() {}
+void Martian::OnEvent(Event::Event& e) {}
+void Martian::OnDetach() {}

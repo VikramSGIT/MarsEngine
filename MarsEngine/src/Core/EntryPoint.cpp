@@ -12,10 +12,9 @@ int main(int, char**)
     ME_MEM_INIT();
     ME_ENTITYINIT();
     {
-        ME::String s = "Hi";
         auto app = ME::Application::CreateApp();
         app->Run();
-        ME::dealloc(app, sizeof(ME::Application));
+        ME::dealloc(app);
     }
     ME_ENTITYCLEAR();
     ME_MEM_CLEAR();

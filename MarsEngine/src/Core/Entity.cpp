@@ -3,6 +3,7 @@
 #include "Core/Logger.h"
 #include "Memory/MemoryManager.h"
 
+#include <iostream>
 ME::EntityDB* ME::EntityDB::s_EntityDB = nullptr;
 
 void ME::InitEntityDB()

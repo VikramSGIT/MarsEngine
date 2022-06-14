@@ -18,13 +18,8 @@ namespace ME
         {
         public:
             std::string Title;
-            uint32_t Width;
-            uint32_t Height;
-
-            WindowProperty(const std::string& title = "Mars Engine",
-                uint32_t widht = 1280,
-                uint32_t height = 720)
-                : Title(title), Width(widht), Height(height) {}
+            uint32_t Width = 1280;
+            uint32_t Height = 720;
         };
 
 
