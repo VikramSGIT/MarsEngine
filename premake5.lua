@@ -70,7 +70,11 @@ workspace "MarsEngine"
 			"MarsEngine/src/Addons/**.h",
 			"MarsEngine/src/Core/**.cpp",
 			"MarsEngine/src/Core/**.h",
+			"MarsEngine/src/Engine Utilites/**.h",
+			"MarsEngine/src/Engine Utilites/**.cpp",
 			"MarsEngine/src/GL/**.h",
+			"MarsEngine/src/Modules/**.h",
+			"MarsEngine/src/Modules/**.cpp",
 			"MarsEngine/src/RenderAPI/**.cpp",
 			"MarsEngine/src/RenderAPI/**.h",
 			"MarsEngine/src/Utils/**.h",
@@ -85,6 +89,7 @@ workspace "MarsEngine"
 		includedirs
 		{
 			"MarsEngine/src/Vender/imgui",
+			"MarsEngine/src/Vender/spdlog/include",
 			"MarsEngine/src"
 		}
 
@@ -133,6 +138,7 @@ workspace "MarsEngine"
 		{
 			"MarsEngine/src/Vender",
 			"MarsEngine/src/Vender/imgui",
+			"MarsEngine/src/Vender/spdlog/include",
 			"MarsEngine/src"
 		}
 		

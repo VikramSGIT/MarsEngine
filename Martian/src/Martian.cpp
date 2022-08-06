@@ -133,7 +133,7 @@ void Martian::OnAttach()
 	Ref<int*> a = CreateRef<int*>(alloc<int>());
 
 	m_Camera = CreateRef<Camera2D>(glm::vec2(m_ViewportSize.x, m_ViewportSize.y));
-}
+}	
 
 void Martian::OnUpdate(Timestep ts)
 {
