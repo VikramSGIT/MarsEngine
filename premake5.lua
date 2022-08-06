@@ -1,12 +1,7 @@
 workspace "MarsEngine"
 	architecture "x64"
-	startproject "MarsEngine"
-
-	configurations
-	{
-		"Debug",
-		"Release"
-	}
+	configurations { "Debug", "Release"}
+	startproject "Martian"
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
@@ -32,8 +27,8 @@ workspace "MarsEngine"
 		includedirs
 		{
 			"MarsEngine/src/Vender/imgui",
-			"MarsEngine/src/Vender/",
-			"MarsEngine/src/"
+			"MarsEngine/src/Vender",
+			"MarsEngine/src"
 		}
 
 		flags
@@ -61,7 +56,7 @@ workspace "MarsEngine"
 
 	project "MarsEngine"
 		location "MarsEngine"
-		kind "ConsoleApp"
+		kind "StaticLib"
 		language "C++"
 		staticruntime "Off"
 
@@ -70,9 +65,16 @@ workspace "MarsEngine"
 
 		files
 		{
+			
+			"MarsEngine/src/Addons/**.cpp",
+			"MarsEngine/src/Addons/**.h",
 			"MarsEngine/src/Core/**.cpp",
 			"MarsEngine/src/Core/**.h",
+			"MarsEngine/src/Engine Utilites/**.h",
+			"MarsEngine/src/Engine Utilites/**.cpp",
 			"MarsEngine/src/GL/**.h",
+			"MarsEngine/src/Modules/**.h",
+			"MarsEngine/src/Modules/**.cpp",
 			"MarsEngine/src/RenderAPI/**.cpp",
 			"MarsEngine/src/RenderAPI/**.h",
 			"MarsEngine/src/Utils/**.h",
@@ -87,7 +89,8 @@ workspace "MarsEngine"
 		includedirs
 		{
 			"MarsEngine/src/Vender/imgui",
-			"MarsEngine/src/"
+			"MarsEngine/src/Vender/spdlog/include",
+			"MarsEngine/src"
 		}
 
 		flags
@@ -104,9 +107,59 @@ workspace "MarsEngine"
 				"ME_PLATFORM_WINDOWS",
 				"IMGUI_IMPL_OPENGL_LOADER_GLEW",
 				"GLFW_INCLUDE_NONE",
-				"GLEW_STATIC"
+				"GLEW_STATIC",
+				"_CRT_SECURE_NO_WARNINGS"
 			}
 
+		filter "configurations:Debug"
+			defines "ME_DEBUG"
+			symbols "On"
+
+		filter "configurations:Release"
+			defines "ME_RELEASE"
+			optimize "On"
+
+	project "Martain"
+		location "Martian"
+		kind "ConsoleApp"
+		language "C++"
+		staticruntime "Off"
+
+		targetdir ("bin/" .. outputdir .. "/bin")
+		objdir("bin/" .. outputdir .."/obj/%{prj.name}")
+
+		files
+		{
+			"Martian/**.h",
+			"Martian/**.cpp"
+		}
+
+		includedirs
+		{
+			"MarsEngine/src/Vender",
+			"MarsEngine/src/Vender/imgui",
+			"MarsEngine/src/Vender/spdlog/include",
+			"MarsEngine/src"
+		}
+		
+		flags
+		{
+			"MultiProcessorCompile"
+		}
+
+		filter "system:windows"
+			cppdialect "C++17"
+			
+		
+			defines
+			{
+				"ME_PLATFORM_WINDOWS",
+				"IMGUI_IMPL_OPENGL_LOADER_GLEW",
+				"GLFW_INCLUDE_NONE",
+				"GLEW_STATIC",
+				"_CRT_SECURE_NO_WARNINGS"
+			}
+		
 			libdirs
 			{
 				"bin/" .. outputdir .. "/lib"
@@ -115,14 +168,12 @@ workspace "MarsEngine"
 			links
 			{
 				"ImGui",
+				"MarsEngine",
 				"opengl32",
-				"user32",
-				"gdi32",
-				"shell32",
-				"glfw3",
-				"glew32s"
+				"glew32s",
+				"glfw3"
 			}
-
+		
 		filter "configurations:Debug"
 			defines "ME_DEBUG"
 			symbols "On"

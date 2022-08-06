@@ -1,34 +1,22 @@
-#pragma once
+#ifndef ME_MARSHEADER
+#define ME_MARSHEADER
 
+<<<<<<< HEAD
 #define ME_DEBUG
 //#define ME_IMGUI
+=======
+#define ME_WINDOWS 1
+#define ME_PLATFORM ME_WINDOWS
+
+#define ME_IMGUI
+>>>>>>> origin/master
 #define ME_DATATYPE float
 //#define ME_DEBUG_SHOW_EVENT
 //#define ME_PROFILE_TRACE_CALLFUNC
-#define ME_MAX_VERTEX_BUFFER_SIZE 1000 * sizeof(ME_DATATYPE) * 24
-#define ME_MAX_INDEX_BUFFER_SIZE 200 * sizeof(unsigned int) * 6
 
-#include "Utils/Intrumentor.h"
-#include "glm/glm/glm.hpp"
-#include "glm/glm/mat4x4.hpp"
-#include "glm/glm/vec4.hpp"
-#include "glm/glm/vec3.hpp"
-#include "glm/glm/vec2.hpp"
+#include "Engine Utilites/Instrumentor.h"
 
-#include <memory>
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-template<typename T>
-using Ref = std::shared_ptr<T>;
-template<typename T>
-using Scope = std::unique_ptr<T>;
-template<typename T, typename... Args>
-Ref<T> CreateRef(Args&& ... args) { return std::make_shared<T>(std::forward<Args>(args)...); }
-template<typename T, typename ... Args>
-Scope<T> CreateScope(Args&& ...args) { return std::make_unique<T>(std::forward<Args>(args)...); }
-
-
+#include "Core/Memory/MemoryManager.h"
 #include "Core/Logger.h"
+
+#endif

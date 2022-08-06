@@ -1,111 +1,72 @@
-#pragma once
-#include <vector>
+#ifndef ME_BUFFERS
+#define ME_BUFFERS
 
-#include "MarsHeader.h"
-#include "GL/glew.h"
+#pragma once
+
+#include "Core/Utilites/Ref.h"
+
+#include <vector>
 
 namespace ME
 {
-    namespace Renderer
+    unsigned int GetElementSize(unsigned int type);
+
+    enum class Type
     {
-        enum class Type
-        {
-            NONE = 0,
-            VERTICES,
-            TEXTURECOORD,
-            INDEX
-        };
+        NONE = 0,
+        VERTICES,
+        TEXTURECOORD,
+        INDEX
+    };
 
-        inline unsigned int GetElementSize(unsigned int type)
-        {
+    struct FramebufferSpecification
+    {
+        uint32_t Height = 1280, Width = 720, Samples = 1;
+        bool SwapChainTarget = false, IncludeDepthbuffer = false;
+    };
 
-            ME_PROFILE_TRACE_CALL();
+    class Framebuffer
+    {
+    public:
 
-            switch (type)
-            {
-            case GL_FLOAT:         return 4;
-            case GL_UNSIGNED_INT:  return 4;
-            case GL_UNSIGNED_BYTE: return 1;
+        virtual void Bind() = 0;
+        virtual void unBind() = 0;
 
-            default:               return 0;
-            }
-        }
-        class VertexBuffer
-        {
-        public:
-            VertexBuffer() = default;
-            virtual ~VertexBuffer() = default;
+        virtual void Resize(uint32_t Width, uint32_t Height) = 0;
 
-            virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
+        virtual unsigned int getColorAttachment() const = 0;
+        virtual unsigned int getDepthAttachment() const = 0;
 
-            virtual void Bind() const = 0;
-            virtual void unBind() const = 0;
+        static Ref<Framebuffer> Create(const FramebufferSpecification&);
+    };
+    //
+    // OpenGL stuffs need to be hidden
+    //
+    struct VertexbufferElement
+    {
+        unsigned int type;
+        unsigned int count;
+        char normalized;
+    };
 
-            virtual inline bool IsEmpty() const = 0;
-            virtual inline unsigned int GetFilledSize() const = 0;
-            virtual inline unsigned int GetID() const = 0;
-            virtual inline void ClearBufferOnDestroy(bool mode) = 0;
-        };
+    class VertexbufferLayout
+    {
+    private:
+        std::vector<VertexbufferElement> m_Elements;
+        unsigned int m_Stride;
+    public:
+        VertexbufferLayout()
+            : m_Stride(0) {};
 
-        class IndexBuffer
-        {
-        public:
-            IndexBuffer() = default;
-            virtual ~IndexBuffer() = default;
+        ~VertexbufferLayout() = default;
 
-            virtual void BufferPostRenderData(const void* data, const unsigned int& size, const unsigned int& offset) = 0;
+        void push(unsigned int type, unsigned int count);
 
-            virtual void Bind() const = 0;
-            virtual void unBind() const = 0;
+        inline const std::vector<VertexbufferElement> GetElements() const { return m_Elements; }
 
-            virtual inline bool IsEmpty() const = 0;
-            virtual inline unsigned int GetFilledSize() const = 0;
-            virtual inline unsigned int GetID() const = 0;
-            virtual inline void ClearBufferOnDestroy(bool mode) = 0;
-        };
-        //
-        // OpenGL stuffs need to be hidden
-        //
-        struct VertexBufferElement
-        {
-            unsigned int type;
-            unsigned int count;
-            char normalized;
-        };
-
-        class VertexBufferLayout
-        {
-        private:
-            std::vector<VertexBufferElement> m_Elements;
-            unsigned int m_Stride;
-        public:
-            VertexBufferLayout()
-                : m_Stride(0) {};
-
-            ~VertexBufferLayout() {}
-
-            void push(unsigned int type, unsigned int count)
-            {
-                m_Elements.push_back({ type, count, GL_FALSE });
-                m_Stride += sizeof(GLfloat) * count;
-            }
-
-            inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
-
-            inline const unsigned int GetStride() const { return m_Stride; }
-            inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(ME_DATATYPE); }
-        };
-
-        class VertexArray
-        {
-        public:
-            VertexArray() = default;
-            virtual ~VertexArray() = default;
-
-            virtual void AddBuffer(const VertexBuffer& vertexbuffer, const VertexBufferLayout& layout) = 0;
-
-            virtual void Bind() const = 0;
-            virtual void unBind() const = 0;
-        };
-    }
+        inline const unsigned int GetStride() const { return m_Stride; }
+        inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(ME_DATATYPE); }
+    };
 }
+
+#endif

@@ -1,39 +1,37 @@
+#ifndef ME_LAYERSTACK
+#define ME_LAYERSTACK
+
 #pragma once
-#include "MarsHeader.h"
 
 #include "Layer.h"
-
-#include <vector>
-#include <algorithm>
-#include <functional>
-
-namespace Window
+#include "Core/Utilites/Vector.h"
+#include "Core/Utilites/Ref.h"
+namespace ME
 {
-    namespace Layer
+    namespace Window
     {
         class LayerStack
         {
         private:
-            std::vector<Ref<Layer>> m_layerstack;
-            unsigned int m_totallayers = 0;
+            Vector<Ref<Layer>> m_layerstack;
         public:
             LayerStack() = default;
             ~LayerStack();
 
-            void PushLayer(Ref<Layer> layer);
-            void PushOverlay(Ref<Layer> overlay);
-            void PopLayer(Ref<Layer> layer);
-            void PopOverlay(Ref<Layer> overlay);
+            void PushOverlay(const Ref<Layer>& overlay);
+            void PushLayer(const Ref<Layer>& layer);
+            void PopLayer(const Ref<Layer>& layer);
 
-            std::vector<Ref<Layer>>::iterator begin() {return m_layerstack.begin();}
-            std::vector<Ref<Layer>>::iterator end() {return m_layerstack.end();}
-            std::vector<Ref<Layer>>::reverse_iterator rbegin() {return m_layerstack.rbegin();}
-            std::vector<Ref<Layer>>::reverse_iterator rend() {return m_layerstack.rend();}
+            void clear() { m_layerstack.clear(); }
+            auto begin() { return m_layerstack.begin(); }
+            auto end() { return m_layerstack.end(); }
 
-            std::vector<Ref<Layer>>::const_iterator begin() const {return m_layerstack.begin();}
-            std::vector<Ref<Layer>>::const_iterator end() const {return m_layerstack.end();}
-            std::vector<Ref<Layer>>::const_reverse_iterator rbegin() const {return m_layerstack.rbegin();}
-            std::vector<Ref<Layer>>::const_reverse_iterator rend() const {return m_layerstack.rend();}
+            auto begin() const { return m_layerstack.begin(); }
+            auto end() const { return m_layerstack.end(); }
+
+            inline size_t GetTotalLayers() const { return m_layerstack.size(); }
         };
     }
 }
+
+#endif

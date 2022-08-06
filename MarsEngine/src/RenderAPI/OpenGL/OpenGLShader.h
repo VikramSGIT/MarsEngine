@@ -1,54 +1,48 @@
-#pragma once
-#include "MarsHeader.h"
-#include "RenderAPI/Buffers.h"
-#include "Vender/glm/glm/gtc/matrix_transform.hpp"
-#include "GL/glew.h"
-#include "OpenGLErrorHandle.h"
-#include "RenderAPI\Shader.h"
+#ifndef ME_OPENGLSHADER
+#define ME_OPENGLSHADER
 
-#include <string>
+#pragma once
+
+#include "Core/Utilites/String.h"
+#include "Vender/glm/glm/gtc/matrix_transform.hpp"
+#include "RenderAPI/Shader.h"
+
 #include <unordered_map>
-#include <iostream>
 #include <fstream>
-#include <sstream>
 
 namespace ME
 {
-    namespace Renderer
+    namespace OpenGL
     {
-        namespace OpenGL
+        struct ShaderSource
         {
-            struct ShaderSource
-            {
-                std::string VertexShader;
-                std::string FragmentShader;
-            };
+            std::string VertexShader, FragmentShader;
+        };
 
-            class OpenGLShader : public Shader
-            {
-            private:
-                unsigned int m_RendererID;
-                std::unordered_map<std::string, int> m_UniformLocationCache;
-                std::string m_Filepath;
-                bool Bound = false;
+        class OpenGLShader : public Shader
+        {
+        private:
+            unsigned int m_RendererID;
+            string m_Filepath;
+            std::unordered_map<std::string, unsigned int> m_UniformLocationCache;
 
-                ShaderSource PharseShader(const std::string& filepath);
-                unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
-                unsigned int CompileShader(unsigned int type, const std::string& program);
+            ShaderSource PharseShader(const string& filepath);
+            unsigned int CreateShader(const string& vertexShader, const string& fragmentShader);
+            unsigned int CompileShader(unsigned int type, const string& program);
 
-            public:
-                OpenGLShader(const std::string& filepath);
-                ~OpenGLShader();
+        public:
+            OpenGLShader(const string& filepath);
+            ~OpenGLShader();
 
-                void Bind() override;
-                void unBind() override;
+            void Bind() override;
+            void unBind() override;
 
-                void SetUniforms4f(const std::string& name, const float& f1, const float& f2, const float& f3, const float& f4) override;
-                void SetUniforms3f(const std::string& name, const float* data) override;
-                void SetUniforms1i(const  std::string& name, const int& data) override;
-                void SetUniforms1f(const  std::string& name, const float& data) override;
-                void SetUniformsMat4f(const std::string& name, const glm::mat4& matrix) override;
-            };
-        }
+            void SetUniforms4f(const string& name, const float& f1, const float& f2, const float& f3, const float& f4) override;
+            void SetUniforms3f(const string& name, const float* data) override;
+            void SetUniforms1i(const string& name, const int& data) override;
+            void SetUniforms1f(const string& name, const float& data) override;
+            void SetUniformsMat4f(const string& name, const glm::mat4& matrix) override;
+        };
     }
 }
+#endif

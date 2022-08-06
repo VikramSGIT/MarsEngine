@@ -1,29 +1,34 @@
+#ifndef ME_LAYER
+#define ME_LAYER
+
 #pragma once
-#include "MarsHeader.h"
 
 #include "Window/Events/Event.h"
+#include "Core/Utilites/TimeStep.h"
+#include "Core/Utilites/String.h"
 
-#include <string>
-
-namespace Window
+namespace ME
 {
-    namespace Layer
+    namespace Window
     {
         class Layer
         {
         private:
-            std::string m_LayerName;
+            String<alloc_dealloc_UpstreamMemory> m_LayerName;
         public:
-            Layer(const std::string& name)
+            Layer(const String<alloc_dealloc_UpstreamMemory>& name)
                 :m_LayerName(name) {}
             virtual ~Layer() = default;
 
             virtual void OnAttach() = 0;
             virtual void OnDetach() = 0;
-            virtual void OnUpdate() = 0;
+            virtual void OnUpdate(Timestep ts) = 0;
+            virtual void OnDraw() = 0;
             virtual void OnEvent(Event::Event& e) = 0;
 
-            const std::string GetName() const { return m_LayerName;}
+            inline String<alloc_dealloc_UpstreamMemory> GetName() const { return m_LayerName; }
         };
     }
 }
+
+#endif

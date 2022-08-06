@@ -1,22 +1,26 @@
+#include "MarsHeader.h"
 #include "imguiLayer.h"
 
-namespace Window
+#include "Vender/imgui/imgui.h"
+#include "Window/Windows/WindowsWindow.h"
+#include "Vender/GLFW/glfw3.h"
+#include "Vender/imgui/backends/imgui_impl_opengl3.h"
+#include "Vender/imgui/backends/imgui_impl_glfw.h"
+#include "Core/Application.h"
+
+namespace ME
 {
-    namespace Layer
+    namespace Window
     {
         imguiLayer::imguiLayer()
-            :Layer("ImGUI"),m_Time(0)
+            :Layer("ImGUI")
         {
-
             ME_PROFILE_TRACE_CALL();
-
         }
 
         imguiLayer::~imguiLayer()
         {
-
             ME_PROFILE_TRACE_CALL();
-
         }
 
         void imguiLayer::OnAttach()
@@ -48,7 +52,7 @@ namespace Window
                 style.Colors[ImGuiCol_WindowBg].w = 1.0f;
             }
 
-            ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(app.GetWindow()->GetNativeWindow()), true);
+            ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow()), true);
             ImGui_ImplOpenGL3_Init("#version 400");
         }
         void imguiLayer::OnDetach()
@@ -61,18 +65,27 @@ namespace Window
             ImGui::DestroyContext();
         }
 
-        void imguiLayer::OnUpdate()
+        void imguiLayer::OnUpdate(Timestep ts)
+        {
+            ME_PROFILE_TRACE_CALL();
+        }
+
+        void imguiLayer::OnEvent(Event::Event& e)
         {
 
             ME_PROFILE_TRACE_CALL();
 
+        }
+
+        void imguiLayer::OnDraw()
+        {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
             ImGuiIO& io = ImGui::GetIO();
 
             draw();
-            
+
             ImGui::Render();
 
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -88,19 +101,6 @@ namespace Window
                 glfwMakeContextCurrent(backup_current_context);
             }
         }
-        
-        void imguiLayer::OnEvent(Event::Event& e)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            if (m_BlockEvents)
-		    {
-                ImGuiIO& io = ImGui::GetIO();
-                e.Handled |= e.IsInCategory(Event::EventCategoryFlag::EventCategoryMouse) & io.WantCaptureMouse;
-                e.Handled |= e.IsInCategory(Event::EventCategoryFlag::EventCategoryKeyboard) & io.WantCaptureKeyboard;
-		    }
-        }
 
         void imguiLayer::SetDrawData(const std::function<void()>& func)
         {
@@ -108,7 +108,3 @@ namespace Window
         }
     }
 }
-
-
-        
-  

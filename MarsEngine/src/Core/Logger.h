@@ -1,32 +1,27 @@
+#ifndef ME_LOGGER
+#define ME_LOGGER
+
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <ctime>
-#include <memory>
-#include <vector>
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+#include "spdlog/fmt/ostr.h"
 
-class Logger
+static void InitLogger() 
 {
-private:
-    time_t now = std::time(0);
-    tm* m_Time = localtime(&now);
+    spdlog::cfg::load_env_levels();
+    spdlog::set_pattern("[%H:%M:%S  %t] [%l] %v");
+}
+static void DeinitLogger() noexcept { }
 
-    bool m_setlog = true;
-public:
+#define ME_LOGINIT() InitLogger()
+#define ME_LOGDEINIT() DeinitLogger()
 
-    void LogError(const std::string& err);
-    void LogInfo(const std::string& info);
-    void LogWarning(const std::string& war);
-    void LogCritical(const std::string& crt);
-    void LogNormal(const std::string& msg);
+#define ME_CORE_FILTER //if(msg[0] == 'R' || msg[0] == 'P')
+#define ME_CORE_MSG(...) spdlog::log(spdlog::level::off, __VA_ARGS__)
+#define ME_CORE_INFO(...) spdlog::info(__VA_ARGS__)
+#define ME_CORE_WARNING(...) spdlog::warn(__VA_ARGS__)
+#define ME_CORE_ERROR(CND, ...) if(CND) { spdlog::error(__VA_ARGS__); }
+#define ME_CORE_CRITICAL(CND, ...) if(CND) { spdlog::critical(__VA_ARGS__); throw "Critical"; }
 
-    void SetLogging(bool setlog) {m_setlog = setlog;}
-};
-
-std::shared_ptr<Logger> GetLogger();
-#define ME_CORE_MSG(X) GetLogger()->LogNormal(X);
-#define ME_CORE_INFO(X) GetLogger()->LogInfo(X)
-#define ME_CORE_WARNING(X) GetLogger()->LogWarning(X)
-#define ME_CORE_ERROR(X) GetLogger()->LogError(X)
-#define ME_CORE_CRITICAL(X) GetLogger()->LogCritical(X)
+#endif

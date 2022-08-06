@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ME_KEYEVENT
+#define ME_KEYEVENT
+
 #include "MarsHeader.h"
 
 #include "Window/Events/Event.h"
@@ -7,99 +9,103 @@
 #include <string>
 #include<sstream>
 
-namespace Event
+namespace ME
 {
-    namespace KeyEvent 
+    namespace Event
     {
-        class KeyEvent : public Event
+        namespace KeyEvent
         {
-        public:
-            KeyCode GetkeyCode() const {return m_KeyCode;}
-            virtual void* GetGenericData() const override { return genericdata; }
-
-            EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
-        protected:
-            KeyEvent(const KeyCode keycode)
-                : m_KeyCode(keycode) {}
-        
-        KeyCode m_KeyCode;
-        };
-
-        class KeyPressedEvent : public KeyEvent
-        {
-            private:
-                uint16_t m_RepeatCount;
+            class KeyEvent : public Event
+            {
             public:
-                KeyPressedEvent(const KeyCode keycode, const uint16_t repeatcount)
-                    : KeyEvent(keycode), m_RepeatCount(repeatcount) 
+                KeyCode GetkeyCode() const { return m_KeyCode; }
+
+                EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
+            protected:
+                KeyEvent(const KeyCode keycode)
+                    : m_KeyCode(keycode) {}
+
+                KeyCode m_KeyCode;
+            };
+
+            class KeyPressedEvent : public KeyEvent
+            {
+            public:
+                KeyPressedEvent(const KeyCode keycode)
+                    : KeyEvent(keycode)
                 {
-                        
                     ME_PROFILE_TRACE_CALL();
-
-                    uint16_t* key = new uint16_t[2];
-                    *key = keycode;
-                    *(key + 1) = repeatcount;
-                    genericdata = (void*)(key);
                 }
-                
-                uint16_t GetRepeatCount() const { return m_RepeatCount;}
 
-                #ifdef ME_DEBUG_SHOW_EVENT
+#ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
                 {
                     std::stringstream ss;
                     ss << "KeyPressed: " << m_KeyCode << "(" << m_RepeatCount << ")";
                     return ss.str();
                 }
-                #endif
-            EVENT_CLASS_TYPE(KeyPressed)
-        };
+#endif
+                EVENT_CLASS_TYPE(KeyPressed)
+            };
 
-        class KeyReleasedEvent : public KeyEvent
-        {
-        public:
-            KeyReleasedEvent(const KeyCode keycode)
-                : KeyEvent(keycode) 
+            class KeyRepeatEvent : public KeyEvent
+            {
+            private:
+                size_t m_RepeatCount;
+            public:
+                KeyRepeatEvent(const KeyCode keycode, const uint16_t repeatcount)
+                    :KeyEvent(keycode), m_RepeatCount(repeatcount) {}
+
+                size_t getRepeatCount() { return m_RepeatCount; }
+
+                EVENT_CLASS_TYPE(KeyRepeat)
+            };
+
+            class KeyReleasedEvent : public KeyEvent
+            {
+            public:
+                KeyReleasedEvent(const KeyCode keycode)
+                    : KeyEvent(keycode)
                 {
-                    
+
                     ME_PROFILE_TRACE_CALL();
 
-                    genericdata = (void*)(new KeyCode(keycode));
                 }
-            
-            #ifdef ME_DEBUG_SHOW_EVENT
-            std::string ToString() const override 
-            {
-                std::stringstream ss;
-                ss << "KeyReleasedEvent: " << m_KeyCode;
-                return ss.str();
-            }
-            #endif
-        EVENT_CLASS_TYPE(KeyReleased)
-        };
 
-        class KeyTypedEvent : public KeyEvent
-        {
-        public:
-            KeyTypedEvent(const KeyCode keycode)
-                : KeyEvent(keycode) 
+#ifdef ME_DEBUG_SHOW_EVENT
+                std::string ToString() const override
                 {
-                
+                    std::stringstream ss;
+                    ss << "KeyReleasedEvent: " << m_KeyCode;
+                    return ss.str();
+                }
+#endif
+                EVENT_CLASS_TYPE(KeyReleased)
+            };
+
+            class KeyTypedEvent : public KeyEvent
+            {
+            public:
+                KeyTypedEvent(const KeyCode keycode)
+                    : KeyEvent(keycode)
+                {
+
                     ME_PROFILE_TRACE_CALL();
 
-                    KeyCode key = keycode; 
-                    genericdata = (void*)(new KeyCode(keycode));
                 }
-            #ifdef ME_DEBUG_SHOW_EVENT
-            std::string ToString() const override
-            {
-                std::stringstream ss;
-                ss << "KeyTyped: "<< m_KeyCode;
-                return ss.str();
-            }
-            #endif
-            EVENT_CLASS_TYPE(KeyTyped)
-        };
+#ifdef ME_DEBUG_SHOW_EVENT
+                std::string ToString() const override
+                {
+                    std::stringstream ss;
+                    ss << "KeyTyped: " << m_KeyCode;
+                    return ss.str();
+                }
+#endif
+                EVENT_CLASS_TYPE(KeyTyped)
+            };
+        }
+
     }
-    
 }
+
+#endif

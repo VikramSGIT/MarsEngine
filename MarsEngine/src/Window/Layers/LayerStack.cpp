@@ -1,7 +1,10 @@
+#include "MarsHeader.h"
 #include "LayerStack.h"
-namespace Window
+
+#include <algorithm>
+namespace ME
 {
-    namespace Layer
+    namespace Window
     {
         LayerStack::~LayerStack()
         {
@@ -9,60 +12,41 @@ namespace Window
             ME_PROFILE_TRACE_CALL();
 
             for (Ref<Layer> layer : m_layerstack)
-            {
                 layer->OnDetach();
-                layer.reset();
-            }    
         }
 
-        void LayerStack::PushLayer(Ref<Layer> layer)
+        void LayerStack::PushLayer(const Ref<Layer>& layer)
         {
 
             ME_PROFILE_TRACE_CALL();
 
-            m_layerstack.emplace(m_layerstack.begin() + m_totallayers, layer);
-            layer->OnAttach();
-            m_totallayers++;
+            Ref<Layer> ref = layer;
+            m_layerstack.emplace_back(layer);
+            ref->OnAttach();
         }
 
-        void LayerStack::PushOverlay(Ref<Layer> overlay)
+        void LayerStack::PushOverlay(const Ref<Layer>& overlay)
         {
 
             ME_PROFILE_TRACE_CALL();
 
-            m_layerstack.emplace_back(overlay);
-            overlay->OnAttach();
+            Ref<Layer> ref = overlay;
+            m_layerstack.emplace(m_layerstack.begin(), ref);
+            ref->OnAttach();
         }
 
-        void LayerStack::PopLayer(Ref<Layer> layer)
+        void LayerStack::PopLayer(const Ref<Layer>& layer)
         {
 
             ME_PROFILE_TRACE_CALL();
 
-            auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_totallayers, layer);
-            if(it != m_layerstack.begin() + m_totallayers)
+            Ref<Layer> ref = layer;
+            auto it = std::find(m_layerstack.begin(), m_layerstack.end(), layer);
+            if (it != m_layerstack.end())
             {
-                layer->OnDetach();
+                ref->OnDetach();
                 m_layerstack.erase(it);
-                m_totallayers--;
             }
         }
-
-        void LayerStack::PopOverlay(Ref<Layer> overlay)
-        {
-
-            ME_PROFILE_TRACE_CALL();
-
-            auto it = std::find(m_layerstack.begin(), m_layerstack.begin() + m_totallayers, overlay);
-            if(it != m_layerstack.end())
-            {
-                overlay->OnDetach();
-                m_layerstack.erase(it);
-                overlay.reset();
-            }
-        }
-
-        
-
     }
 }

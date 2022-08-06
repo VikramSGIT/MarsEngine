@@ -1,58 +1,62 @@
+#ifndef ME_RENDERER
+#define ME_RENDERER
+
 #pragma once
-#include "MarsHeader.h"
+
+#define ME_OPENGL_MAXVERTEXBUFFER 1000
+#define ME_OPENGL_MAXINDEXBUFFER 1000
+
 #include "Shader.h"
-#include "Mesh.h"
+#include "Modules/Mesh.h"
+#include "Modules/2D/Mesh2D.h"
 #include "Window/Layers/Layer.h"
-#include "Window/Layers/BasicLayer.h"
-#include "RenderAPI/OpenGL/OpenGLShader.h"
+#include "Buffers.h"
+#include "Core/Utilites/Ref.h"
 
 namespace ME
 {
-    namespace Renderer
+    enum class RenderAPItype
     {
-        enum class RenderAPItype
-        {
-            ME_NONE = 0,
-            ME_RENDERER_OPENGL = 1
-        };
-        class RenderAPI
-        {
-        private:
-            RenderAPItype m_renderapi;
-        public:
-            RenderAPI(RenderAPItype api)
-                :m_renderapi(api) {}
-            virtual ~RenderAPI() = default;
+        ME_NONE = 0,
+        ME_RENDERER_OPENGL,
+        ME_RENDERER_OPENGL2D
+    };
 
-            virtual void Init() = 0;
-            virtual void OnUpdate() = 0;
-            virtual void OnEvent(Event::Event& e) = 0;
-            virtual void Clear() const = 0;
-            virtual void SetClearColor(const glm::vec4& color) = 0;
-            virtual void AddRenderSubmition(const ME::MeshQueue& meshqueue, std::function<void()> preprocessdata) = 0;
-            virtual Ref<Layer::BasicLayer> GetLayer() = 0;
-            virtual void Draw(const Ref<Shader>& shader) = 0;
+    class RenderAPI : public Window::Layer
+    {
+    public:
+        RenderAPI(RenderAPItype api)
+            :Layer("Renderer") {}
+        virtual ~RenderAPI() = default;
 
-            virtual bool SwitchAPI(const RenderAPItype api) = 0;
-            virtual void SetViewPortSize(const unsigned int& X, const unsigned int& Y) = 0;
+        virtual void OnAttach() override = 0;
+        virtual void OnDetach() override = 0;
+        virtual void OnEvent(Event::Event& e) override = 0;
+        virtual void OnUpdate(Timestep ts) override = 0;
+        virtual void OnDraw() override = 0;
 
-            inline RenderAPItype GetAPI() { return m_renderapi; };
-            virtual inline std::vector<ME::MeshQueue> GetRenderQueue() = 0;
+        virtual void AddMesh(const Ref<Mesh>&) = 0;
+        virtual void AddMesh(const std::vector<Ref<Mesh>>&) = 0;
+        virtual void AddMesh(const Ref<Mesh2D>&) = 0;
+        virtual void AddMesh(const std::vector<Ref<Mesh2D>>&) = 0;
+        virtual void AddFramebuffer(const FramebufferSpecification& framebufferspec) = 0;
 
+        virtual void PushUpdate(Mesh* mesh) = 0;
+        virtual void PushUpdate(Mesh2D* mesh) = 0;
+        virtual void SetViewPortSize(const uint32_t& X, const uint32_t& Y) = 0;
+        virtual void SetClearColor(const glm::vec4& color) = 0;
+        virtual void SetShader(const Ref<Shader>& shader) = 0;
 
-            Ref<Shader> Create(const std::string& filepath)
-            {
-                if (GetAPI() == RenderAPItype::ME_RENDERER_OPENGL)
-                {
-                    return CreateRef<OpenGL::OpenGLShader>(filepath);
-                }
-                else
-                {
-                    ME_CORE_ERROR("MarsEngine Only supports OpenGl!");
-                    return nullptr;
-                }
-            }
-        };
+        virtual size_t GetTotalVertices() const = 0;
+        virtual size_t GetTotalIndices() const = 0;
 
-    }
+        static RenderAPItype GetAPI() { return s_renderapi; }
+        static Ref<RenderAPI> Create(const RenderAPItype& renderapitype);
+
+        Ref<Framebuffer> framebuffer;
+    private:
+        static RenderAPItype s_renderapi;
+    };
 }
+
+#endif
