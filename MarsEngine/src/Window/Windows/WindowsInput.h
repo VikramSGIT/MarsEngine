@@ -17,7 +17,7 @@ namespace ME
 		{
 			std::set<Event::KeyCode> m_Keystack;
 			std::set<Event::MouseCode> m_Mousestack;
-			glm::vec2 m_MousePos;
+			glm::vec2 m_MousePos, m_MouseDelta;
 		};
 
 		class WindowsInput : public Input
@@ -28,10 +28,14 @@ namespace ME
 		protected:
 			virtual bool IsKeyPressedImpl(const int& keycode) override;
 
+			virtual bool GetMouseMovedImpl() override;
 			virtual bool IsMousePressedImpl(const int& mousecode) override;
+			virtual glm::vec2 GetMouseImpl() override;
 			virtual float GetMouseXImpl() override;
 			virtual float GetMouseYImpl() override;
-			virtual glm::vec2 GetMousePosImpl() override;
+			virtual glm::vec2 GetMouseDeltaImpl() override;
+			virtual float GetMouseDeltaXImpl() override;
+			virtual float GetMouseDeltaYImpl() override;
 		private:
 			InputData m_InputData;
 		};

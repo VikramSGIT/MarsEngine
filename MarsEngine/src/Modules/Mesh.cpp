@@ -60,6 +60,11 @@ namespace ME
 		memcpy(m_MeshData.index.begin(), data, sizeof(unsigned int) * count);
 	}
 
+	void Mesh::SetTexture(const Ref<Texture>& texture)
+	{
+		m_TextureData = texture;
+	}
+
 	void Mesh::SetReset(const VERTEX* vertex)
 	{
 
@@ -95,8 +100,8 @@ namespace ME
 		for (VERTEX& vertex : m_MeshData.vertex)
 		{
 			vertex.x += xyz.x;
-			vertex.x += xyz.y;
-			vertex.x += xyz.z;
+			vertex.y += xyz.y;
+			vertex.z += xyz.z;
 		}
 
 		Application::GetInstance().UpdateNotification(this);

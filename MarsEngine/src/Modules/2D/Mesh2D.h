@@ -9,6 +9,7 @@
 #include "Core/Utilites/Vector.h"
 #include "Addons/Addon.h"
 #include "Core/Utilites/Ref.h"
+#include "RenderAPI/Texture.h"
 
 /*
 * TODO: Plan virtually exposed functions
@@ -92,6 +93,7 @@ namespace ME
 
 		void BufferVertices(const VERTEX2D* vertex, const unsigned int& count);
 		void BufferIndices(const unsigned int* data, const unsigned int& count);
+		void SetTexture(const Ref<Texture>& texture);
 
 		void SetReset(const VERTEX2D* vertex);
 		void SetReset(const std::vector<VERTEX2D>& vertices);
@@ -104,16 +106,20 @@ namespace ME
 		void Scale(const glm::vec2& XY);
 
 		inline MeshData2D& GetMeshData() { return m_MeshData; }
+		inline string GetName() { return m_Name; }
+		inline Ref<Texture> GetTexture() { return m_TextureData; }
 		inline const MeshData2D& GetMeshData() const { return m_MeshData; }
 		inline const string GetName() const { return m_Name; }
+		inline const Ref<Texture> GetTexture() const { return m_TextureData; }
 		const glm::vec2 GetCentroid() const;
 
 		Mesh2D operator* (const glm::mat4& mat);
 
 	private:
 		MeshData2D m_MeshData;
-
 		string m_Name;
+		Ref<Texture> m_TextureData; // Will need to change to materials
+
 		friend class MeshQueue2D;
 	};
 

@@ -111,15 +111,16 @@ namespace ME
 		}
 
 		inline T* ptr() { return Ptr; }
+		inline bool IsValid() const { return Ptr != nullptr; }
 
 		T& operator*() { return *Ptr; }
 		T* operator->() { return Ptr; }
 		T const& operator*() const { return *Ptr; }
 		T const* operator->() const { return Ptr; }
-		bool operator==(const Ref& other) { return other.Ptr == Ptr; }
-		bool operator!=(const Ref& other) { return other.Ptr != Ptr; }
-		template<typename U> bool operator==(const Ref<U, upstreammemory>& other) { return other.Ptr == Ptr; }
-		template<typename U> bool operator!=(const Ref<U, upstreammemory>& other) { return other.Ptr != Ptr; }
+		bool operator==(const Ref& other) const { return other.Ptr == Ptr; }
+		bool operator!=(const Ref& other) const { return other.Ptr != Ptr; }
+		template<typename U> bool operator== (const Ref<U, upstreammemory>& other) const { return other.Ptr == Ptr; }
+		template<typename U> bool operator!= (const Ref<U, upstreammemory>& other) const { return other.Ptr != Ptr; }
 	private:
 
 		block* getControlBlock() { return ((block*)((char*)Ptr - sizeof(size_t))); }

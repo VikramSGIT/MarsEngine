@@ -43,6 +43,7 @@ namespace ME
 
                 virtual void Init(const WindowProperty& props);
                 virtual void Shutdown();
+                void PoolInputs();
 
                 struct WindowData
                 {

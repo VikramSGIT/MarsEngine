@@ -20,17 +20,19 @@ namespace ME
         void METerminate();
 
         Window::LayerStack* GetLayerStack() { return &m_LayerStack; }
-        void setRenderAPI(const Ref<Renderer::RenderAPI>& api);
+        void setRenderAPI(const Ref<RenderAPI>& api);
         Window::Window& GetWindow() { return *m_Window; }
 
         void UpdateNotification(Mesh2D* mesh);
         void UpdateNotification(Mesh* mesh);
 
+        double GetTime() { return m_LastFrameTime; }
+
         static Application& GetInstance() { return *s_Application; }
         static Application* CreateApp();
     private:
         Window::LayerStack m_LayerStack;
-        Ref<Renderer::RenderAPI> m_RenderAPI;
+        Ref<RenderAPI> m_RenderAPI;
 
         bool m_Running = true;
         Window::Window* m_Window;

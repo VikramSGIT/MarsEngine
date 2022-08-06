@@ -58,6 +58,11 @@ namespace ME
 		memcpy(m_MeshData.index.begin(), data, sizeof(unsigned int) * count);
 	}
 
+	void Mesh2D::SetTexture(const Ref<Texture>& texture)
+	{
+		m_TextureData = texture;
+	}
+
 	void Mesh2D::SetReset(const VERTEX2D* vertex)
 	{
 

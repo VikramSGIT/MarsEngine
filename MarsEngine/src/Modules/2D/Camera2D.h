@@ -7,19 +7,37 @@
 
 namespace ME
 {
-	namespace Renderer
+	class Camera2D
 	{
-		class Camera2D
-		{
-		public:
-			Camera2D(const glm::mat4& pv);
+	public:
+		Camera2D() = default;
+		Camera2D(const glm::vec2& lb);
 
-			inline glm::mat4& GetProjectionViewMat() { return m_PV; }
-			inline void SetProjectionViewMat(const glm::mat4& pv) { m_PV = pv; }
-		private:
-			glm::mat4 m_PV;
-		};
-	}
+		void SetViewport(const glm::vec2& lb);
+		void Zoom(const ME_DATATYPE& zoom, const glm::vec2& pos = glm::vec2(0.0f, 0.0f));
+		void Pan(const glm::vec2& pan);
+		void Rotate(const glm::vec2& rot);
+
+		void ZoomTo(const ME_DATATYPE& zoom, const glm::vec2& pos = glm::vec2(0.0f, 0.0f));
+		void PanTo(const glm::vec2& pan);
+		void RotateTo(const glm::vec2& rot);
+
+		void Reset();
+		operator glm::mat4();
+		inline const glm::mat4& GetProjectionViewMat()
+		{
+			Validate();
+			return m_Transform;
+		}
+	private:
+
+		void Validate();
+
+		glm::mat4 m_Transform;
+		glm::vec2 m_Pan, m_Rotate, m_ViewPortSize, At;
+		ME_DATATYPE m_Zoom, senZoom, senPan, senRot;
+		bool validated;
+	};
 }
 
 #endif

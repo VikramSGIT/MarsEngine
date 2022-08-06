@@ -30,18 +30,12 @@ namespace ME
 
             class KeyPressedEvent : public KeyEvent
             {
-            private:
-                uint16_t m_RepeatCount;
             public:
-                KeyPressedEvent(const KeyCode keycode, const uint16_t repeatcount)
-                    : KeyEvent(keycode), m_RepeatCount(repeatcount)
+                KeyPressedEvent(const KeyCode keycode)
+                    : KeyEvent(keycode)
                 {
-
                     ME_PROFILE_TRACE_CALL();
-
                 }
-
-                uint16_t GetRepeatCount() const { return m_RepeatCount; }
 
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
@@ -52,6 +46,19 @@ namespace ME
                 }
 #endif
                 EVENT_CLASS_TYPE(KeyPressed)
+            };
+
+            class KeyRepeatEvent : public KeyEvent
+            {
+            private:
+                size_t m_RepeatCount;
+            public:
+                KeyRepeatEvent(const KeyCode keycode, const uint16_t repeatcount)
+                    :KeyEvent(keycode), m_RepeatCount(repeatcount) {}
+
+                size_t getRepeatCount() { return m_RepeatCount; }
+
+                EVENT_CLASS_TYPE(KeyRepeat)
             };
 
             class KeyReleasedEvent : public KeyEvent

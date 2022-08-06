@@ -9,6 +9,7 @@
 #include "Core/Utilites/Ref.h"
 #include "Core/Utilites/Vector.h"
 #include "Core/Utilites/String.h"
+#include "RenderAPI/Texture.h"
 
 #include "Vender/glm/glm/glm.hpp"
 #include "Vender/glm/glm/gtc/matrix_transform.hpp"
@@ -98,6 +99,7 @@ namespace ME
 
 		void BufferVertices(const VERTEX* vertex, const unsigned int& count);
 		void BufferIndices(const unsigned int* data, const unsigned int& count);
+		void SetTexture(const Ref<Texture>& texture);
 
 		void Translate(const glm::vec3&);
 		void TranslateTo(const glm::vec3& xyz);
@@ -111,13 +113,15 @@ namespace ME
 
 		inline MeshData& GetMeshData() { return m_MeshData; }
 		inline const MeshData& GetMeshData() const { return m_MeshData; }
-		inline const string GetName() const { return m_Name; }
+		inline string GetName() const { return m_Name; }
+		inline Ref<Texture> GetTexture() { return m_TextureData; }
 		glm::vec3 getCentroid() const;
 
 		Mesh operator* (const glm::mat4& mat);
 	private:
 		MeshData m_MeshData;
 		string m_Name;
+		Ref<Texture> m_TextureData;
 
 		friend class MeshQueue;
 	};

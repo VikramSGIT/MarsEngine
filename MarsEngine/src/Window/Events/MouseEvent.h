@@ -12,7 +12,7 @@ namespace ME
 {
     namespace Event
     {
-        namespace Mouse
+        namespace MouseEvent
         {
             class MouseMovedEvent : public Event
             {

@@ -18,7 +18,7 @@ namespace ME
             None = 0,
             WindowClosed, WindowResized, WindowLostFocused, WindowMoved, WindowFocused,
             AppTick, AppUpdate, AppRender,
-            KeyPressed, KeyReleased, KeyTyped,
+            KeyPressed, KeyRepeat, KeyReleased, KeyTyped,
             MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
         };
 

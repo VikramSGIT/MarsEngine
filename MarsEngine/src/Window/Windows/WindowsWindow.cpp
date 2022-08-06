@@ -89,7 +89,7 @@ namespace ME
                             {
                             case GLFW_PRESS:
                             {
-                                Event::KeyEvent::KeyPressedEvent event(key, 0);
+                                Event::KeyEvent::KeyPressedEvent event(key);
                                 keyrepeatcount = 0;
                                 data.Input->m_Keystack.insert(key);
                                 data.fn(event);
@@ -104,7 +104,7 @@ namespace ME
                             case GLFW_REPEAT:
                             {
                                 keyrepeatcount++;
-                                Event::KeyEvent::KeyPressedEvent event(key, keyrepeatcount);
+                                Event::KeyEvent::KeyRepeatEvent event(key, keyrepeatcount);
                                 data.fn(event);
                                 break;
                             }
@@ -119,14 +119,14 @@ namespace ME
                         {
                         case GLFW_PRESS:
                         {
-                            Event::Mouse::MouseButtonPressedEvent event(mousecode);
+                            Event::MouseEvent::MouseButtonPressedEvent event(mousecode);
                             data.Input->m_Mousestack.insert(mousecode);
                             data.fn(event);
                             break;
                         }
                         case GLFW_RELEASE:
                         {
-                            Event::Mouse::MouseButtonReleasedEvent event(mousecode);
+                            Event::MouseEvent::MouseButtonReleasedEvent event(mousecode);
                             data.Input->m_Mousestack.erase(mousecode);
                             data.fn(event);
                             break;
@@ -137,15 +137,14 @@ namespace ME
                 glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double X, double Y)
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-                        Event::Mouse::MouseScrooledEvent event(X, Y);
+                        Event::MouseEvent::MouseScrooledEvent event(X, Y);
                         data.fn(event);
                     });
 
                 glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double X, double Y)
                     {
                         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-                        Event::Mouse::MouseMovedEvent event(X, Y);
-                        data.Input->m_MousePos = { X, Y };
+                        Event::MouseEvent::MouseMovedEvent event(X, Y);
                         data.fn(event);
                     });
 
@@ -156,6 +155,7 @@ namespace ME
 
                 ME_PROFILE_TRACE_CALL();
 
+                PoolInputs();
                 glfwPollEvents();
                 glfwSwapBuffers(m_Window);
             }
@@ -173,6 +173,16 @@ namespace ME
                     glfwTerminate();
                     delete Input::Get();
                 }
+            }
+
+            void WindowsWindow::PoolInputs()
+            {
+                double X, Y;
+                int wx, wy;
+                glfwGetWindowPos(m_Window, &wx, &wy);
+                glfwGetCursorPos(m_Window, &X, &Y);
+                m_Data.Input->m_MouseDelta = m_Data.Input->m_MousePos - glm::vec2{ X + wx, Y + wy };
+                m_Data.Input->m_MousePos = { X + wx, Y + wy };
             }
 
             void WindowsWindow::SetVSync(bool enable)

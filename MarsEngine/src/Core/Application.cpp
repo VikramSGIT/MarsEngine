@@ -52,7 +52,7 @@ namespace ME
         m_RenderAPI.reset();
     }
 
-    void Application::setRenderAPI(const Ref<Renderer::RenderAPI>& api)
+    void Application::setRenderAPI(const Ref<RenderAPI>& api)
     {
         m_RenderAPI = api;
         m_LayerStack.PushLayer(api);
