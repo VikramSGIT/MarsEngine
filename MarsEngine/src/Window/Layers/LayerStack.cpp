@@ -1,5 +1,5 @@
 #include "MarsHeader.h"
-#include "LayerStack.h"
+#include "Layer.h"
 
 #include <algorithm>
 namespace ME

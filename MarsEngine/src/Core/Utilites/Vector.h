@@ -176,5 +176,7 @@ namespace ME
 		T *m_Head, *m_Tail;
 		size_t m_Capacity, m_Size;
 	};
+
+	template<typename T> using vector = Vector<T, alloc_dealloc_UpstreamMemory>;
 }
 #endif

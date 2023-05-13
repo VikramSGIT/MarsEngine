@@ -14,7 +14,7 @@ namespace ME
     namespace OpenGL
     {
         class OpenGLTexture2D : public Texture2D
-        {ME_CLASS_CONNECT("OpenGLTexture2D")
+        {
         public:
             OpenGLTexture2D(const string filepath);
             virtual ~OpenGLTexture2D();

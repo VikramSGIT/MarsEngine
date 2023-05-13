@@ -14,13 +14,13 @@ namespace ME
 //////////////////////////////////////// Mesh2D //////////////////////////////////////////////////
 
 	Mesh2D::Mesh2D(const string& name)
-		:m_Name(name), m_MeshData(MeshData2D()) {}
+		:m_MeshData(MeshData2D()), Entity(name, "Mesh2D") {}
 
 	Mesh2D::Mesh2D(const Mesh2D& mesh)
-		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
+		:m_MeshData(mesh.m_MeshData), Entity(mesh.getName(), "Mesh2D") {}
 
 	Mesh2D::Mesh2D(Mesh2D&& mesh) noexcept
-		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
+		:m_MeshData(mesh.m_MeshData), Entity(mesh.getName(), "Mesh2D") {}
 
 	Mesh2D::~Mesh2D()
 	{

@@ -1,13 +1,15 @@
-#ifndef ME_WINDOW
-#define ME_WINDOW
+#pragma once
 
-#include "MarsHeader.h"
+#include "MarsFlags.h"
 
 #include "Events/Event.h"
-#include "Events/KeyboardCode.h"
-#include "Vender/GLFW/glfw3.h"
 
-#include <string>
+#include "Core/Utilites/String.h"
+#include "Core/Utilites/Ref.h"
+#include "Window/Layers/Layer.h"
+
+#include "Vender/GLFW/glfw3.h"
+#include "Vender/glm/glm/glm.hpp"
 #include <functional>
 
 namespace ME
@@ -17,11 +19,9 @@ namespace ME
         struct WindowProperty
         {
         public:
-            std::string Title;
-            uint32_t Width = 1280;
-            uint32_t Height = 720;
+            string Title;
+            glm::uvec2 Size{ 1280, 720 };
         };
-
 
         class Window
         {
@@ -30,20 +30,36 @@ namespace ME
 
             virtual ~Window() = default;
 
-            virtual void OnUpdate() = 0;
+            virtual void OnIOUpdate() = 0;
 
-            virtual uint32_t GetWidth() const = 0;
-            virtual uint32_t GetHeight() const = 0;
-            virtual std::string GetTitle() const = 0;
+            virtual void setWindowVSync(bool) = 0;
+            virtual void setWindowTitle(const string&) = 0;
+            virtual void setWindowSize(const glm::uvec2&) = 0;
+            virtual void setWindowPosition(const glm::uvec2&) = 0;
+            virtual void setEventCallBack(const EventCallBackFunc&) = 0;
 
-            virtual void SetEventCallBack(const EventCallBackFunc& callback) = 0;
-            virtual void SetVSync(bool enable) = 0;
-            virtual bool IsVSync() const = 0;
+            virtual inline const glm::uvec2& getWindowSize() = 0;
+            virtual inline const bool& getWindowVSync() = 0;
+            virtual inline const bool& getWindowFocus() = 0;
+            virtual inline const string& getWindowTitle() = 0;
+            virtual inline const glm::uvec2& getWindowPosition() = 0;
+            virtual inline const bool& getWindowMaximize() = 0;
 
-            virtual GLFWwindow* GetNativeWindow() = 0;
+            virtual GLFWwindow* getNativeWindow() = 0;
             static Window* Create(const WindowProperty& winprop = WindowProperty());
+        };
+
+        class WindowIOLayer : public IOLayer
+        {
+        public:
+            WindowIOLayer(Window* window)
+                :m_Window(window) {}
+
+            virtual void OnIOUpdate() override { m_Window->OnIOUpdate(); }
+
+            inline Window& getWindow() { return *m_Window; }
+        private:
+            Window* m_Window;
         };
     }
 }
-
-#endif

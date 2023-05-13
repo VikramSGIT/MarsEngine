@@ -6,6 +6,7 @@
 #include "Window/Events/Event.h"
 #include "Window/Events/MouseCode.h"
 
+#include "Vender/glm/glm/glm.hpp"
 #include <string>
 #include <sstream>
 namespace ME
@@ -44,12 +45,12 @@ namespace ME
                     EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
             };
 
-            class MouseScrooledEvent : public Event
+            class MouseScrolledEvent : public Event
             {
             private:
                 double m_OffsetX, m_OffsetY;
             public:
-                MouseScrooledEvent(const double offsetX, const double offsetY)
+                MouseScrolledEvent(const double offsetX, const double offsetY)
                     :m_OffsetX(offsetX), m_OffsetY(offsetY)
                 {
 

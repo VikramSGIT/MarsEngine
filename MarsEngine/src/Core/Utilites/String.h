@@ -4,11 +4,10 @@
 #pragma once
 
 #include "Core/Memory/MemoryManager.h"
-#include "Core/Entity.h"
 
 namespace ME
 {
-	template <typename upstreammemory = ME::alloc_dealloc_UpstreamMemory> class String
+	template <typename upstreammemory = alloc_dealloc_UpstreamMemory> class String
 	{
 	public:	
 
@@ -84,28 +83,59 @@ namespace ME
 		bool operator==(const String& right)
 		{
 			size_t l = 0, r = 0;
+			if (m_Size != right.m_Size)
+				return false;
+
 			while (l < m_Size || r < right.m_Size)
 			{
 				if (m_String[l] != right.m_String[r])
 					return false;
 				l++, r++;
 			}
-			if (l != m_Size && r != right.m_Size)
+			return true;
+		}
+
+		bool operator==(const char* right)
+		{
+			size_t l = 0, r = 0;
+			size_t len = strlen(right);
+			if (m_Size != len)
 				return false;
+			while (l < m_Size || r < len)
+			{
+				if (m_String[l] != right[r])
+					return false;
+				l++, r++;
+			}
 			return true;
 		}
 
 		bool operator!=(const String& right)
 		{
 			size_t l = 0, r = 0;
+			if (m_Size != right.m_Size)
+				return true;
 			while (l < m_Size || r < right.m_Size)
 			{
 				if (m_String[l] != right.m_String[r])
 					return true;
 				l++, r++;
 			}
-			if (l != m_Size && r != right.m_Size)
+			return false;
+		}
+
+		bool operator!=(const char* right)
+		{
+			size_t l = 0, r = 0;
+			size_t len = strlen(right);
+			if (m_Size != len)
 				return true;
+			while (l < m_Size || r < len)
+			{
+				if (m_String[l] != right[r])
+					return true;
+				l++, r++;
+			}
 			return false;
 		}
 

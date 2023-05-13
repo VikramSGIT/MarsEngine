@@ -1,10 +1,10 @@
-#ifndef ME_WINDOWSEVENT
-#define ME_WINDOWSEVENT
-
-#include "MarsHeader.h"
+#pragma once
+#include "MarsFlags.h"
 
 #include "Event.h"
 #include "Core/Logger.h"
+
+#include "Window/Window.h"
 
 #include <sstream>
 #include <string>
@@ -12,24 +12,34 @@ namespace ME
 {
     namespace Event
     {
-        namespace AppEvent
+        namespace WindowEvent
         {
-            class WindowResizeEvent : public Event
+            class WindowEvent : public Event
             {
-            private:
-                unsigned int m_Width, m_Height;
             public:
-                WindowResizeEvent(const unsigned int width, const unsigned int height)
-                    :m_Width(width), m_Height(height)
+                WindowEvent(Window::Window* window)
+                    :m_NativeWindow(window) {}
+
+                inline Window::Window* getWindow() { return m_NativeWindow; }
+
+                EVENT_CLASS_TYPE(None)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            private:
+                Window::Window* m_NativeWindow;
+            };
+
+            class WindowResizeEvent : public WindowEvent
+            {
+            public:
+                WindowResizeEvent(Window::Window* window,const glm::uvec2& size)
+                    :m_Size(size), WindowEvent(window)
                 {
 
                     ME_PROFILE_TRACE_CALL();
 
                 }
 
-                unsigned int GetWidth() const { return m_Width; }
-                unsigned int GetHeight() const { return m_Height; }
-                glm::vec2 GetDimensions() const{ return {m_Width, m_Height}; }
+                inline const glm::uvec2& getWindowSize() { return m_Size; }
 
 #ifdef ME_DEBUG_SHOW_EVENT
                 std::string ToString() const override
@@ -40,17 +50,37 @@ namespace ME
                 }
 #endif
 
-                EVENT_CLASS_TYPE(WindowResized)
-                    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+                EVENT_CLASS_TYPE(WindowResize)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            private:
+                glm::uvec2 m_Size;
             };
 
-            class WindowClosedEvent : public Event
+            class WindowMoveEvent : public WindowEvent
             {
             public:
-                WindowClosedEvent() = default;
+                WindowMoveEvent(Window::Window* window,const glm::uvec2& pos)
+                    :WindowEvent(window)
+                {
+                    ME_PROFILE_TRACE_CALL()
+                }
 
-                EVENT_CLASS_TYPE(WindowClosed)
-                    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+                inline const glm::uvec2& getWindowPosition() { return m_Position; }
+
+                EVENT_CLASS_TYPE(WindowMove)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            private:
+                glm::uvec2 m_Position;
+            };
+
+            class WindowCloseEvent : public WindowEvent
+            {
+            public:
+                WindowCloseEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowClose)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
 #ifdef ME_DEBUG_SHOW_EVENT
                     std::string ToString() const override
                 {
@@ -61,13 +91,94 @@ namespace ME
 #endif
             };
 
+            class WindowFocus : public WindowEvent
+            {
+            public:
+                WindowFocus(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowFocus)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowLostFocus : public WindowEvent
+            {
+            public:
+                WindowLostFocus(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowLostFocus)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowVSyncOnEvent : public WindowEvent
+            {
+            public:
+                WindowVSyncOnEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowVSyncOn)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowVSyncOffEvent : public WindowEvent
+            {
+            public:
+                WindowVSyncOffEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowVSyncOff)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowMinimizeEvent : public WindowEvent
+            {
+            public:
+                WindowMinimizeEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowMinimize)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowMaximizeEvent : public WindowEvent
+            {
+            public:
+                WindowMaximizeEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowMaximize)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowMouseEnterEvent : public WindowEvent
+            {
+            public:
+                WindowMouseEnterEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowMouseEnter)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+            class WindowMouseLeaveEvent : public WindowEvent
+            {
+            public:
+                WindowMouseLeaveEvent(Window::Window* window)
+                    :WindowEvent(window) {}
+
+                EVENT_CLASS_TYPE(WindowMouseLeave)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
+            };
+
+// TODO: Check usefulness 13/05/2023
             class ApptickEvent : public Event
             {
             public:
                 ApptickEvent() = default;
 
                 EVENT_CLASS_TYPE(AppTick)
-                    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
 #ifdef ME_DEBUG_SHOW_EVENT
                     std::string ToString() const override
                 {
@@ -84,7 +195,7 @@ namespace ME
                 AppUpdateEvent() = default;
 
                 EVENT_CLASS_TYPE(AppUpdate)
-                    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
 #ifdef ME_DEBUG_SHOW_EVENT
                     std::string ToString() const override
                 {
@@ -101,7 +212,7 @@ namespace ME
                 AppRenderEvent() = default;
 
                 EVENT_CLASS_TYPE(AppRender)
-                    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+                    EVENT_CLASS_CATEGORY(EventCategoryWindow)
 #ifdef ME_DEBUG_SHOW_EVENT
                     std::string ToString() const override
                 {
@@ -114,5 +225,3 @@ namespace ME
         }
     }
 }
-
-#endif

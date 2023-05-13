@@ -1,12 +1,13 @@
 #include "MarsHeader.h"
 
 #include "Application.h"
-#include "Window/Events/WindowEvent.h"
-#include "Window/Windows/WindowsWindow.h"
-#include "Core/Utilites/Ref.h"
 #include "Logger.h"
-#include "Vender/glm/glm/glm.hpp"
+#include "Core/Utilites/Ref.h"
 #include "Utilites/TimeStep.h"
+#include "Window/Windows/WindowsWindow.h"
+#include "Window/Events/WindowEvent.h"
+
+#include "Vender/glm/glm/glm.hpp"
 
 #include <functional>
 namespace ME
@@ -14,16 +15,23 @@ namespace ME
     Application* Application::s_Application = nullptr;
 
     Application::Application()
-        :m_Window(Window::Window::Create({ "MarsEngine" })), m_LastFrameTime(0)
+        :m_LastFrameTime(0)
     {
         ME_PROFILE_TRACE_CALL();
 
+        m_Input = Window::Input::Create();
+
+        m_Window = Window::Window::Create({ "MarsEngine" });
+        m_Window->setEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+
+        m_IOLayerStack.push_back(CreateRef<Window::WindowIOLayer>(m_Window));
         s_Application = this;
     }
 
     Application::~Application()
     {
         delete m_Window;
+        delete m_Input;
     }
 
     bool Application::OnWindowClose()
@@ -64,8 +72,8 @@ namespace ME
         ME_PROFILE_TRACE_CALL();
 
         Event::EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<Event::AppEvent::WindowClosedEvent>(std::bind(&Application::OnWindowClose, this));
-        dispatcher.Dispatch<Event::AppEvent::WindowResizeEvent>(std::bind(&Application::OnWindowResize, this));
+        dispatcher.Dispatch<Event::WindowEvent::WindowCloseEvent>(std::bind(&Application::OnWindowClose, this));
+        dispatcher.Dispatch<Event::WindowEvent::WindowResizeEvent>(std::bind(&Application::OnWindowResize, this));
 
         for (auto it : m_LayerStack)
         {
@@ -89,8 +97,6 @@ namespace ME
 
         ME_PROFILE_TRACE_CALL();
 
-        m_Window->SetEventCallBack(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-
         while (m_Running)
         {
             double curtime = glfwGetTime(); // TODO: Make it glfw independent
@@ -103,7 +109,8 @@ namespace ME
             for (Ref<Window::Layer> layer : m_LayerStack)
                 layer->OnDraw();
 
-            m_Window->OnUpdate();
+            for (Ref<Window::IOLayer> layer : m_IOLayerStack)
+                layer->OnIOUpdate();
         }
         METerminate();
     }

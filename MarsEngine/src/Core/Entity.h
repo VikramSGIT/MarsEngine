@@ -3,69 +3,52 @@
 
 #pragma once
 
-#define ME_ENTITYINIT() ME::InitEntityDB()
-#define ME_ENTITYCLEAR() ME::DestroyEntityDB()
-
-#define ME_CLASS_CONNECT(X)											\
-public: \
-virtual bool isValid(const type_info& id = typeid(X)) override { return typeid(X) == id; }	\
-virtual const char* getName() override {return typeid(X).name();}
-
 #include "Utilites/UUID.h"
-
-#include <set>
-#include <unordered_map>
-#include <typeinfo>
+#include "Utilites/Ref.h"
+#include "Utilites/Vector.h"
+#include "Utilites/String.h"
 
 namespace ME
 {
+	class EntityType {
+	public:
+		EntityType() = delete;
+		string getName() const { return m_Name; }
 
-	void InitEntityDB();
-	void DestroyEntityDB();
+		bool operator==(EntityType const& right) { return m_Name == right.m_Name; }
+		bool operator!=(EntityType const& right) { return m_Name != right.m_Name; }
+	private:
+		EntityType(const string& name)
+			:m_Name(name) {}
+		string m_Name;
 
-	class EntityDB;
+		friend class Entity;
+	};
 
 	class Entity
 	{
 	public:
-		Entity();
-		virtual ~Entity();
-
-		UUID const GetUUID() { return m_UUID; }
+		Entity(const string& name, const string& type)
+			:m_Name(name), m_Type(type) {};
+		virtual ~Entity() {};
 
 		bool operator==(const Entity& right) const { return m_UUID == right.m_UUID; }
+		bool operator!=(const Entity& right) const { return m_UUID != right.m_UUID; }
 
-		virtual bool isValid(const type_info& = typeid(Entity)) = 0;
-		virtual const char* getName() = 0;
+		virtual void setName(const string& name) { m_Name = name; }
+
+		virtual string getName() const { return m_Name; }
+		virtual ref<Entity> getParent() { return m_Parent; }
+		virtual vector<ref<Entity>>& getChildren() {return m_Children; }
+		
+		UUID GetUUID() const { return m_UUID; }
+		EntityType const& getType() const { return m_Type; }
 	private:
 		UUID m_UUID;
-		friend class EntityDB;
-	};
-
-	class EntityDB
-	{
-	public:
-		static const EntityDB const* get() { return s_EntityDB; }
-
-		inline Entity* getEntity(const UUID& uuid) 
-		{
-			for (auto e : m_Database)
-			{
-				if (e->m_UUID == uuid)
-					return e;
-			}
-			return nullptr;
-		}
-
-		inline size_t getAlive() { return m_Database.size(); }
-	private:
-		std::set<Entity*> m_Database;
-		
-		static EntityDB* s_EntityDB;
-
-		friend class Entity;
-		friend void InitEntityDB();
-		friend void DestroyEntityDB();
+		string m_Name;
+		EntityType m_Type;
+		ref<Entity> m_Parent;
+		vector<ref<Entity>> m_Children;
 	};
 }
 

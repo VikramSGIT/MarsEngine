@@ -1,8 +1,6 @@
-#ifndef REF
-#define REF
+#pragma once
 
 #include "Core/Memory/MemoryManager.h"
-#include "Core/Entity.h"
 
 namespace ME
 {
@@ -136,5 +134,6 @@ namespace ME
 
 		return ref;
 	}
+
+	template<typename T> using ref = Ref<T, alloc_dealloc_UpstreamMemory>;
 }
-#endif

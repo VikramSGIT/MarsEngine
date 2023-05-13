@@ -89,7 +89,7 @@ namespace ME
 	};
 
 	class Mesh : public Entity
-	{	ME_CLASS_CONNECT(Mesh)
+	{
 	public:
 
 		Mesh(const string& name);
@@ -113,14 +113,12 @@ namespace ME
 
 		inline MeshData& GetMeshData() { return m_MeshData; }
 		inline const MeshData& GetMeshData() const { return m_MeshData; }
-		inline string GetName() const { return m_Name; }
 		inline Ref<Texture> GetTexture() { return m_TextureData; }
 		glm::vec3 getCentroid() const;
 
 		Mesh operator* (const glm::mat4& mat);
 	private:
 		MeshData m_MeshData;
-		string m_Name;
 		Ref<Texture> m_TextureData;
 
 		friend class MeshQueue;

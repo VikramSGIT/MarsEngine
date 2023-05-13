@@ -16,27 +16,31 @@ namespace ME
         enum class EventType
         {
             None = 0,
-            WindowClosed, WindowResized, WindowLostFocused, WindowMoved, WindowFocused,
+            WindowClose, WindowResize, WindowMove, WindowFocus, WindowLostFocus, WindowVSyncOn, WindowVSyncOff,
+            WindowMinimize, WindowMaximize, WindowMouseEnter, WindowMouseLeave,
             AppTick, AppUpdate, AppRender,
             KeyPressed, KeyRepeat, KeyReleased, KeyTyped,
+            UIWindowResize, UIWindowClose, UIWindowFocus, UIWindowLostFocus, UIWindowMove, UIWindowMouseEnter, 
+            UIWindowMouseLeave, UIWindowHide, UIWindowShow,
             MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
         };
 
         enum EventCategoryFlag
         {
             None = 0,
-            EventCategoryApplication = BIT(0),
+            EventCategoryWindow = BIT(0),
             EventCategoryInput = BIT(1),
             EventCategoryKeyboard = BIT(2),
             EventCategoryMouse = BIT(3),
-            EventCategoryMouseButton = BIT(4)
+            EventCategoryMouseButton = BIT(4),
+            EventCategoryUIWindow = BIT(5)
         };
 
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() {return EventType::type;}\
                                   virtual EventType GetEventType() const override{return GetStaticType();}\
                                   virtual const char* GetName() const override{return #type;}
 
-#define EVENT_CLASS_CATEGORY(catogory) virtual int GetCategoryFlags() const {return catogory;}                                
+#define EVENT_CLASS_CATEGORY(catogory) virtual int GetCategoryFlags() const {return catogory;}                               
 
         class Event
         {
@@ -55,8 +59,6 @@ namespace ME
 
             bool IsInCategory(const EventCategoryFlag& category) { return GetCategoryFlags() & category; }
             bool IsInType(const EventType& type) { return GetEventType() == type; }
-        protected:
-            friend class WindowsWindow;
         };
 
         class EventDispatcher

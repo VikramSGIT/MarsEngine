@@ -10,8 +10,9 @@
 #include "RenderAPI/Shader.h"
 #include "RenderAPI/OpenGL/OpenGL2D/OpenGLTexture2D.h"
 #include "Window/Layers/ImGUI/imguiLayer.h"
-#include "Modules/2D/Camera2D.h"
+#include "Modules/OrthographicCameraController.h"
 #include "Core/Utilites/Ref.h"
+#include "Window/UI.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -27,15 +28,19 @@ public:
 	virtual void OnDraw() override;
 	virtual void OnEvent(ME::Event::Event& e) override;
 private:
-	ME::Ref<ME::Window::imguiLayer> imgui;
-	ME::Ref<ME::Shader> shader;
-	ME::Ref<ME::Mesh2D> Player;
-	ME::Ref<ME::Rectangle> background;
-	ME::Ref<ME::OpenGL::OpenGLTexture2D> tex;
-	std::vector<ME::Ref<ME::Mesh2D>> obj;
-	ME::Ref<ME::RenderAPI> renderer;
-	ME::Ref<ME::Framebuffer> framebuffer;
-	ME::Ref<ME::Camera2D> m_Camera;
+	ME::ref<ME::Window::imguiLayer> imgui;
+	ME::ref<ME::Shader> shader;
+	ME::ref<ME::Mesh2D> Player;
+	ME::ref<ME::Rectangle> background;
+	ME::ref<ME::OpenGL::OpenGLTexture2D> tex;
+	ME::vector<ME::Ref<ME::Mesh2D>> obj;
+	ME::ref<ME::RenderAPI> renderer;
+	ME::ref<ME::Framebuffer> framebuffer;
+	ME::ref<ME::OrthographicCameraController> m_CameraController;
+
+	ME::Ref<ME::UIWindow> MartianUI;
+	ME::Ref<ME::UIWindow> EditorUI;
+	ME::Ref<ME::UIWindow> StatsUI;
 
 	glm::vec2 m_ViewportSize, m_ViewPortMousePos;
 	ImGuiWindow* m_Editor;

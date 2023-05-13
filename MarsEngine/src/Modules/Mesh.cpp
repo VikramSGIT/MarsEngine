@@ -16,13 +16,13 @@ namespace ME
 	//////////////////////////////////////// Mesh //////////////////////////////////////////////////
 
 	Mesh::Mesh(const string& name)
-		:m_Name(name), m_MeshData(MeshData()) {}
+		:m_MeshData(MeshData()), Entity(name, "Mesh") {}
 
 	Mesh::Mesh(const Mesh& mesh)
-		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
+		:m_MeshData(mesh.m_MeshData), Entity(mesh.getName(), "Mesh") {}
 
 	Mesh::Mesh(Mesh&& mesh) noexcept
-		:m_Name(mesh.m_Name), m_MeshData(mesh.m_MeshData) {}
+		:m_MeshData(mesh.m_MeshData), Entity(mesh.getName(), "Mesh") {}
 
 	Mesh::~Mesh()
 	{

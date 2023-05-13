@@ -1,13 +1,10 @@
-#ifndef ME_APPLICATION
-#define ME_APPLICATION
-
 #pragma once 
 
-#include "Window/Layers/LayerStack.h"
 #include "Window/Window.h"
 #include "RenderAPI/Renderer.h"
 #include "Window/Events/Event.h"
 #include "Core/Utilites/Vector.h"
+#include "Window/Input.h"
 
 namespace ME
 {
@@ -19,23 +16,29 @@ namespace ME
         void Run();
         void METerminate();
 
-        Window::LayerStack* GetLayerStack() { return &m_LayerStack; }
-        void setRenderAPI(const Ref<RenderAPI>& api);
-        Window::Window& GetWindow() { return *m_Window; }
+
+        void setRenderAPI(const ref<RenderAPI>& api);
 
         void UpdateNotification(Mesh2D* mesh);
         void UpdateNotification(Mesh* mesh);
 
-        double GetTime() { return m_LastFrameTime; }
+        double getTime() { return m_LastFrameTime; }
 
+        Window::LayerStack& getLayerStack() { return m_LayerStack; }
+        vector<Ref<Window::IOLayer>>& getIOLayerStack() { return m_IOLayerStack; }
         static Application& GetInstance() { return *s_Application; }
+        Window::Window& GetWindow() { return *m_Window; }
+        Window::Input& GetInput() { return *m_Input; }
+
         static Application* CreateApp();
     private:
         Window::LayerStack m_LayerStack;
+        vector<Ref<Window::IOLayer>> m_IOLayerStack;
         Ref<RenderAPI> m_RenderAPI;
 
         bool m_Running = true;
         Window::Window* m_Window;
+        Window::Input* m_Input;
 
         void OnEvent(Event::Event& e);
         bool OnWindowClose();
@@ -49,5 +52,3 @@ namespace ME
     };
 
 }
-
-#endif

@@ -17,8 +17,8 @@ namespace ME
 		int32_t BPP = 0;
 	};
 
-	class Texture : public Entity
-	{ME_CLASS_CONNECT("Texture")
+	class Texture
+	{
 	public:
 		virtual ~Texture() = default;
 
@@ -28,7 +28,7 @@ namespace ME
 	};
 
 	class Texture2D : public Texture
-	{ME_CLASS_CONNECT("Texture2D")
+	{
 		public:
 		static Ref<Texture> Create(const string& path);
 	};

@@ -6,6 +6,8 @@
 #include "Window/Events/Event.h"
 #include "Core/Utilites/TimeStep.h"
 #include "Core/Utilites/String.h"
+#include "Core/Utilites/Vector.h"
+#include "Core/Utilites/Ref.h"
 
 namespace ME
 {
@@ -13,20 +15,48 @@ namespace ME
     {
         class Layer
         {
-        private:
-            String<alloc_dealloc_UpstreamMemory> m_LayerName;
         public:
-            Layer(const String<alloc_dealloc_UpstreamMemory>& name)
+            Layer(const string& name)
                 :m_LayerName(name) {}
             virtual ~Layer() = default;
 
-            virtual void OnAttach() = 0;
-            virtual void OnDetach() = 0;
-            virtual void OnUpdate(Timestep ts) = 0;
-            virtual void OnDraw() = 0;
-            virtual void OnEvent(Event::Event& e) = 0;
+            virtual void OnAttach() {};
+            virtual void OnDetach() {};
+            virtual void OnUpdate(Timestep) {};
+            virtual void OnDraw() {};
+            virtual void OnEvent(Event::Event&) {};
 
-            inline String<alloc_dealloc_UpstreamMemory> GetName() const { return m_LayerName; }
+            inline string GetName() const { return m_LayerName; }
+        private:
+            string m_LayerName;
+        };
+
+        class IOLayer
+        {
+        public:
+            virtual void OnIOUpdate() {}
+        };
+
+        class LayerStack
+        {
+        private:
+            vector<ref<Layer>> m_layerstack;
+        public:
+            LayerStack() = default;
+            ~LayerStack();
+
+            void PushOverlay(const Ref<Layer>& overlay);
+            void PushLayer(const Ref<Layer>& layer);
+            void PopLayer(const Ref<Layer>& layer);
+
+            void clear() { m_layerstack.clear(); }
+            auto begin() { return m_layerstack.begin(); }
+            auto end() { return m_layerstack.end(); }
+
+            auto begin() const { return m_layerstack.begin(); }
+            auto end() const { return m_layerstack.end(); }
+
+            inline size_t GetTotalLayers() const { return m_layerstack.size(); }
         };
     }
 }
