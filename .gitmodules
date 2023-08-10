@@ -16,3 +16,9 @@
 [submodule "MarsEngine/src/Vender/spdlog"]
 	path = MarsEngine/src/Vender/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "MarsEngine/src/Core/MTL"]
+	path = MarsEngine/src/Core/MTL
+	url = https://github.com/VikramSGIT/MTL
+[submodule "MarsEngine/src/Vender/MTL"]
+	path = MarsEngine/src/Vender/MTL
+	url = https://github.com/VikramSGIT/MTL
