@@ -57,7 +57,8 @@ namespace ME
             }
             m_VisibilityChanged = false;
         }
-
+        m_Data.MouseInside = Window::Input::GetMouseX() > m_NativeUIWindow->Pos.x && Window::Input::GetMouseY() > m_NativeUIWindow->Pos.y
+            && Window::Input::GetMouseX() < m_NativeUIWindow->Pos.x + m_NativeUIWindow->Size.x && Window::Input::GetMouseY() < m_NativeUIWindow->Pos.y + m_NativeUIWindow->Size.y;
     }
     bool ImGuiUIWindow::UIWindowBegin(const int& flags)
     {

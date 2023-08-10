@@ -1,81 +1,47 @@
 #pragma once
 
+#include "MarsFlags.h"
+
 #include "Core/Entity.h"
-#include "Core/Utilites/Vector.h"
-#include "Core/Utilites/Ref.h"
+#include "Vender/MTL/Vector.h"
+#include "Vender/MTL/Ref.h"
 #include "RenderAPI/Texture.h"
 
 #include "Vender/glm/glm/glm.hpp"
+#include <Vender/glm/glm/gtc/quaternion.hpp>
 
 /*
 * TODO: Plan virtually exposed functions
 */
 namespace ME
 {
-	struct VERTEX2D
-	{
-		ME_DATATYPE x = 0.0f, y = 0.0f, uv_x = 0.0f, uv_y = 0.0f, index = 0.0f;
+	/*
+	-MeshDataTypeFlags contains information of data which are changed draw during a draw cycle. This allows to send lower bandwidth data to the gpu by reducing the MeshDataSent in every draw call. Needed to be implemented later.
+	*/
+	enum class MeshDataTypeFlags {
+		None = 0,
+		Translation = 1,
+		Scale = 1 << 1,
+		Rotation = 1 << 2,
 	};
 
-	struct MeshData2D
+	struct MeshData2D {
+		glm::vec2 translation = { 0.0f, 0.0f }, scale = { 1.0f, 1.0f }, centroid = { 0.0f, 0.0f };
+		ME_DATATYPE rotation = 0.0f;
+		uint32_t vertexoffset;
+	};
+
+	struct VERTEX2D
 	{
-		MeshData2D()
-			:vertex(Vertex()), index(Index()) {}
-		class Vertex
-		{
-		public:
-			Vertex()
-				:vertex(nullptr), reset_vertex(nullptr), m_Size(0), m_Offset(0) {}
+		glm::vec2 Position, UV;
+		ME_DATATYPE index = 0.0f;
+	};
 
-			VERTEX2D* begin() { return vertex; }
-			VERTEX2D* end() { return (vertex + m_Size); }
-
-			const VERTEX2D* begin() const { return vertex; }
-			const VERTEX2D* end() const { return (vertex + m_Size); }
-
-			VERTEX2D* operator++() { return vertex++; }
-
-			inline const unsigned int Size() const { return m_Size; }
-			inline VERTEX2D* GetReset() { return reset_vertex; }
-			inline const unsigned int GetOffset() const { return m_Offset; }
-
-			void SetOffset(const unsigned int& offset) { m_Offset = offset; }
-
-		private:
-			VERTEX2D* vertex, * reset_vertex;
-			unsigned int m_Size, m_Offset;
-
-			friend class Mesh2D;
-		};
-
-		class Index
-		{
-		public:
-			Index()
-				:index(nullptr), m_Size(0), m_Offset(0), m_IndexOffset(0) {}
-
-			unsigned int* begin() { return index; }
-			unsigned int* end() { return (index + m_Size); }
-
-			const unsigned* begin() const { return index; }
-			const unsigned* end() const { return (index + m_Size);; }
-
-			inline const unsigned int Size() const { return m_Size; }
-			inline const unsigned int GetOffset() const { return m_Offset; }
-			inline const unsigned int GetIndexOffset() const { return m_IndexOffset; }
-
-			void SetOffset(const unsigned int& offset) { m_Offset = offset; }
-			void SetIndexOffset(const unsigned int& offset) { m_IndexOffset = offset; }
-
-		private:
-			unsigned int* index;
-			unsigned int m_Size, m_Offset, m_IndexOffset;
-
-			friend class Mesh2D;
-		};
-
-		Vertex vertex;
-		Index index;
+	struct MeshPrimitive
+	{
+		vector<VERTEX2D> vertex;
+		vector<uint32_t> index;
+		uint32_t m_VertexOffset = 0, m_IndexOffset = 0, m_StartIndex = 0;
 	};
 
 	class Mesh2D : public Entity
@@ -83,73 +49,59 @@ namespace ME
 	public:
 
 		Mesh2D(const string& name);
-		Mesh2D(const Mesh2D& mesh);
-		Mesh2D(Mesh2D&& mesh) noexcept;
-		~Mesh2D();
 
-		void BufferVertices(const VERTEX2D* vertex, const unsigned int& count);
-		void BufferIndices(const unsigned int* data, const unsigned int& count);
+		void BufferData(const vector<VERTEX2D>& vertex, const vector<uint32_t>& index);
 		void SetTexture(const Ref<Texture>& texture);
 
-		void SetReset(const VERTEX2D* vertex);
-		void SetReset(const std::vector<VERTEX2D>& vertices);
-		void Reset();
-
-		void Transform(const glm::mat4& matrix);
 		void Translate(const glm::vec2& XY);
-		void TranslateTo(const glm::vec2& XY); //translate the mesh's centroid to the point specified
 		void Rotate(const ME_DATATYPE& degree);
 		void Scale(const glm::vec2& XY);
 
-		inline MeshData2D& GetMeshData() { return m_MeshData; }
-		inline Ref<Texture> GetTexture() { return m_TextureData; }
-		inline const MeshData2D& GetMeshData() const { return m_MeshData; }
-		inline const Ref<Texture> GetTexture() const { return m_TextureData; }
+		inline Ref<MeshData2D> getMeshData() const { return m_MeshData; }
+		inline Ref<MeshPrimitive> getPrimitive() const { return m_Primitive; }
+		inline Ref<Texture> getTexture() const { return m_TextureData; }
 		const glm::vec2 GetCentroid() const;
 
-		Mesh2D operator* (const glm::mat4& mat);
-
 	private:
-		MeshData2D m_MeshData;
+		Ref<MeshData2D> m_MeshData;
+		Ref<MeshPrimitive> m_Primitive;
 		Ref<Texture> m_TextureData; // Will need to change to materials
-
-		friend class MeshQueue2D;
-	};
-
-	class Rectangle : public Mesh2D
-	{
-	public:
-		Rectangle(const string& name, const unsigned int& index = 0);
-		Rectangle(const string& name, const glm::vec2& lb, const unsigned int& index = 0);
-		Rectangle(const string& name, const glm::vec2& edge1, glm::vec2 edge2, const unsigned int& index = 0);
-		virtual ~Rectangle() = default;
-
-		void Grow(const glm::vec2& lb);
-		void Set(const glm::vec2& lb);
 	};
 //
 // Commenly used meshes
 //
-	static Ref<Mesh2D> GenQuad2D(const string& name, const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3, const glm::vec2& v4, const unsigned int& index = 0)
-	{
-
-		ME_PROFILE_TRACE_CALL();
-
-		VERTEX2D vertexbuffer[] =
+	static Ref<Mesh2D> genRect(const string& name, const glm::vec2& lb, const uint32_t& index = 0) {
+		vector<VERTEX2D> vertexbuffer =
 		{
-			{v1.x, v1.y, 0.0f, 0.0f, (float)index},
-			{v2.x, v2.y, 1.0f, 0.0f, (float)index},
-			{v3.x, v3.y, 1.0f, 1.0f, (float)index},
-			{v4.x, v4.y, 0.0f, 1.0f, (float)index}
+			{{0.0f, 0.0f}, {0.0f, 0.0f}, (float)index},
+			{{lb.x, 0.0f}, {1.0f, 0.0f}, (float)index},
+			{{lb.x, lb.y}, {1.0f, 1.0f}, (float)index},
+			{{0.0f, lb.y}, {0.0f, 1.0f}, (float)index}
 		};
-		unsigned int indexbuffer[] =
+		vector<uint32_t> indexbuffer =
 		{
 			0, 1, 2,
 			2, 3, 0
 		};
 		Ref<Mesh2D> out = CreateRef<Mesh2D>(name);
-		out->BufferVertices(vertexbuffer, 4);
-		out->BufferIndices(indexbuffer, 6);
+		out->BufferData(vertexbuffer, indexbuffer);
+		return out;
+	}
+	static Ref<Mesh2D> GenQuad2D(const string& name, const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3, const glm::vec2& v4, const unsigned int& index = 0){
+		vector<VERTEX2D> vertexbuffer;
+		{
+			VERTEX2D{ {v1.x, v1.y}, {0.0f, 0.0f}, (float)index },
+			VERTEX2D{ {v2.x, v2.y}, {1.0f, 0.0f}, (float)index },
+			VERTEX2D{ {v3.x, v3.y}, {1.0f, 1.0f}, (float)index },
+			VERTEX2D{ {v4.x, v4.y}, {0.0f, 1.0f}, (float)index };
+		};
+		vector<uint32_t> indexbuffer =
+		{
+			0, 1, 2,
+			2, 3, 0
+		};
+		Ref<Mesh2D> out = CreateRef<Mesh2D>(name);
+		out->BufferData(vertexbuffer, indexbuffer);
 		return out;
 	}
 }

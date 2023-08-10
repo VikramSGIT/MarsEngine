@@ -2,7 +2,7 @@
 
     #version 400 core
 
-    layout(location = 0) in vec3 position;
+    layout(location = 0) in vec2 position;
     layout(location = 1) in vec2 TexCoord;
     layout(location = 2) in float index;
 
@@ -13,7 +13,7 @@
 
     void main()
     {
-        vec4 pos = vec4(position, 1);
+        vec4 pos = vec4(position, 1, 1);
         gl_Position =  u_MVP * pos;
         v_TexCoord = TexCoord;
         v_index = index;
@@ -34,7 +34,7 @@
     void main()
     {
         if (v_index == 1)
-            color = vec4(0.023, 0.293, 1.0, 1.0);
+            color = vec4(0.23, 0.293, 0.293, 1.0);
         else if (v_index == 0)
             color = texture(u_Texture, v_TexCoord);
         else

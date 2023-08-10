@@ -7,11 +7,14 @@
 #include "RenderAPI/Renderer.h"
 #include "RenderAPI/Shader.h"
 #include "Vender/glm/glm/glm.hpp"
-#include "Core/Utilites/Vector.h"
-#include "Core/Utilites/Array.h"
+#include "Vender/MTL/Vector.h"
+#include "Vender/MTL/Array.h"
 #include "OpenGLTexture2D.h"
 
+#include "CUDAInterface/kernel.h"
+
 #include  <vector>
+#include <set>
 namespace ME
 {
     namespace OpenGL
@@ -19,7 +22,7 @@ namespace ME
         struct RenderData2D
         {
             Ref<Shader> Shader;
-            Vector <Mesh2D*> Update;
+            std::set<Mesh2D*> Update;
             Vector <Ref<Mesh2D>> Meshes;
             Ref<VertexbufferLayout> Layout;
             uint32_t vertex_id = 0, index_id = 0, NextIndex = 0, TextureSlotIndex = 1;
@@ -56,8 +59,8 @@ namespace ME
             uint32_t m_TotalVertices, m_TotalIndices;
             glm::vec4 m_clearcolor;
             Vector<Ref<RenderData2D>> m_RenderData;
+            CUDAMesh2DUpdate m_MeshUpdater;
         };
-
     }
 }
 

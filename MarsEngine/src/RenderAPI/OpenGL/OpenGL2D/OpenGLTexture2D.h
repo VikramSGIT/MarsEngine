@@ -7,7 +7,7 @@
 
 #include "RenderAPI/OpenGL/OpenGLErrorHandler.h"
 #include "RenderAPI/Texture.h"
-#include "Core/Utilites/String.h"
+#include "Vender/MTL/String.h"
 
 namespace ME
 {

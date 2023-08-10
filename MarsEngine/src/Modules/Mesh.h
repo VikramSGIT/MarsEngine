@@ -1,14 +1,13 @@
-#ifndef ME_MESH
-#define ME_MESH
-
 #pragma once
+
+#include "MarsFlags.h"
 
 #include "Core/Entity.h"
 #include "RenderAPI/Buffers.h"
 #include "Addons/Addon.h"
-#include "Core/Utilites/Ref.h"
-#include "Core/Utilites/Vector.h"
-#include "Core/Utilites/String.h"
+#include "Vender/MTL/Ref.h"
+#include "Vender/MTL/Vector.h"
+#include "Vender/MTL/String.h"
 #include "RenderAPI/Texture.h"
 
 #include "Vender/glm/glm/glm.hpp"
@@ -108,7 +107,7 @@ namespace ME
 		void Transform(const glm::mat4& mat);
 
 		void SetReset(const VERTEX* vertex);
-		void SetReset(const std::vector<VERTEX>& vertices);
+		void SetReset(const vector<VERTEX>& vertices);
 		void Reset();
 
 		inline MeshData& GetMeshData() { return m_MeshData; }
@@ -200,5 +199,3 @@ namespace ME
 // Quickest quad generation with 1x1 size
 	static Ref<Mesh> QuickQuad(const unsigned int& index = 0) { return GenRect("Quad", {1.0f, 1.0f}, index); }
 }
-
-#endif

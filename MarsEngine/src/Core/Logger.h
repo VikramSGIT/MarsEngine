@@ -1,6 +1,3 @@
-#ifndef ME_LOGGER
-#define ME_LOGGER
-
 #pragma once
 
 #include "spdlog/spdlog.h"
@@ -23,5 +20,3 @@ static void DeinitLogger() noexcept { }
 #define ME_CORE_WARNING(...) spdlog::warn(__VA_ARGS__)
 #define ME_CORE_ERROR(CND, ...) if(CND) { spdlog::error(__VA_ARGS__); }
 #define ME_CORE_CRITICAL(CND, ...) if(CND) { spdlog::critical(__VA_ARGS__); throw "Critical"; }
-
-#endif

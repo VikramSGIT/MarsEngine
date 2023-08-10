@@ -3,7 +3,7 @@
 #include "MarsFlags.h"
 
 #include "Events/Event.h"
-#include "Core/Utilites/String.h"
+#include "Vender/MTL/String.h"
 
 #include "Vender/glm/glm/glm.hpp"
 #include "imgui.h"
@@ -30,9 +30,12 @@ namespace ME
 
 		virtual const glm::uvec2& getUIWindowPosition() = 0;
 		virtual const glm::uvec2& getUIWindowSize() = 0;
-		virtual const bool& getUIWindowFocus() = 0;
-		virtual const bool& getUIWindowVisibility() = 0;
+		virtual const glm::uvec2& getUIContentSize() = 0;
 		virtual const string& getUIWindowTitle() = 0;
 		virtual ImGuiWindow* getNativeUIWindow() = 0;
+
+		virtual const bool& isUIWindowVisibile() = 0;
+		virtual const bool& isUIWindowFocused() = 0;
+		virtual const bool& isMouseInside() = 0;
 	};
 }

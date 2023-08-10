@@ -1,7 +1,6 @@
-#ifndef ME_WINDOWSINPUT
-#define ME_WINDOWSINPUT
-
 #pragma once
+
+#include "MarsFlags.h"
 
 #include "Window/Input.h"
 #include "Window/Events/KeyboardCode.h"
@@ -26,20 +25,18 @@ namespace ME
 			InputData* GetFrameData() { return &m_InputData; }
 
 		protected:
-			virtual bool IsKeyPressedImpl(const int& keycode) override;
+			virtual const bool& IsKeyPressedImpl(const int& keycode) override;
 
-			virtual bool GetMouseMovedImpl() override;
-			virtual bool IsMousePressedImpl(const int& mousecode) override;
-			virtual glm::vec2 GetMouseImpl() override;
-			virtual float GetMouseXImpl() override;
-			virtual float GetMouseYImpl() override;
-			virtual glm::vec2 GetMouseDeltaImpl() override;
-			virtual float GetMouseDeltaXImpl() override;
-			virtual float GetMouseDeltaYImpl() override;
+			virtual const bool& GetMouseMovedImpl() override;
+			virtual const bool& IsMousePressedImpl(const int& mousecode) override;
+			virtual const glm::vec2& GetMouseImpl() override;
+			virtual const float& GetMouseXImpl() override;
+			virtual const float& GetMouseYImpl() override;
+			virtual const glm::vec2& GetMouseDeltaImpl() override;
+			virtual const float& GetMouseDeltaXImpl() override;
+			virtual const float& GetMouseDeltaYImpl() override;
 		private:
 			InputData m_InputData;
 		};
 	}
 }
-
-#endif

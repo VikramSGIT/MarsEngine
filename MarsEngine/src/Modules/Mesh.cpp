@@ -73,7 +73,7 @@ namespace ME
 		memcpy(m_MeshData.vertex.begin(), vertex, sizeof(VERTEX) * m_MeshData.vertex.m_Size);
 	}
 
-	void Mesh::SetReset(const std::vector<VERTEX>& vertex)
+	void Mesh::SetReset(const vector<VERTEX>& vertex)
 	{
 
 		ME_PROFILE_TRACE_CALL();

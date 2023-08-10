@@ -12,7 +12,7 @@ namespace ME
 {
 	OrthographicCameraController::OrthographicCameraController(const glm::vec2& size)
 		:Layer("OrthographicCameraController"), m_Size(size), m_CameraTranslationSpeed(100.0f), 
-		m_CameraRotationSpeed(100.0f), m_Camera(-size.x/2.0f, size.x/2.0f, -size.y/2.0f, size.y/2.0f) 
+		m_CameraRotationSpeed(1.0f), m_CameraZoomSpeed(0.25f), m_CameraMinZoom(0.25f), m_Camera(-size.x/2.0f, size.x/2.0f, -size.y/2.0f, size.y/2.0f) 
 	{
 		m_Camera.changed = true;
 	}
@@ -60,7 +60,8 @@ namespace ME
 	}
 	bool OrthographicCameraController::OnMouseScrolled(Event::Event& e)
 	{
-		m_Camera.m_Zoom -= ((Event::MouseEvent::MouseScrolledEvent&)e).GetOffsetY();
+		m_Camera.m_Zoom -= ((Event::MouseEvent::MouseScrolledEvent&)e).GetOffsetY() * m_CameraZoomSpeed;
+		m_Camera.m_Zoom = std::max(m_CameraMinZoom, m_Camera.m_Zoom);
 		m_Camera.changed = true;
 		return true;
 	}

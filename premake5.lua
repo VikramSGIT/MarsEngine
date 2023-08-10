@@ -60,7 +60,7 @@ workspace "MarsEngine"
 		language "C++"
 		staticruntime "Off"
 
-		targetdir ("bin/" .. outputdir .. "/bin")
+		targetdir ("bin/" .. outputdir .. "/lib")
 		objdir("bin/" .. outputdir .."/obj/%{prj.name}")
 
 		files
@@ -171,7 +171,8 @@ workspace "MarsEngine"
 				"MarsEngine",
 				"opengl32",
 				"glew32s",
-				"glfw3"
+				"glfw3",
+				"OpenCL"
 			}
 		
 		filter "configurations:Debug"
@@ -181,3 +182,49 @@ workspace "MarsEngine"
 		filter "configurations:Release"
 			defines "ME_RELEASE"
 			optimize "On"
+
+
+	project "CUDAInterface"
+	   location "MarsEngine/src/OpenCL"
+	   kind "StaticLib"
+	   language "C++"
+
+	   targetdir ("bin/" .. outputdir .. "/lib")
+	   objdir("bin/" .. outputdir .."/obj/%{prj.name}")
+
+	   files {
+		   "MarsEngine/src/OpenCL/**.h",
+		   "MarsEngine/src/OpenCL/**.cpp",
+		   "MarsEngine/src/OpenCL/**.cu" 
+	   }
+
+		   filter "system:windows"
+				cppdialect "C++17"
+
+		        defines
+				{
+					"ME_PLATFORM_WINDOWS",
+					"_CRT_SECURE_NO_WARNINGS"
+				}
+				links 
+				{ 
+					"cudart_static.lib" 
+				}
+
+				libdirs
+				{
+					"$(CUDA_PATH)/lib/x64"
+				}
+
+
+	   filter "configurations:Debug"
+		  symbols "On"
+		  optimize "Off"
+		  defines "ME_DEBUG"
+
+	   filter "configurations:Release"
+		  optimize "Full"
+		  defines "ME_RELEASE"
+
+	   buildmessage "Building %{file.relpath}"
+	   buildcommands "$(CUDA_PATH)/bin/nvcc -c -o %{cfg.objdir}/%{file.basename}.obj %{file.relpath}"

@@ -8,9 +8,12 @@
 #include "Window/Events/MouseEvent.h"
 #include "Window/ImGui/ImGuiUI.h"
 
+#include "CUDAInterface/kernel.h"
+
 #include "Vender/imgui/imgui.h"
-#include "Core/Memory/Scope.h"
-#include "Core/Utilites/Vector.h"
+#include "Vender/MTL/Scope.h"
+#include "Vender/MTL/Vector.h"
+#include "glm/glm/gtc/type_ptr.hpp"
 
 ME::Application* app;
 
@@ -23,9 +26,20 @@ ME::Application* ME::Application::CreateApp()
 	return app;
 }
 
-using namespace ME;
+void PositionCallback(ME::Ref<ME::Mesh2D>& mesh, const glm::vec2& position) {
+	mesh->Translate(position);
+}
 
-int count = 0;
+void ScaleCallback(ME::Ref<ME::Mesh2D>& mesh, const glm::vec2& scale) {
+	mesh->Scale(scale);
+}
+
+void RotateCallback(ME::Ref<ME::Mesh2D>& mesh, const ME_DATATYPE& rotate) {
+	mesh->Rotate(rotate);
+}
+
+
+using namespace ME;
 
 bool IsMouseInsideWindow(ImGuiWindow* window)
 {
@@ -47,22 +61,47 @@ void Martian::OnAttach()
 	MartianUI = CreateRef<ImGuiUIWindow>();
 	EditorUI = CreateRef<ImGuiUIWindow>();
 	StatsUI = CreateRef<ImGuiUIWindow>();
+	Properties = CreateRef<ImGuiUIWindow>();
+
 	MartianUI->setUIWindowTitle("Matrian");
 	EditorUI->setUIWindowTitle("Editor");
 	StatsUI->setUIWindowTitle("Stats");
+	Properties->setUIWindowTitle("Properties");
+
 	MartianUI->setCallbackFunction(Event::throwEvent);
 	EditorUI->setCallbackFunction(Event::throwEvent);
 	StatsUI->setCallbackFunction(Event::throwEvent);
+	Properties->setCallbackFunction(Event::throwEvent);
+
 	app->getIOLayerStack().push_back(MartianUI);
 	app->getIOLayerStack().push_back(EditorUI);
 	app->getIOLayerStack().push_back(StatsUI);
+	app->getIOLayerStack().push_back(Properties);
 
 	imgui = CreateRef<Window::imguiLayer>();
 	app->getLayerStack().PushLayer(imgui);
 
 	renderer->framebuffer = Framebuffer::Create({});
-	background = CreateRef<ME::Rectangle>("Background", glm::vec2{ 1280 * 4, 720 * 4 }, 3);
-	background->TranslateTo({ -1280.0f * 2, -720.0f * 2 });
+	background = genRect("Background", glm::vec2{ 1280 * 4, 720 * 4 }, 3);
+	background->Translate({ -1280.0f * 2, -720.0f * 2 });
+
+	shader = Shader::Create("res\\shaders\\Basic.shader");
+	renderer->SetShader(shader);
+	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
+
+	Player = genRect("Aadhav", glm::vec2{ 200.0f, 200.0f });
+	renderer->AddMesh(background);
+	renderer->AddMesh(Player);
+	tex = Texture2D::Create("res\\textures\\android.png");
+
+	m_Meshes.push_back(Player);
+	m_Names.push_back(Player->getName().c_str());
+
+	m_CameraController = CreateRef<OrthographicCameraController>(m_ViewportSize);
+	app->getLayerStack().PushLayer(m_CameraController);
+
+	currMeshID = 0;
+
 	imgui->SetDrawData([this]() -> void
 		{
 			static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -121,10 +160,8 @@ void Martian::OnAttach()
 				m_ViewportSize = { s.x, s.y };
 				renderer->framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 
-				
-
-				background->Set(m_ViewportSize * glm::vec2{ 4.0f, 4.0f });
-				background->TranslateTo(-m_ViewportSize * glm::vec2{ 2.0f, 2.0f });
+				background->Scale(m_ViewportSize * glm::vec2{ 4.0f, 4.0f });
+				background->Translate(-m_ViewportSize * glm::vec2{ 2.0f, 2.0f });
 			}
 			ImGui::Image((void*)renderer->framebuffer->getColorAttachment(), s, ImVec2{0, 1}, ImVec2{1, 0});
 			EditorUI->UIWindowEnd();
@@ -133,83 +170,52 @@ void Martian::OnAttach()
 
 			StatsUI->UIWindowBegin(0);
 			ImGui::Text("Up time: %ds", (int)app->getTime());
-			ImGui::Text("Frame Time: %lfms", (glfwGetTime() - app->getTime())*1000);
+			ImGui::Text("Frame Time: %lf ms", (glfwGetTime() - app->getTime())*1000);
 			ImGui::Text("Mouse Delta: [%d %d]", (int)Window::Input::GetMouseDeltaX(), (int)Window::Input::GetMouseDeltaY());
 			ImGui::Text("Vertices: %d", renderer->GetTotalVertices());
 			ImGui::Text("Indices: %d", renderer->GetTotalIndices());
 			ImGui::Text("Editor Size: %dx%d", EditorUI->getUIWindowSize().x, EditorUI->getUIWindowSize().y);
 			ImGui::Text("My Size: %dx%d", StatsUI->getUIWindowSize().x, StatsUI->getUIWindowSize().y);
 			ImGui::Text("Title: %s", StatsUI->getUIWindowTitle().c_str());
-			ImGui::Text("Focus: %d", StatsUI->getUIWindowFocus());
-			ImGui::Text("Visibility: %d", StatsUI->getUIWindowVisibility());
+			ImGui::Text("Focus: %d", StatsUI->isUIWindowFocused());
+			ImGui::Text("Visibility: %d", StatsUI->isUIWindowVisibile());
+
+			ImGui::ListBox("Meshes", &currMeshID, m_Names.begin(), m_Meshes.size());
+			Ref<Mesh2D> currMesh = m_Meshes[currMeshID];
 			StatsUI->UIWindowEnd();
+			
+
+			Properties->UIWindowBegin(0);
+
+			ImGui::Text("Mesh Properties");
+			ImGui::PushItemWidth(200);
+
+			ImGui::BeginGroup();
+			ImGui::DragFloat2("Position", glm::value_ptr(currMesh->getMeshData()->translation), 1.0f, -500.0f, 500.0f);
+			if (ImGui::IsItemEdited()) { PositionCallback(Player, currMesh->getMeshData()->translation); } ImGui::SameLine();
+			ImGui::EndGroup();
+
+			ImGui::BeginGroup();
+			ImGui::DragFloat2("Scale", glm::value_ptr(currMesh->getMeshData()->scale), 0.01f, 0.01f, 2.0f);
+			if (ImGui::IsItemEdited()) { ScaleCallback(Player, currMesh->getMeshData()->scale); } ImGui::SameLine();
+			ImGui::EndGroup();
+
+			ImGui::BeginGroup();
+			ImGui::DragFloat("Rotation", &currMesh->getMeshData()->rotation, 1.0f, 0.0f, 360.0f);
+			if (ImGui::IsItemEdited()) { RotateCallback(Player, currMesh->getMeshData()->rotation); }
+			ImGui::EndGroup();
+
+			ImGui::PopItemWidth();
+			Properties->UIWindowEnd();
 		});
-
-	shader = Shader::Create("res\\shaders\\Basic.shader");
-	renderer->SetShader(shader);
-	renderer->SetClearColor({ 0.4f, 0.4f, 0.4f, 1.0f });
-
-	Player =CreateRef<ME::Rectangle>("Aadhav", glm::vec2{200.0f, 200.0f});
-	renderer->AddMesh(Ref<Mesh2D>(background));
-	renderer->AddMesh(Player);
-	tex = Texture2D::Create("res\\textures\\android.png");
-
-	Ref<int*> a = CreateRef<int*>(alloc<int>());
-
-	m_CameraController = CreateRef<OrthographicCameraController>(m_ViewportSize);
-	app->getLayerStack().PushLayer(m_CameraController);
 }	
 
 void Martian::OnUpdate(Timestep ts)
 {
-	/*
-	if (Window::Input::IsKeyPressed(Event::Key::W))
-		Player->Translate({ 0.0f, 300.0f * ts });
-	if (Window::Input::IsKeyPressed(Event::Key::A))
-		Player->Translate({ -300.0f * ts, 0.0f});
-	if (Window::Input::IsKeyPressed(Event::Key::S))
-		Player->Translate({ 0.0f, -300.0f * ts});
-	if (Window::Input::IsKeyPressed(Event::Key::D))
-		Player->Translate({ 300.0f * ts, 0.0f});
-	if (Window::Input::IsKeyPressed(Event::Key::Space))
-		Player->Rotate({90.0f * ts});
-	if (Window::Input::IsKeyPressed(Event::Key::LeftShift))
-		Player->Scale({ 1.005f, 1.005f});
-	if (Window::Input::IsKeyPressed(Event::Key::CapsLock))
-		Player->Scale({ 0.995f, 0.995f});
-	if (Window::Input::IsKeyPressed(Event::Key::RightShift))
-		app->GetWindow().setWindowVSync(!app->GetWindow().getWindowVSync());
-	if (Window::Input::IsMousePressed(Event::Mouse::ButtonMiddle) && Window::Input::IsMouseMoved())
-	{
-		m_CameraController->getCamera().setPosition(glm::vec3(Window::Input::GetMouseDelta(), 0.0));
-		background->Translate(-Window::Input::GetMouseDelta());
-	}
-	*/
-
 	shader->SetUniformsMat4f("u_MVP", m_CameraController->getCamera());
 	tex->Bind();
 }
 
 void Martian::OnDraw() {}
-void Martian::OnEvent(Event::Event& e) 
-{
-	Event::EventDispatcher dis(e);
-	dis.Dispatch<Event::KeyEvent::KeyPressedEvent>([this](Event::Event& e) ->bool
-		{
-			if (Event::Key::Equal == ((Event::KeyEvent::KeyPressedEvent&)e).GetkeyCode())
-			{
-				renderer->AddMesh(GenQuad2D("TileMap", { 0.0 + count, 0.0}, { 50.0 + count, 0.0}, { 50.0 + count, 50.0 }, { 0.0 + count, 50.0 }, 1));
-				count += 50;
-				return true;
-			}
-			return false;
-		});
-
-	dis.Dispatch<Event::MouseEvent::MouseScrolledEvent>([this](Event::MouseEvent::MouseScrolledEvent& e) -> bool
-		{
-			float offset = e.GetOffsetY() + 1;
-			std::cout << offset << std::endl;
-			return true;
-		});
-}
+void Martian::OnEvent(Event::Event& e) {}
 void Martian::OnDetach() {}

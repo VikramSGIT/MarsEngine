@@ -2,19 +2,19 @@
 
 #include "Application.h"
 
-#include "Core/Utilites/String.h"
+#include "Vender/MTL/String.h"
 
 int main(int, char**)
 {
     ME_LOGINIT();
     ME_CORE_INFO("MARS ENGINE STARTING....");
-    ME_MEM_INIT();
+    InitAllocator();
     {
         auto app = ME::Application::CreateApp();
         app->Run();
         ME::dealloc(app);
     }
-    ME_MEM_CLEAR();
+    DeInitAllocator();
     ME_CORE_INFO("MARS ENGINE SHUTDOWN....");
     ME_LOGDEINIT();
     return 0;

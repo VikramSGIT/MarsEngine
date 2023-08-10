@@ -5,7 +5,7 @@
 
 #include "Vender/GLFW/glfw3.h"
 
-#include "Core/Utilites/String.h"
+#include "String.h"
 namespace ME
 {
     namespace Window

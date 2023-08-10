@@ -5,9 +5,9 @@
 
 #include "Window/Events/Event.h"
 #include "Core/Utilites/TimeStep.h"
-#include "Core/Utilites/String.h"
-#include "Core/Utilites/Vector.h"
-#include "Core/Utilites/Ref.h"
+#include "Vender/MTL/String.h"
+#include "Vender/MTL/Vector.h"
+#include "Vender/MTL/Ref.h"
 
 namespace ME
 {

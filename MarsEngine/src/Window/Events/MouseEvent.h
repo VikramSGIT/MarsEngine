@@ -26,7 +26,6 @@ namespace ME
 
                     ME_PROFILE_TRACE_CALL();
 
-
                 }
                 const double GetX() const { return m_MouseX; }
                 const double GetY() const { return m_MouseY; }

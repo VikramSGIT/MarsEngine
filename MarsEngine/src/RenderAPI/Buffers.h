@@ -1,9 +1,7 @@
-#ifndef ME_BUFFERS
-#define ME_BUFFERS
-
 #pragma once
 
-#include "Core/Utilites/Ref.h"
+#include "MarsFlags.h"
+#include "Vender/MTL/Ref.h"
 
 #include <vector>
 
@@ -68,5 +66,3 @@ namespace ME
         inline const unsigned int GetTotalCount() const { return m_Stride / sizeof(ME_DATATYPE); }
     };
 }
-
-#endif

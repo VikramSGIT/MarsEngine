@@ -9,7 +9,6 @@ namespace ME
 	{
 		Input* Input::s_Instance = nullptr;
 
-
 		Input* Input::Create()
 		{
 			switch (ME_PLATFORM)

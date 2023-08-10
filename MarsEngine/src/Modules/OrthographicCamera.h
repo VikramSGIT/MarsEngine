@@ -11,6 +11,7 @@ namespace ME
 	public:
 		OrthographicCamera(const ME_DATATYPE& left, const ME_DATATYPE& right, const ME_DATATYPE& bottom, const ME_DATATYPE& top);
 
+		void setProjection(const ME_DATATYPE& left, const ME_DATATYPE& right, const ME_DATATYPE& bottom, const ME_DATATYPE& top);
 		void setPosition(const glm::vec2& pos);
 		void setRotate(const ME_DATATYPE& rot);
 		void setZoom(const ME_DATATYPE& zoom);

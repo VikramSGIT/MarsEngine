@@ -18,7 +18,7 @@ namespace ME
 		ImGuiUIWindow() = default;
 		virtual void OnIOUpdate() override;
 
-		virtual bool UIWindowBegin(const int& flags) override;
+		virtual bool UIWindowBegin(const int& flags = 0) override;
 		virtual void UIWindowEnd() override;
 
 		virtual void setUIWindowPosition(const glm::uvec2& pos) override { m_NativeUIWindow->Pos = ImVec2(pos.x, pos.y); }
@@ -29,10 +29,13 @@ namespace ME
 
 		virtual const glm::uvec2& getUIWindowPosition() override { return m_Data.Position; }
 		virtual const glm::uvec2& getUIWindowSize() override { return m_Data.WindowSize; }
+		virtual const glm::uvec2& getUIContentSize() override { return m_Data.ContentSize; }
 		virtual const string& getUIWindowTitle() override { return m_Data.Title; }
-		virtual const bool& getUIWindowVisibility() override { return m_Data.Hidden; }
-		virtual const bool& getUIWindowFocus() override { return m_Data.Focus; }
 		virtual ImGuiWindow* getNativeUIWindow() override { return m_NativeUIWindow; }
+
+		virtual const bool& isMouseInside() override { return m_Data.MouseInside; }
+		virtual const bool& isUIWindowFocused() override { return m_Data.Focus; }
+		virtual const bool& isUIWindowVisibile() override { return m_Data.Hidden; }
 	private:
 		ImGuiWindow* m_NativeUIWindow = nullptr;
 
@@ -40,7 +43,7 @@ namespace ME
 		{
 			string Title = "New Window";
 			glm::uvec2 WindowSize, Position, ContentSize;
-			bool Focus = true, Maximize = true, Hidden = false;
+			bool Focus = true, Maximize = true, Hidden = false, MouseInside = false;
 
 			UICallbackFunction Callback;
 		} m_Data;
